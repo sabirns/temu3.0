@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="ml">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Campus Life Section with Writings</title>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+Malayalam:wght@400;500;600;700&display=swap"
+        rel="stylesheet" />
+
+    <style>
+        /* === YOUR EXISTING LIGHT THEME VARIABLES (for demo) === */
+        :root {
+            --bg0: #f8f9fa;
+            --bg1: #ffffff;
+            --card: rgba(255, 255, 255, 0.95);
+            --card2: rgba(255, 255, 255, 0.98);
+            --stroke: rgba(51, 51, 51, 0.12);
+            --text: #333333;
+            --muted: #666666;
+            --muted2: #888888;
+            --primary: #ac2629;
+            --secondary: #3a7549;
+            --accent: #f1af47;
+            --neutral: #333333;
+            --warn: #d9534f;
+            --success: #5cb85c;
+            --info: #5bc0de;
+
+            --radius: 16px;
+            --shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
+            --shadow2: 0 4px 20px rgba(0, 0, 0, 0.05);
+            --blur: 10px;
+            --container: 1200px;
+            --navH: 72px;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: Inter, "Noto Sans Malayalam", sans-serif;
+            background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
+            color: var(--text);
+            padding: 40px 20px;
+        }
+
+        .container {
+            max-width: var(--container);
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* ===== CAMPUS LIFE SECTION (with writings) ===== */
+        .campus-section {
+            padding: 60px 0;
+            position: relative;
+        }
+
+        /* highlight cards */
+        .campus-highlights {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 24px;
+            margin-bottom: 60px;
+        }
+
+        .campus-card {
+            background: var(--card);
+            border: 1px solid var(--stroke);
+            border-radius: var(--radius);
+            padding: 32px 24px;
+            backdrop-filter: blur(var(--blur));
+            box-shadow: var(--shadow);
+            transition: transform 0.2s ease, border-color 0.2s;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .campus-card:hover {
+            transform: translateY(-6px);
+            border-color: var(--primary);
+            background: var(--card2);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+        }
+
+        .card-icon {
+            font-size: 42px;
+            margin-bottom: 16px;
+            background: rgba(172, 38, 41, 0.05);
+            width: 70px;
+            height: 70px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 30% 70% 70% 30% / 30% 30% 70% 70%;
+            border: 2px solid rgba(172, 38, 41, 0.15);
+            color: var(--primary);
+        }
+
+        .campus-card h3 {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--neutral);
+            margin-bottom: 12px;
+        }
+
+        .campus-card p {
+            color: var(--muted);
+            font-size: 14px;
+            line-height: 1.6;
+            margin-bottom: 0;
+            flex-grow: 1;
+        }
+
+        .campus-quote {
+            font-style: italic;
+            color: var(--secondary);
+            border-left: 3px solid var(--accent);
+            padding-left: 16px;
+            margin-top: 8px;
+            font-size: 13px;
+            background: rgba(241, 175, 71, 0.05);
+            padding: 12px;
+            border-radius: 12px;
+        }
+
+        /* gallery with writings */
+        .campus-gallery {
+            margin: 50px 0;
+        }
+
+        .gallery-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+        }
+
+        @media (max-width: 980px) {
+            .gallery-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 560px) {
+            .gallery-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .gallery-item {
+            position: relative;
+            border-radius: 24px;
+            overflow: hidden;
+            aspect-ratio: 4/3;
+            border: 1px solid var(--stroke);
+            background: var(--card);
+            box-shadow: var(--shadow2);
+            transition: all 0.3s ease;
+        }
+
+        .gallery-item:hover {
+            transform: scale(1.01);
+            border-color: var(--primary);
+            box-shadow: 0 20px 30px rgba(172, 38, 41, 0.1);
+        }
+
+        .gallery-img {
+            width: 100%;
+            height: 100%;
+            background-size: cover;
+            background-position: center;
+            transition: transform 0.4s;
+        }
+
+        .gallery-item:hover .gallery-img {
+            transform: scale(1.05);
+        }
+
+        .gallery-caption {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: linear-gradient(to top, rgba(0, 0, 0, 0.8), transparent);
+            color: white;
+            padding: 20px 15px 15px;
+            font-weight: 600;
+            font-size: 14px;
+            transform: translateY(100%);
+            transition: transform 0.3s ease;
+            line-height: 1.5;
+        }
+
+        .gallery-item:hover .gallery-caption {
+            transform: translateY(0);
+        }
+
+        .gallery-caption small {
+            display: block;
+            font-size: 12px;
+            opacity: 0.9;
+            font-weight: 400;
+            margin-top: 4px;
+        }
+
+        /* facility chips */
+        .facility-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 15px;
+            margin: 40px 0;
+        }
+
+        @media (max-width: 980px) {
+            .facility-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+
+        @media (max-width: 560px) {
+            .facility-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        .facility-item {
+            background: var(--card);
+            border: 1px solid var(--stroke);
+            border-radius: 60px;
+            padding: 12px 15px;
+            text-align: center;
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--muted);
+            backdrop-filter: blur(4px);
+            box-shadow: var(--shadow2);
+            transition: all 0.2s;
+            white-space: nowrap;
+        }
+
+        .facility-item:hover {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(172, 38, 41, 0.2);
+        }
+
+        /* writings panel – campus story */
+        .campus-story {
+            background: var(--card2);
+            border: 1px solid var(--stroke);
+            border-radius: 40px;
+            padding: 40px;
+            margin: 50px 0;
+            box-shadow: var(--shadow);
+            backdrop-filter: blur(5px);
+            background-image: radial-gradient(circle at 100% 0%, rgba(172, 38, 41, 0.02) 0%, transparent 50%);
+        }
+
+        .story-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+            align-items: center;
+        }
+
+        @media (max-width: 768px) {
+            .story-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .story-text h3 {
+            font-size: 28px;
+            color: var(--primary);
+            font-weight: 800;
+            margin-bottom: 20px;
+            font-family: "Noto Sans Malayalam", Inter, sans-serif;
+        }
+
+        .story-text p {
+            color: var(--muted);
+            font-size: 16px;
+            line-height: 1.8;
+            margin-bottom: 20px;
+        }
+
+        .story-highlight {
+            background: rgba(58, 117, 73, 0.05);
+            border-left: 6px solid var(--secondary);
+            padding: 20px;
+            border-radius: 20px;
+            font-style: italic;
+            color: var(--neutral);
+            font-weight: 500;
+        }
+
+        .story-image {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border-radius: 30px;
+            height: 480px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 28px;
+            border: 8px solid white;
+            box-shadow: var(--shadow);
+            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300" width="400" height="300"><rect width="400" height="300" fill="%233a7549"/><circle cx="200" cy="150" r="60" fill="%23ac2629"/><text x="120" y="180" fill="white" font-size="28" font-family="Inter">കാമ്പസ്</text></svg>');
+            background-size: cover;
+        }
+
+        /* cta */
+        .campus-cta {
+            margin-top: 60px;
+            padding: 48px;
+            border-radius: 40px;
+            background: linear-gradient(135deg, rgba(172, 38, 41, 0.03), rgba(58, 117, 73, 0.03));
+            border: 1px solid var(--stroke);
+            text-align: center;
+        }
+
+        .campus-cta h3 {
+            font-size: 28px;
+            color: var(--primary);
+            font-weight: 800;
+            margin-bottom: 15px;
+        }
+
+        .campus-cta p {
+            color: var(--muted);
+            max-width: 600px;
+            margin: 0 auto 25px;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 14px 38px;
+            border-radius: 60px;
+            font-weight: 700;
+            text-decoration: none;
+            transition: all 0.2s;
+            border: 1px solid rgba(51, 51, 51, 0.15);
+            background: rgba(255, 255, 255, 0.9);
+            color: var(--text);
+        }
+
+        .btn.primary {
+            background: linear-gradient(135deg, var(--primary), #c03939);
+            color: white;
+            border: none;
+            box-shadow: 0 8px 25px rgba(172, 38, 41, 0.25);
+        }
+
+        .btn.primary:hover {
+            background: linear-gradient(135deg, #c03939, var(--primary));
+            transform: translateY(-3px);
+            box-shadow: 0 15px 35px rgba(172, 38, 41, 0.35);
+        }
+    </style>
+</head>
+
+<body>
+    <!-- ========== CAMPUS LIFE SECTION (with extensive writings) ========== -->
+    <section class="campus-section">
+        <div class="container">
+
+            <!-- campus story – longer writing panel -->
+            <div class="campus-story">
+                <div class="story-grid">
+                    <div class="story-text">
+                        <h3>കാമ്പസും കാമ്പസ് ജീവിതവും</h3>
+                        <p><b>അറിവ് പ്രകൃതിയെയും സംസ്കാരത്തെയും ഒന്നിപ്പിക്കുന്നിടം</b></p>
+                        <p>
+                            മലയാളസർവകലാശാലയുടെ കാമ്പസ് അവിശ്വസനീയമായ സ്വാഭാവിക സൗന്ദര്യവും, സമാധാനപൂർവകമായ പഠനവാതവരണവും
+                            വാഗ്ദാനം ചെയ്യുന്നു. ആധുനിക സൗകര്യങ്ങൾ, നീളംകൊണ്ട് വിരലെടുത്ത ശാഖകൾ, വൈവിധ്യമാർന്ന
+                            പഠനകേന്ദ്രങ്ങൾ, ഗവേഷണ പ്രോജക്റ്റുകൾ, ശാഖകളുമായി സമന്വയിച്ച കൃത്യമായ സൗകര്യങ്ങൾ എല്ലാം
+                            വിദ്യാർഥികൾക്ക് ഉത്തമമായ പഠന അനുഭവം നൽകുന്നു. വിപുലമായ ഗ്രന്ഥാലയം, വിശാലമായ ഗാർഡൻ, വിവിധ
+                            ശില്പകലാസംഗ്രഹങ്ങൾ, പൈതൃക മ്യൂസിയം തുടങ്ങിയവയും അതിന്റെ ഭാഗമാണ്. സഹജമായ പഠനവാതവരണവും
+                            സൗഹൃദപരമായ ക്ലാസുകൾ, വിദ്യാർത്ഥികളിൽ പ്രചോദനവും ഉന്നമനവും ഉണ്ടാക്കുന്നു.
+                        </p>
+                        <a href="#" class="btn primary" style="margin-left: 15px;">
+                            കൂടുതല്‍ വായിക്കുക →</a>
+                    </div>
+                    <div class="story-image"
+                        style="background-image: url('images/campus.jpg'); background-size: cover;">
+                        <!-- image placeholder with text -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- cards with descriptive text -->
+            <div class="campus-highlights">
+                <div class="campus-card">
+                    <div class="card-icon">🌳</div>
+                    <h3>ഹരിത കാമ്പസ്</h3>
+                    <p>മലയാളസർവകലാശാലയുടെ ഹരിത കാമ്പസ് പ്രകൃതിയുമായി പൂർണ്ണമായും ചേർന്നിരിക്കുന്നു. വിശാലമായ തോട്ടങ്ങളും
+                        പൂക്കളും ശുദ്ധമായ വായുമാലിന്യവും പഠനത്തിന് അനുയോജ്യമായ പരിസ്ഥിതി സൃഷ്ടിക്കുന്നു. കാലാവസ്ഥയുടെ
+                        മികച്ച അനുയോജ്യതയിൽ വിദ്യാർത്ഥികൾക്ക് ഉത്തമമായ പഠനവും വിശ്രമവും നൽകുന്നു.</p>
+                </div>
+                <div class="campus-card">
+                    <div class="card-icon">🏛️</div>
+                    <h3>ആധുനിക സൗകര്യങ്ങൾ</h3>
+                    <p>മലയാളസർവകലാശാലയിൽ ഏറ്റവും പുതിയ സാങ്കേതിക വിദ്യകളും ആധുനിക സൗകര്യങ്ങളും സമഗ്രമായ പഠനത്തിനായി
+                        ഒരുക്കിയിട്ടുണ്ട്. സ്മാർട്ട്ബോർഡുകൾ, കമ്പ്യൂട്ടർ ലാബുകൾ, wi-fi സൗകര്യങ്ങൾ, ഗ്രന്ഥാലയം,
+                        സപ്പോർട്ട് സേവനങ്ങൾ എന്നിവ വിദ്യാർത്ഥികൾക്ക് മികച്ച പഠന അനുഭവം നൽകുന്നു.</p>
+                </div>
+                <div class="campus-card">
+                    <div class="card-icon">🎭</div>
+                    <h3>കലാ സാംസ്കാരികം</h3>
+                    <p>മലയാളസർവകലാശാല പഠനവും കലാസാംസ്കാരിക പ്രവർത്തനങ്ങളും സമന്വയിച്ചുള്ള ഒരു പ്രധാന കേന്ദ്രമാണ്. ഓരോ
+                        വർഷവും കലാപരിപാടികൾ, നാടകങ്ങൾ, സംഗീതമേളകൾ, കലാസമ്മേളനങ്ങൾ എന്നിവ വിദ്യാർത്ഥികളുടെ സൃഷ്ടിപരമായ
+                        കഴിവുകളെ മികവുറ്റവാക്കുന്നു. സാംസ്കാരിക വൈവിധ്യത്തിന് ഉത്തമ പ്രോത്സാഹനമാണ് ഇവിടെ നൽകപ്പെടുന്നത്.
+                    </p>
+                </div>
+            </div>
+
+            <!-- facility chips (short) -->
+            <div class="facility-grid">
+                <span class="facility-item">ഐ.ടി സൗകര്യങ്ങൾ</span>
+                <span class="facility-item">ഗ്രന്ഥാലയം</span>
+                <span class="facility-item">മ്യൂസിയം</span>
+                <span class="facility-item">തിയേറ്റർ</span>
+                <span class="facility-item">യാത്രാസൗകര്യങ്ങൾ</span>
+                <span class="facility-item">സ്പോർട്സ്</span>
+                <span class="facility-item">ഭാഷാ ലാബ്</span>
+                <span class="facility-item">ശാസ്ത്ര ലാബ്</span>
+                <span class="facility-item">മീഡിയ ലാബ്</span>
+                <span class="facility-item">ഇ-ലേണിംഗ് സൗകര്യങ്ങൾ</span>
+                <span class="facility-item">കയ്യെഴുത്തു ഗ്രന്ഥാലയം</span>
+                <span class="facility-item">ഫീൽഡ് ട്രിപ്പുകൾ</span>
+                <span class="facility-item">ഇന്റേൺഷിപ്പ്</span>
+                <span class="facility-item">ആരോഗ്യവും ക്ഷേമവും കേന്ദ്രം</span>
+            </div>
+
+            <!-- call to action -->
+            <div class="campus-cta">
+                <h3>കാമ്പസ് നേരിൽ കാണൂ ·</h3>
+                <p>മലയാളസർവകലാശാലയുടെ വിവിധ കാമ്പസ് സൗകര്യങ്ങൾ, അങ്കണങ്ങൾ, ക്ലാസുകൾ, ഗാർഡൻ, ലൈബ്രറി, മ്യൂസിയം എന്നിവ
+                    ദൂരവീക്ഷണത്തിലൂടെ അനുഭവപ്പെടുന്നതിനുള്ള ഒരു ഓൺലൈൻ സവാരി ആണ്.</p>
+                <a href="#" class="btn primary" style="margin-left: 15px;">📷 Virtual tour →</a>
+            </div>
+        </div>
+    </section>
+</body>
+
+</html>

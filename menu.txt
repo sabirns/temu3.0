@@ -1,0 +1,388 @@
+ <nav class="main-nav" aria-label="Primary Navigation">
+                    <ul class="nav-menu justify-content-center">
+                        <li class="nav-item">
+                            <a class="nav-link" href="#home">🏠 പൂമുഖം</a>
+                        </li>
+
+                        <li class="nav-item has-dropdown" data-dd>
+                            <a class="nav-link" href="#university" aria-haspopup="true" aria-expanded="false">
+                                🏛️ സർവകലാശാല <span class="dropdown-arrow">▼</span>
+                            </a>
+                            <div class="dropdown-menu">
+                                <div class="dropdown-header">University Overview</div>
+                                <div class="dropdown-grid">
+                                    <a href="#about" class="dropdown-item">
+                                        <span class="item-icon">📖</span>
+                                        <div>
+                                            <strong>സർവകലാശാല (Overview)</strong>
+                                            <span>ചരിത്രം, ലക്ഷ്യം, ദൗത്യം</span>
+                                        </div>
+                                    </a>
+                                    <a href="#acts" class="dropdown-item">
+                                        <span class="item-icon">⚖️</span>
+                                        <div>
+                                            <strong>ആക്റ്റും സ്റ്റാറ്റ്യുട്ടും</strong>
+                                            <span>നിയമങ്ങൾ, ചട്ടങ്ങൾ</span>
+                                        </div>
+                                    </a>
+                                    <a href="#development" class="dropdown-item">
+                                        <span class="item-icon">🗺️</span>
+                                        <div>
+                                            <strong>സ്ഥാപന വികസന പദ്ധതി</strong>
+                                            <span>Roadmap & strategic plan</span>
+                                        </div>
+                                    </a>
+                                    <a href="#rti" class="dropdown-item">
+                                        <span class="item-icon">📋</span>
+                                        <div>
+                                            <strong>വിവരാവകാശം (RTI)</strong>
+                                            <span>RTI വിവരങ്ങൾ</span>
+                                        </div>
+                                    </a>
+                                </div>
+                            </div>
+                        </li>
+
+                        <li class="nav-item has-dropdown" data-dd>
+                            <a class="nav-link" href="#governance" aria-haspopup="true" aria-expanded="false">
+                                👥 ഭരണം <span class="dropdown-arrow">▼</span>
+                            </a>
+                            <div class="dropdown-menu">
+                                <div class="dropdown-header">Governance & Leadership</div>
+                                <div class="dropdown-grid">
+                                    <a href="#governance" class="dropdown-item">
+                                        <span class="item-icon">👑</span>
+                                        <div>
+                                            <strong>ചാൻസലർ / പ്രോ-ചാൻസലർ</strong>
+                                            <span>Leadership pages</span>
+                                        </div>
+                                    </a>
+                                    <a href="#governance" class="dropdown-item">
+                                        <span class="item-icon">🎓</span>
+                                        <div>
+                                            <strong>വൈസ് ചാൻസലർ</strong>
+                                            <span>Vice-Chancellor</span>
+                                        </div>
+                                    </a>
+                                    <a href="#governance" class="dropdown-item">
+                                        <span class="item-icon">🏛️</span>
+                                        <div>
+                                            <strong>ഭരണസംവിധാനം</strong>
+                                            <span>പൊതുസഭ, സമിതി, കൗൺസിൽ</span>
+                                        </div>
+                                    </a>
+                                </div>
+                            </div>
+                        </li>
+
+                        <!-- MEGA MENU -->
+                        <li class="nav-item has-megamenu" data-dd>
+                            <a class="nav-link" href="#academics" aria-haspopup="true" aria-expanded="false">
+                                📚 വിഭാഗങ്ങൾ <span class="dropdown-arrow">▼</span>
+                            </a>
+                            <div class="megamenu">
+                                <div class="megamenu-grid">
+                                    <div class="megamenu-col">
+                                        <h4>അക്കാദമികം</h4>
+                                        <div class="megamenu-links">
+                                            <a href="#academics"><strong>ഫാക്കൽറ്റികൾ</strong><span>Faculty /
+                                                    Schools</span></a>
+                                            <a href="#programs"><strong>പ്രോഗ്രാമുകൾ</strong><span>UG / PG /
+                                                    Ph.D</span></a>
+                                            <a href="#calendar"><strong>അക്കാദമിക് കലണ്ടർ</strong><span>Academic
+                                                    calendar</span></a>
+                                            <a href="#library"><strong>ലൈബ്രറി</strong><span>Library
+                                                    resources</span></a>
+                                            <a href="#lms"><strong>എൽ.എം.എസ്</strong><span>Learning portal</span></a>
+                                        </div>
+                                    </div>
+
+                                    <div class="megamenu-col">
+                                        <h4>പ്രവേശനം & പരീക്ഷ</h4>
+                                        <div class="megamenu-links">
+                                            <a href="#admissions"><strong>പ്രവേശനം</strong><span>Admission
+                                                    info</span></a>
+                                            <a href="#exams"><strong>പരീക്ഷാ
+                                                    വിജ്ഞാപനം</strong><span>Notifications</span></a>
+                                            <a href="#exams"><strong>പരീക്ഷാ സമയക്രമം</strong><span>Timetable</span></a>
+                                            <a href="#exams"><strong>പരീക്ഷാഫലം</strong><span>Results</span></a>
+                                            <a href="#exams"><strong>ചോദ്യപേപ്പറുകൾ</strong><span>Previous
+                                                    papers</span></a>
+                                        </div>
+                                    </div>
+
+                                    <div class="megamenu-col">
+                                        <h4>ഗവേഷണം & പിന്തുണ</h4>
+                                        <div class="megamenu-links">
+                                            <a href="#research"><strong>ഗവേഷണം</strong><span>Research
+                                                    ecosystem</span></a>
+                                            <a href="#student-support"><strong>വിദ്യാർത്ഥി
+                                                    പിന്തുണ</strong><span>Services & portals</span></a>
+                                            <a href="#campus"><strong>കാമ്പസ് സൗഹൃദം</strong><span>Committees</span></a>
+                                            <a href="#publications"><strong>പ്രസാധനം</strong><span>Books,
+                                                    Journals</span></a>
+                                            <a href="#contact"><strong>ബന്ധപ്പെടുക</strong><span>Contact &
+                                                    directory</span></a>
+                                        </div>
+                                    </div>
+
+                                    <div class="megamenu-col highlight">
+                                        <h4>Quick Links</h4>
+                                        <div class="megamenu-links">
+                                            <a href="#initiatives" class="highlight-link">
+                                                <strong>പദ്ധതികളും സംരംഭങ്ങളും</strong>
+                                                <span>Centers • Chairs • Museum</span>
+                                            </a>
+                                            <a href="#updates" class="highlight-link">
+                                                <strong>വിശേഷങ്ങൾ / ദർഘാസ് / ഉത്തരവുകൾ</strong>
+                                                <span>Events • Tenders • Orders</span>
+                                            </a>
+                                            <a href="#quick" class="highlight-link">
+                                                <strong>പ്രധാന ലിങ്കുകൾ</strong>
+                                                <span>External • Internal portals</span>
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </li>
+
+                        <li class="nav-item">
+                            <a class="nav-link" href="#initiatives">🚀 പദ്ധതികളും സംരംഭങ്ങളും</a>
+                        </li>
+
+                        <li class="nav-item">
+                            <a class="nav-link" href="#updates">📢 വിശേഷങ്ങൾ</a>
+                        </li>
+
+                        <li class="nav-item">
+                            <a class="nav-link" href="#contact">📞 ബന്ധപ്പെടുക</a>
+                        </li>
+
+                        <li class="nav-item cta">
+                            <a class="nav-link btn-primary" href="#admissions">
+                                <span>🎯 പ്രവേശനം</span>
+                            </a>
+                        </li>
+                    </ul>
+
+                    <!-- Mobile Menu Toggle -->
+                    <button class="mobile-toggle" id="burger" aria-label="Open menu">
+                        <span class="bar"></span>
+                        <span class="bar"></span>
+                        <span class="bar"></span>
+                    </button>
+                </nav>
+├── 01_HOME
+│   ├── Text
+│   │   ├── Welcome_Message.md
+│   │   ├── University_Overview.md
+│   │   └── Latest_Announcements.md
+│   ├── Images
+│   │   ├── Banner
+│   │   └── Highlights
+│   └── Videos
+│       └── Promo
+│
+├── 02_ABOUT_UNIVERSITY
+│   ├── Vision_Mission
+│   ├── History
+│   ├── Acts_Statutes_Ordinances
+│   ├── Annual_Reports
+│   ├── Mandatory_Disclosures
+│   ├── Images
+│   └── Videos
+│
+├── 03_GOVERNANCE
+│   ├── Chancellor_VC
+│   ├── Syndicate
+│   ├── Academic_Council
+│   ├── Finance_Committee
+│   ├── Administration
+│   ├── Policies
+│   └── Images
+│
+├── 04_ACADEMICS
+│   ├── Schools
+│   ├── Departments
+│   │
+│   │   ├── Department_Malayalam_Language_Studies
+│   │   │   ├── 01_Overview
+│   │   │   ├── 02_Programmes
+│   │   │   ├── 03_Faculty
+│   │   │   ├── 04_Infrastructure
+│   │   │   ├── 05_Research_Publications
+│   │   │   ├── 06_Students
+│   │   │   ├── 07_Curriculum_Resources
+│   │   │   ├── 08_Activities_Events
+│   │   │   ├── 09_Projects_Internships
+│   │   │   ├── 10_NAAC_Disclosures
+│   │   │   ├── 11_Downloads
+│   │   │   ├── 12_Contact
+│   │   │   ├── Images
+│   │   │   └── Videos
+│   │
+│   │   ├── Department_Malayalam_Literature
+│   │   ├── Department_Malayalam_Creative_Writing
+│   │   ├── Department_Malayalam_Cultural_Heritage
+│   │   ├── Department_Comparative_Literature
+│   │   ├── Department_Linguistics
+│   │   ├── Department_Film_Studies
+│   │   ├── Department_Journalism_and_Mass_Communication
+│   │   ├── Department_Environmental_Studies
+│   │   ├── Department_Development_Studies
+│   │   ├── Department_History
+│   │   └── Department_Sociology
+│   │
+│   ├── Programmes
+│   ├── Academic_Calendar
+│   └── Regulations
+│
+├── 05_ADMISSIONS
+│   ├── Prospectus
+│   ├── Admission_Process
+│   ├── Eligibility
+│   ├── Fee_Structure
+│   ├── Notifications
+│   └── Images
+│
+├── 06_EXAMINATIONS
+│   ├── Timetable
+│   ├── Results
+│   ├── Forms
+│   ├── Regulations
+│   └── Notifications
+│
+├── 07_RESEARCH
+│   ├── Research_Centers
+│   ├── Projects_Grants
+│   ├── Publications
+│   ├── Patents_IPR
+│   ├── MoUs_Collaborations
+│   ├── Extension_Activities
+│   └── Images
+│
+├── 08_STUDENT_SUPPORT
+│   ├── Scholarships
+│   ├── Placement_Career
+│   ├── Counseling_Health
+│   ├── Hostels_Amenities
+│   ├── Clubs_NSS_NCC
+│   ├── Anti_Ragging
+│   ├── Grievance_Redressal
+│   ├── ICC
+│   └── Equal_Opportunity_Cell
+│
+├── 09_LIBRARY
+│   ├── About_Library
+│   ├── OPAC
+│   ├── E_Resources
+│   ├── Library_Rules
+│   ├── Staff
+│   └── Images
+│
+├── 10_STATUTORY_CELLS
+│   ├── IQAC
+│   │   ├── Composition
+│   │   ├── Minutes
+│   │   ├── Action_Taken_Reports
+│   │   └── AQAR
+│   ├── SC_ST_Cell
+│   ├── OBC_Minority_Cell
+│   ├── Anti_Ragging_Committee
+│   ├── Grievance_Committee
+│   └── Ethics_Committee
+│
+├── 11_IQAC_NAAC
+│   ├── NAAC_Certificates
+│   ├── Self_Study_Report_SSR
+│   ├── Peer_Team_Report
+│   ├── AQAR_Yearwise
+│   ├── Best_Practices
+│   └── Institutional_Distinctiveness
+│
+├── 12_ALUMNI
+│   ├── Alumni_Association
+│   ├── Distinguished_Alumni
+│   ├── Events_Reunions
+│   └── Alumni_Feedback
+│
+├── 13_RTI
+│   ├── PIO_Details
+│   ├── RTI_Guidelines
+│   ├── Proactive_Disclosure
+│   └── Applications_Responses
+│
+└── 14_CONTACT
+    ├── Address_Map
+    ├── Phone_Email
+    ├── Helplines
+    ├── Enquiry_Form_Content
+    └── Social_Media_Links
+
+
+    <div class="mobile-sheet" id="mobileSheet" aria-hidden="true">
+        <div class="mobile-panel" role="dialog" aria-modal="true" aria-label="Mobile menu">
+            <div class="mobile-head">
+                <strong>Menu</strong>
+                <button class="btn" id="closeMobile">Close</button>
+            </div>
+
+            <div class="mobile-list">
+                <a class="mobile-link" href="#home" onclick="closeMobile()">പൂമുഖം</a>
+
+                <details>
+                    <summary>സർവകലാശാല <span style="opacity:.7">▾</span></summary>
+                    <div class="detail-body">
+                        <a class="mobile-link" href="#about" onclick="closeMobile()">സർവകലാശാല (Overview)</a>
+                        <a class="mobile-link" href="#acts" onclick="closeMobile()">ആക്റ്റും സ്റ്റാറ്റ്യുട്ടും</a>
+                        <a class="mobile-link" href="#development" onclick="closeMobile()">സ്ഥാപന വികസന പദ്ധതി</a>
+                        <a class="mobile-link" href="#rti" onclick="closeMobile()">വിവരാവകാശം (RTI)</a>
+                    </div>
+                </details>
+
+                <details>
+                    <summary>ഭരണം <span style="opacity:.7">▾</span></summary>
+                    <div class="detail-body">
+                        <a class="mobile-link" href="#governance" onclick="closeMobile()">ചാൻസലർ / പ്രോ-ചാൻസലർ</a>
+                        <a class="mobile-link" href="#governance" onclick="closeMobile()">വൈസ് ചാൻസലർ</a>
+                        <a class="mobile-link" href="#governance" onclick="closeMobile()">ഭരണസംവിധാനം</a>
+                    </div>
+                </details>
+
+                <details>
+                    <summary>അക്കാദമികം <span style="opacity:.7">▾</span></summary>
+                    <div class="detail-body">
+                        <a class="mobile-link" href="#academics" onclick="closeMobile()">ഫാക്കൽറ്റികൾ</a>
+                        <a class="mobile-link" href="#programs" onclick="closeMobile()">പ്രോഗ്രാമുകൾ</a>
+                        <a class="mobile-link" href="#calendar" onclick="closeMobile()">അക്കാദമിക് കലണ്ടർ</a>
+                        <a class="mobile-link" href="#library" onclick="closeMobile()">ലൈബ്രറി</a>
+                        <a class="mobile-link" href="#lms" onclick="closeMobile()">എൽ.എം.എസ്</a>
+                    </div>
+                </details>
+
+                <details>
+                    <summary>പ്രവേശനം & പരീക്ഷ <span style="opacity:.7">▾</span></summary>
+                    <div class="detail-body">
+                        <a class="mobile-link" href="#admissions" onclick="closeMobile()">പ്രവേശനം</a>
+                        <a class="mobile-link" href="#exams" onclick="closeMobile()">പരീക്ഷ</a>
+                    </div>
+                </details>
+
+                <details>
+                    <summary>ഗവേഷണം & പിന്തുണ <span style="opacity:.7">▾</span></summary>
+                    <div class="detail-body">
+                        <a class="mobile-link" href="#research" onclick="closeMobile()">ഗവേഷണം</a>
+                        <a class="mobile-link" href="#student-support" onclick="closeMobile()">വിദ്യാർത്ഥി പിന്തുണ</a>
+                        <a class="mobile-link" href="#campus" onclick="closeMobile()">കാമ്പസ് സൗഹൃദം</a>
+                        <a class="mobile-link" href="#publications" onclick="closeMobile()">പ്രസാധനം</a>
+                    </div>
+                </details>
+
+                <a class="mobile-link" href="#initiatives" onclick="closeMobile()">പദ്ധതികളും സംരംഭങ്ങളും</a>
+                <a class="mobile-link" href="#updates" onclick="closeMobile()">വിശേഷങ്ങൾ / ദർഘാസ് / ഉത്തരവുകൾ</a>
+                <a class="mobile-link" href="#quick" onclick="closeMobile()">പ്രധാന ലിങ്കുകൾ</a>
+                <a class="mobile-link" href="#contact" onclick="closeMobile()">ബന്ധപ്പെടുക</a>
+            </div>
+        </div>
+    </div>

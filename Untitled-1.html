@@ -1,0 +1,4631 @@
+<!doctype html>
+<html lang="ml">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>മലയാള സർവകലാശാല | Futuristic Website (Demo)</title>
+
+    <!-- Google Fonts (optional) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+Malayalam:wght@400;500;600;700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="css/style-dark.css">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body>
+    <div class="grid-bg" aria-hidden="true"></div>
+
+    <!-- TOPBAR -->
+    <!-- TWO-PART HEADER -->
+    <header class="header">
+        <!-- TOP SECTION: Logo + Quick Actions -->
+        <div class="header-top">
+            <div class="container">
+                <div class="header-top-inner">
+                    <!-- Logo (smaller) -->
+                    <a class="logo-link" href="#home" aria-label="Home">
+                        <img src="images/malayalam-university-logo.png" alt="Malayalam University Logo">
+                    </a>
+
+                    <!-- Quick Actions -->
+                    <div class="quick-actions">
+                        <div class="contact-info">
+                            <span class="contact-item">
+                                <span style="opacity:.7">📞</span>
+                                <span>Helpline: 123-456-7890</span>
+                            </span>
+                            <span class="contact-item">
+                                <span style="opacity:.7">✉️</span>
+                                <span>info@malayalamuniversity.edu</span>
+                            </span>
+                        </div>
+
+                        <div class="action-buttons">
+                            <a href="https://lms.temu.ac.in/" target="_blank" class="btn btn-small" rel="noreferrer">
+                                <span>LMS</span>
+                            </a>
+                            <a href="#search" class="btn btn-small"
+                                onclick="showToast('Search functionality can be added here')">
+                                <span>🔍</span>
+                            </a>
+                            <div class="toggle" id="langToggle" title="Language toggle">
+                                <span class="dot" aria-hidden="true"></span>
+                                <span id="langLabel">ML</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- BOTTOM SECTION: Full Navigation Menu -->
+        <div class="header-bottom">
+            <div class="container-fluid">
+                <nav class="main-nav" aria-label="Primary Navigation">
+                    <ul class="nav-menu justify-content-center">
+
+                        <!-- HOME -->
+                        <li class="nav-item">
+                            <a class="nav-link" href="#home">Home</a>
+                        </li>
+
+                        <!-- ABOUT US -->
+                        <li class="nav-item has-dropdown" data-dd>
+                            <a class="nav-link" href="#about" aria-haspopup="true" aria-expanded="false">
+                                About Us <span class="dropdown-arrow">▼</span>
+                            </a>
+                            <div class="dropdown-menu">
+                                <div class="dropdown-header">About the University</div>
+                                <div class="dropdown-grid">
+
+                                    <a href="#vision-mission" class="dropdown-item">
+                                        <div>
+                                            <strong>Vision & Mission</strong>
+                                            <span>Purpose and goals</span>
+                                        </div>
+                                    </a>
+
+                                    <a href="#history-overview" class="dropdown-item">
+                                        <div>
+                                            <strong>History & Overview</strong>
+                                            <span>Background, motto, establishment</span>
+                                        </div>
+                                    </a>
+
+                                    <a href="#organizational-profile" class="dropdown-item">
+                                        <div>
+                                            <strong>Organizational Profile</strong>
+                                            <span>Acts, recognitions, development plan</span>
+                                        </div>
+                                    </a>
+
+                                    <a href="#mandatory-disclosures" class="dropdown-item">
+                                        <div>
+                                            <strong>Mandatory Disclosures</strong>
+                                            <span>UGC/NAAC required disclosures</span>
+                                        </div>
+                                    </a>
+
+                                    <a href="#annual-reports" class="dropdown-item">
+                                        <div>
+                                            <strong>Annual Reports & Accounts</strong>
+                                            <span>Reports and audited statements</span>
+                                        </div>
+                                    </a>
+
+                                </div>
+                            </div>
+                        </li>
+
+                        <!-- GOVERNANCE -->
+                        <li class="nav-item has-dropdown" data-dd>
+                            <a class="nav-link" href="#governance" aria-haspopup="true" aria-expanded="false">
+                                Governance <span class="dropdown-arrow">▼</span>
+                            </a>
+                            <div class="dropdown-menu">
+                                <div class="dropdown-header">Governance & Administration</div>
+                                <div class="dropdown-grid">
+
+                                    <a href="#leadership" class="dropdown-item">
+                                        <div>
+                                            <strong>Leadership</strong>
+                                            <span>Chancellor, VC, Registrar, etc.</span>
+                                        </div>
+                                    </a>
+
+                                    <a href="#governing-bodies" class="dropdown-item">
+                                        <div>
+                                            <strong>Governing Bodies</strong>
+                                            <span>Syndicate, Academic Council, Boards</span>
+                                        </div>
+                                    </a>
+
+                                    <a href="#administration" class="dropdown-item">
+                                        <div>
+                                            <strong>Administration</strong>
+                                            <span>Offices, structure, key officials</span>
+                                        </div>
+                                    </a>
+
+                                    <a href="#acts-statutes-policies" class="dropdown-item">
+                                        <div>
+                                            <strong>Acts, Statutes & Policies</strong>
+                                            <span>Act, statutes, ordinances, policies</span>
+                                        </div>
+                                    </a>
+
+                                </div>
+                            </div>
+                        </li>
+
+                        <!-- ACADEMICS MEGA MENU -->
+                        <li class="nav-item has-megamenu" data-dd>
+                            <a class="nav-link" href="#academics" aria-haspopup="true" aria-expanded="false">
+                                Academics <span class="dropdown-arrow">▼</span>
+                            </a>
+
+                            <div class="megamenu">
+                                <div class="megamenu-grid">
+
+                                    <div class="megamenu-col">
+                                        <h4>Academics</h4>
+                                        <div class="megamenu-links">
+                                            <a href="#departments-schools"><strong>Departments &
+                                                    Schools</strong><span>Faculties and departments</span></a>
+                                            <a href="#programs-courses"><strong>Programs & Courses</strong><span>UG / PG
+                                                    / PhD details</span></a>
+                                            <a href="#academic-calendar"><strong>Academic
+                                                    Calendar</strong><span>Important dates</span></a>
+                                            <a href="#academic-regulations"><strong>Academic
+                                                    Regulations</strong><span>Rules and guidelines</span></a>
+                                            <a href="#collaborations"><strong>Collaborations</strong><span>MoUs and
+                                                    exchanges</span></a>
+                                        </div>
+                                    </div>
+
+                                    <div class="megamenu-col">
+                                        <h4>Admissions & Examinations</h4>
+                                        <div class="megamenu-links">
+                                            <a href="#admissions"><strong>Admissions</strong><span>Process and
+                                                    criteria</span></a>
+                                            <a href="#prospectus"><strong>Prospectus</strong><span>Intake, fees, refund
+                                                    policy</span></a>
+                                            <a href="#examinations"><strong>Examinations</strong><span>Timetable, rules,
+                                                    forms</span></a>
+                                            <a href="#results"><strong>Results</strong><span>Result portal and
+                                                    updates</span></a>
+                                        </div>
+                                    </div>
+
+                                    <div class="megamenu-col">
+                                        <h4>Research & Learning</h4>
+                                        <div class="megamenu-links">
+                                            <a href="#research"><strong>Research</strong><span>Research
+                                                    ecosystem</span></a>
+                                            <a href="#research-centers"><strong>Research Centers</strong><span>Centers
+                                                    and cells</span></a>
+                                            <a href="#library"><strong>Library</strong><span>Learning
+                                                    resources</span></a>
+                                            <a href="#student-support"><strong>Student Support</strong><span>Welfare and
+                                                    services</span></a>
+                                        </div>
+                                    </div>
+
+                                    <div class="megamenu-col highlight">
+                                        <h4>Quality & Compliance</h4>
+                                        <div class="megamenu-links">
+                                            <a href="#iqac" class="highlight-link">
+                                                <strong>IQAC & Accreditation</strong>
+                                                <span>NAAC, SSR, AQAR</span>
+                                            </a>
+                                            <a href="#statutory-cells" class="highlight-link">
+                                                <strong>Statutory Cells & Committees</strong>
+                                                <span>UGC/NAAC mandated cells</span>
+                                            </a>
+                                            <a href="#rti" class="highlight-link">
+                                                <strong>RTI</strong>
+                                                <span>Right to Information</span>
+                                            </a>
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </div>
+                        </li>
+
+                        <!-- RESEARCH -->
+                        <li class="nav-item has-dropdown" data-dd>
+                            <a class="nav-link" href="#research" aria-haspopup="true" aria-expanded="false">
+                                Research <span class="dropdown-arrow">▼</span>
+                            </a>
+                            <div class="dropdown-menu">
+                                <div class="dropdown-header">Research, Innovation & Extension</div>
+                                <div class="dropdown-grid">
+
+                                    <a href="#research-centers" class="dropdown-item">
+                                        <div>
+                                            <strong>Research Centers & Cells</strong>
+                                            <span>Centers of excellence and R&D</span>
+                                        </div>
+                                    </a>
+
+                                    <a href="#projects-grants" class="dropdown-item">
+                                        <div>
+                                            <strong>Projects & Grants</strong>
+                                            <span>Funded projects and outcomes</span>
+                                        </div>
+                                    </a>
+
+                                    <a href="#publications" class="dropdown-item">
+                                        <div>
+                                            <strong>Publications</strong>
+                                            <span>Journals, conferences, repository</span>
+                                        </div>
+                                    </a>
+
+                                    <a href="#patents-ipr" class="dropdown-item">
+                                        <div>
+                                            <strong>Patents & IPR</strong>
+                                            <span>IPR cell and patents</span>
+                                        </div>
+                                    </a>
+
+                                    <a href="#consultancy-collaboration" class="dropdown-item">
+                                        <div>
+                                            <strong>Consultancy & Collaborations</strong>
+                                            <span>Industry and academic partnerships</span>
+                                        </div>
+                                    </a>
+
+                                    <a href="#extension-activities" class="dropdown-item">
+                                        <div>
+                                            <strong>Extension Activities</strong>
+                                            <span>NSS/NCC and community outreach</span>
+                                        </div>
+                                    </a>
+
+                                </div>
+                            </div>
+                        </li>
+
+                        <!-- STUDENT SUPPORT -->
+                        <li class="nav-item has-dropdown" data-dd>
+                            <a class="nav-link" href="#student-support" aria-haspopup="true" aria-expanded="false">
+                                Student Support <span class="dropdown-arrow">▼</span>
+                            </a>
+                            <div class="dropdown-menu">
+                                <div class="dropdown-header">Student Welfare & Progression</div>
+                                <div class="dropdown-grid">
+
+                                    <a href="#scholarships" class="dropdown-item">
+                                        <div>
+                                            <strong>Scholarships & Financial Aid</strong>
+                                            <span>Scholarships, waivers, schemes</span>
+                                        </div>
+                                    </a>
+
+                                    <a href="#placement" class="dropdown-item">
+                                        <div>
+                                            <strong>Career Guidance & Placement</strong>
+                                            <span>Training, recruiters, statistics</span>
+                                        </div>
+                                    </a>
+
+                                    <a href="#counseling-health" class="dropdown-item">
+                                        <div>
+                                            <strong>Counseling & Health Services</strong>
+                                            <span>Guidance and medical support</span>
+                                        </div>
+                                    </a>
+
+                                    <a href="#hostels-amenities" class="dropdown-item">
+                                        <div>
+                                            <strong>Hostels & Amenities</strong>
+                                            <span>Hostel, transport, dining</span>
+                                        </div>
+                                    </a>
+
+                                    <a href="#clubs-extracurricular" class="dropdown-item">
+                                        <div>
+                                            <strong>Clubs & Extracurricular</strong>
+                                            <span>Sports, arts, NSS/NCC</span>
+                                        </div>
+                                    </a>
+
+                                    <a href="#anti-ragging" class="dropdown-item">
+                                        <div>
+                                            <strong>Anti-Ragging Cell</strong>
+                                            <span>Policy, helplines, committee</span>
+                                        </div>
+                                    </a>
+
+                                    <a href="#grievance-redressal" class="dropdown-item">
+                                        <div>
+                                            <strong>Grievance Redressal</strong>
+                                            <span>Online portal and process</span>
+                                        </div>
+                                    </a>
+
+                                    <a href="#icc" class="dropdown-item">
+                                        <div>
+                                            <strong>Internal Complaints Committee</strong>
+                                            <span>POSH policy and reporting</span>
+                                        </div>
+                                    </a>
+
+                                    <a href="#equal-opportunity" class="dropdown-item">
+                                        <div>
+                                            <strong>Equal Opportunity Cell</strong>
+                                            <span>Inclusion and accessibility</span>
+                                        </div>
+                                    </a>
+
+                                    <a href="#student-feedback" class="dropdown-item">
+                                        <div>
+                                            <strong>Student Feedback</strong>
+                                            <span>Feedback forms and surveys</span>
+                                        </div>
+                                    </a>
+
+                                </div>
+                            </div>
+                        </li>
+
+                        <!-- LIBRARY -->
+                        <li class="nav-item has-dropdown" data-dd>
+                            <a class="nav-link" href="#library" aria-haspopup="true" aria-expanded="false">
+                                Library <span class="dropdown-arrow">▼</span>
+                            </a>
+                            <div class="dropdown-menu">
+                                <div class="dropdown-header">Library & E-Resources</div>
+                                <div class="dropdown-grid">
+
+                                    <a href="#library-about" class="dropdown-item">
+                                        <div>
+                                            <strong>About the Library</strong>
+                                            <span>Facilities and services</span>
+                                        </div>
+                                    </a>
+
+                                    <a href="#opac" class="dropdown-item">
+                                        <div>
+                                            <strong>Catalog & OPAC</strong>
+                                            <span>Search library holdings</span>
+                                        </div>
+                                    </a>
+
+                                    <a href="#e-resources" class="dropdown-item">
+                                        <div>
+                                            <strong>E-Resources</strong>
+                                            <span>NDL, INFLIBNET, databases</span>
+                                        </div>
+                                    </a>
+
+                                    <a href="#library-services" class="dropdown-item">
+                                        <div>
+                                            <strong>Library Services</strong>
+                                            <span>Rules, timings, access</span>
+                                        </div>
+                                    </a>
+
+                                    <a href="#library-staff" class="dropdown-item">
+                                        <div>
+                                            <strong>Library Staff</strong>
+                                            <span>Contacts and assistance</span>
+                                        </div>
+                                    </a>
+
+                                </div>
+                            </div>
+                        </li>
+
+                        <!-- STATUTORY CELLS -->
+                        <li class="nav-item has-dropdown" data-dd>
+                            <a class="nav-link" href="#statutory-cells" aria-haspopup="true" aria-expanded="false">
+                                Statutory Cells <span class="dropdown-arrow">▼</span>
+                            </a>
+                            <div class="dropdown-menu">
+                                <div class="dropdown-header">Statutory Cells & Committees</div>
+                                <div class="dropdown-grid">
+
+                                    <a href="#sc-st-cell" class="dropdown-item">
+                                        <div>
+                                            <strong>SC/ST Cell</strong>
+                                            <span>Welfare and support</span>
+                                        </div>
+                                    </a>
+
+                                    <a href="#obc-minority-cell" class="dropdown-item">
+                                        <div>
+                                            <strong>OBC / Minority Cell</strong>
+                                            <span>Support and initiatives</span>
+                                        </div>
+                                    </a>
+
+                                    <a href="#womens-cell" class="dropdown-item">
+                                        <div>
+                                            <strong>Women’s Cell</strong>
+                                            <span>Empowerment and safety</span>
+                                        </div>
+                                    </a>
+
+                                    <a href="#icc" class="dropdown-item">
+                                        <div>
+                                            <strong>Internal Complaints Committee</strong>
+                                            <span>POSH compliance</span>
+                                        </div>
+                                    </a>
+
+                                    <a href="#anti-ragging-committee" class="dropdown-item">
+                                        <div>
+                                            <strong>Anti-Ragging Committee</strong>
+                                            <span>Committee and compliance</span>
+                                        </div>
+                                    </a>
+
+                                    <a href="#grievance-committee" class="dropdown-item">
+                                        <div>
+                                            <strong>Grievance Redressal Committee</strong>
+                                            <span>SGRC members and policy</span>
+                                        </div>
+                                    </a>
+
+                                    <a href="#alumni-association" class="dropdown-item">
+                                        <div>
+                                            <strong>Alumni Association</strong>
+                                            <span>Committee and info</span>
+                                        </div>
+                                    </a>
+
+                                    <a href="#other-committees" class="dropdown-item">
+                                        <div>
+                                            <strong>Other Committees</strong>
+                                            <span>Disciplinary, ethics, audit, etc.</span>
+                                        </div>
+                                    </a>
+
+                                </div>
+                            </div>
+                        </li>
+
+                        <!-- IQAC & ACCREDITATION -->
+                        <li class="nav-item has-dropdown" data-dd>
+                            <a class="nav-link" href="#iqac" aria-haspopup="true" aria-expanded="false">
+                                IQAC & Accreditation <span class="dropdown-arrow">▼</span>
+                            </a>
+                            <div class="dropdown-menu">
+                                <div class="dropdown-header">Quality Assurance</div>
+                                <div class="dropdown-grid">
+
+                                    <a href="#naac" class="dropdown-item">
+                                        <div>
+                                            <strong>NAAC Accreditation</strong>
+                                            <span>Grade and certificate</span>
+                                        </div>
+                                    </a>
+
+                                    <a href="#ssr" class="dropdown-item">
+                                        <div>
+                                            <strong>Self Study Report (SSR)</strong>
+                                            <span>Download SSR</span>
+                                        </div>
+                                    </a>
+
+                                    <a href="#peer-team-reports" class="dropdown-item">
+                                        <div>
+                                            <strong>Peer Team Reports</strong>
+                                            <span>Reports and grade sheets</span>
+                                        </div>
+                                    </a>
+
+                                    <a href="#iqac-cell" class="dropdown-item">
+                                        <div>
+                                            <strong>Internal Quality Assurance Cell</strong>
+                                            <span>Members, minutes, ATR</span>
+                                        </div>
+                                    </a>
+
+                                    <a href="#aqar" class="dropdown-item">
+                                        <div>
+                                            <strong>AQAR</strong>
+                                            <span>Year-wise reports</span>
+                                        </div>
+                                    </a>
+
+                                    <a href="#feedback-surveys" class="dropdown-item">
+                                        <div>
+                                            <strong>Feedback & Surveys</strong>
+                                            <span>Forms and analysis</span>
+                                        </div>
+                                    </a>
+
+                                    <a href="#best-practices" class="dropdown-item">
+                                        <div>
+                                            <strong>Best Practices & Innovations</strong>
+                                            <span>Distinctiveness and practices</span>
+                                        </div>
+                                    </a>
+
+                                    <a href="#accreditation-archives" class="dropdown-item">
+                                        <div>
+                                            <strong>Accreditation Archives</strong>
+                                            <span>Past cycles and rankings</span>
+                                        </div>
+                                    </a>
+
+                                </div>
+                            </div>
+                        </li>
+
+                        <!-- ALUMNI -->
+                        <li class="nav-item has-dropdown" data-dd>
+                            <a class="nav-link" href="#alumni" aria-haspopup="true" aria-expanded="false">
+                                Alumni <span class="dropdown-arrow">▼</span>
+                            </a>
+                            <div class="dropdown-menu">
+                                <div class="dropdown-header">Alumni Engagement</div>
+                                <div class="dropdown-grid">
+
+                                    <a href="#alumni-association" class="dropdown-item">
+                                        <div>
+                                            <strong>Alumni Association</strong>
+                                            <span>Registration and objectives</span>
+                                        </div>
+                                    </a>
+
+                                    <a href="#alumni-network" class="dropdown-item">
+                                        <div>
+                                            <strong>Alumni Network</strong>
+                                            <span>Chapters and stories</span>
+                                        </div>
+                                    </a>
+
+                                    <a href="#alumni-events" class="dropdown-item">
+                                        <div>
+                                            <strong>Events & Reunions</strong>
+                                            <span>Calendar and gallery</span>
+                                        </div>
+                                    </a>
+
+                                    <a href="#give-back" class="dropdown-item">
+                                        <div>
+                                            <strong>Give Back</strong>
+                                            <span>Mentorship and contributions</span>
+                                        </div>
+                                    </a>
+
+                                    <a href="#alumni-feedback" class="dropdown-item">
+                                        <div>
+                                            <strong>Alumni Feedback</strong>
+                                            <span>Survey and suggestions</span>
+                                        </div>
+                                    </a>
+
+                                </div>
+                            </div>
+                        </li>
+
+                        <!-- RTI -->
+                        <li class="nav-item has-dropdown" data-dd>
+                            <a class="nav-link" href="#rti" aria-haspopup="true" aria-expanded="false">
+                                RTI <span class="dropdown-arrow">▼</span>
+                            </a>
+                            <div class="dropdown-menu">
+                                <div class="dropdown-header">Right to Information</div>
+                                <div class="dropdown-grid">
+
+                                    <a href="#rti-contacts" class="dropdown-item">
+                                        <div>
+                                            <strong>RTI Contacts</strong>
+                                            <span>PIO and Appellate Authority</span>
+                                        </div>
+                                    </a>
+
+                                    <a href="#rti-guidelines" class="dropdown-item">
+                                        <div>
+                                            <strong>RTI Guidelines</strong>
+                                            <span>How to file RTI</span>
+                                        </div>
+                                    </a>
+
+                                    <a href="#proactive-disclosure" class="dropdown-item">
+                                        <div>
+                                            <strong>Proactive Disclosure</strong>
+                                            <span>Section 4 disclosures</span>
+                                        </div>
+                                    </a>
+
+                                    <a href="#rti-reports" class="dropdown-item">
+                                        <div>
+                                            <strong>RTI Applications & Reports</strong>
+                                            <span>Reports and responses</span>
+                                        </div>
+                                    </a>
+
+                                </div>
+                            </div>
+                        </li>
+
+                        <!-- CONTACT -->
+                        <li class="nav-item has-dropdown" data-dd>
+                            <a class="nav-link" href="#contact" aria-haspopup="true" aria-expanded="false">
+                                Contact Us <span class="dropdown-arrow">▼</span>
+                            </a>
+                            <div class="dropdown-menu">
+                                <div class="dropdown-header">Get in Touch</div>
+                                <div class="dropdown-grid">
+
+                                    <a href="#campus-address" class="dropdown-item">
+                                        <div>
+                                            <strong>Campus Address</strong>
+                                            <span>Map and location</span>
+                                        </div>
+                                    </a>
+
+                                    <a href="#phone-email" class="dropdown-item">
+                                        <div>
+                                            <strong>Phone & Email</strong>
+                                            <span>Important contacts</span>
+                                        </div>
+                                    </a>
+
+                                    <a href="#helplines" class="dropdown-item">
+                                        <div>
+                                            <strong>Helplines</strong>
+                                            <span>Anti-ragging, admissions, IT</span>
+                                        </div>
+                                    </a>
+
+                                    <a href="#directory" class="dropdown-item">
+                                        <div>
+                                            <strong>Faculty & Staff Directory</strong>
+                                            <span>Searchable directory / PDF</span>
+                                        </div>
+                                    </a>
+
+                                    <a href="#enquiry-form" class="dropdown-item">
+                                        <div>
+                                            <strong>Enquiry Form</strong>
+                                            <span>Submit your query</span>
+                                        </div>
+                                    </a>
+
+                                    <a href="#social-media" class="dropdown-item">
+                                        <div>
+                                            <strong>Social Media</strong>
+                                            <span>Official channels</span>
+                                        </div>
+                                    </a>
+
+                                </div>
+                            </div>
+                        </li>
+
+                        <!-- CTA -->
+                        <li class="nav-item cta">
+                            <a class="nav-link btn-primary" href="#admissions">
+                                <span>Admissions</span>
+                            </a>
+                        </li>
+
+                    </ul>
+
+
+
+                    <!-- Mobile Toggle -->
+                    <button class="mobile-toggle" id="burger" aria-label="Open menu">
+                        <span class="bar"></span>
+                        <span class="bar"></span>
+                        <span class="bar"></span>
+                    </button>
+                </nav>
+
+            </div>
+        </div>
+    </header>
+
+    <!-- Mobile sheet -->
+
+
+    <!-- SLIDER HERO -->
+    <!-- SLIDER HERO - FIXED LAYOUT -->
+    <main id="home" class="hero-slider">
+        <div class="slider-container">
+            <!-- Slide 1 -->
+            <div class="slide active">
+                <div class="slide-bg" style="background-image: url('images/slider.jpg');">
+                </div>
+                <div class="container">
+                    <div class="slide-content-wrapper">
+                        <div class="slide-content">
+                            <div class="slide-kicker">
+                                <span>🏛️</span>
+                                <span>Heritage & Tradition</span>
+                            </div>
+                            <h2 class="slide-title">മലയാള ഭാഷയുടെ പൈതൃകത്തെ പരിപാലിക്കുകയും പ്രോത്സാഹിപ്പിക്കുകയും</h2>
+                            <p class="slide-sub">
+                                മലയാള സർവകലാശാല മലയാള ഭാഷ, സാഹിത്യം, സംസ്കാരം എന്നിവയുടെ സംരക്ഷണത്തിനും പ്രചാരണത്തിനും
+                                വികസനത്തിനും സമർപ്പിച്ചിരിക്കുന്നു.
+                                ഞങ്ങളുടെ പ്രമുഖർ ആഴത്തിലുള്ള ഗവേഷണത്തിലൂടെയും വ്യാപകമായ അക്കാദമിക് പ്രോഗ്രാമുകളിലൂടെയും
+                                മലയാളത്തിന്റെ സമ്പന്നമായ പാരമ്പര്യത്തെ
+                                പിന്തുണയ്ക്കുന്നു.
+                            </p>
+                            <div class="slide-cta">
+                                <button class="btn primary" onclick="scrollToId('about')">About University</button>
+                                <button class="btn" onclick="scrollToId('academics')">Academic Programs</button>
+                            </div>
+                        </div>
+                        <div class="slide-image-preview">
+                            <div class="preview-frame">
+                                <div class="preview-image" style="background-image: url('images/slider.jpg');">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Slide 2 -->
+            <div class="slide">
+                <div class="slide-bg" style="background-image: url('images/slider2.jpg');">
+                </div>
+                <div class="container">
+                    <div class="slide-content-wrapper">
+                        <div class="slide-content">
+                            <div class="slide-kicker">
+                                <span>🎓</span>
+                                <span>Academic Excellence</span>
+                            </div>
+                            <h2 class="slide-title">ഉന്നത നിലവാരത്തിലുള്ള അക്കാദമിക് പ്രോഗ്രാമുകളും ഗവേഷണ സംരംഭങ്ങളും
+                            </h2>
+                            <p class="slide-sub">
+                                ഞങ്ങൾ UG, PG, PhD ലെവലുകളിൽ വൈവിധ്യമാർന്ന അക്കാദമിക് പ്രോഗ്രാമുകൾ വാഗ്ദാനം ചെയ്യുന്നു.
+                                ഞങ്ങളുടെ പ്രോഗ്രാമുകൾ ഇന്റർഡിസിപ്ലിനറി പഠനത്തിനും
+                                ആധുനിക ഗവേഷണ സാങ്കേതിക വിദ്യകൾക്കും പ്രാധാന്യം നൽകുന്നു, ഒപ്പം വിദ്യാർത്ഥികൾക്ക് അവരുടെ
+                                താൽപ്പര്യ മേഖലകളിൽ വിജയിക്കാൻ സഹായിക്കുന്നു.
+                            </p>
+                            <div class="slide-cta">
+                                <button class="btn primary" onclick="scrollToId('academics')">Explore Programs</button>
+                                <button class="btn" onclick="scrollToId('admissions')">Admissions</button>
+                            </div>
+                        </div>
+                        <div class="slide-image-preview">
+                            <div class="preview-frame">
+                                <div class="preview-image" style="background-image: url('images/slider2.jpg');">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Slide 3 -->
+            <div class="slide">
+                <div class="slide-bg" style="background-image: url('images/slider.jpg');">
+                </div>
+                <div class="container">
+                    <div class="slide-content-wrapper">
+                        <div class="slide-content">
+                            <div class="slide-kicker">
+                                <span>🌱</span>
+                                <span>Sustainable Campus</span>
+                            </div>
+                            <h2 class="slide-title">ഹരിത കാമ്പസ്: പുകയിലവിരുദ്ധ, ലഹരിവിരുദ്ധ, റാഗിങ്ങ് രഹിത</h2>
+                            <p class="slide-sub">
+                                മലയാള സർവകലാശാല വിദ്യാർത്ഥികൾക്കും സ്റ്റാഫിനും സുരക്ഷിതവും സൗഹൃദപരവുമായ ഒരു പഠന-ജോലി
+                                അന്തരീക്ഷം നൽകുന്നു.
+                                ഞങ്ങൾ 100% പുകയിലവിരുദ്ധ, ലഹരിവിരുദ്ധ, റാഗിങ്ങ് രഹിത, പരിസ്ഥിതി സൗഹൃദ ഗ്രീൻ കാമ്പസായി
+                                പ്രവർത്തിക്കുന്നു.
+                            </p>
+                            <div class="slide-cta">
+                                <button class="btn primary" onclick="scrollToId('principles')">Our Principles</button>
+                                <button class="btn" onclick="scrollToId('campus')">Campus Life</button>
+                            </div>
+                        </div>
+                        <div class="slide-image-preview">
+                            <div class="preview-frame">
+                                <div class="preview-image" style="background-image: url('images/slider.jpg');">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Slide 4 -->
+            <div class="slide">
+                <div class="slide-bg" style="background-image: url('images/slider2.jpg');">
+                </div>
+                <div class="container">
+                    <div class="slide-content-wrapper">
+                        <div class="slide-content">
+                            <div class="slide-kicker">
+                                <span>🤝</span>
+                                <span>Global Collaborations</span>
+                            </div>
+                            <h2 class="slide-title">അന്തർദേശീയ കോളബറേഷനുകളും ഗവേഷണ പങ്കാളിത്തങ്ങളും</h2>
+                            <p class="slide-sub">
+                                ലോകമെമ്പാടുമുള്ള പ്രമുഖ സർവകലാശാലകളുമായുള്ള കോളബറേഷനിലൂടെ ഞങ്ങൾ ഗ്ലോബൽ ആകുന്നു.
+                                ഇന്റർനാഷണൽ വിദ്യാർത്ഥി കൈമാറ്റം, സംയുക്ത ഗവേഷണ പ്രോജക്ടുകൾ, അക്കാദമിക് വിനിമയ
+                                പ്രോഗ്രാമുകൾ എന്നിവയിലൂടെ
+                                വിദ്യാർത്ഥികൾക്ക് അന്തർദേശീയ അനുഭവങ്ങൾ നൽകുന്നു.
+                            </p>
+                            <div class="slide-cta">
+                                <button class="btn primary" onclick="scrollToId('research')">Research</button>
+                                <button class="btn" onclick="scrollToId('initiatives')">Initiatives</button>
+                            </div>
+                        </div>
+                        <div class="slide-image-preview">
+                            <div class="preview-frame">
+                                <div class="preview-image" style="background-image: url('images/slider2.jpg');">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Navigation Dots -->
+        <div class="slider-dots">
+            <button class="dot active" data-slide="0" aria-label="Go to slide 1"></button>
+            <button class="dot" data-slide="1" aria-label="Go to slide 2"></button>
+            <button class="dot" data-slide="2" aria-label="Go to slide 3"></button>
+            <button class="dot" data-slide="3" aria-label="Go to slide 4"></button>
+        </div>
+
+        <!-- Navigation Arrows -->
+        <button class="slider-arrow prev" aria-label="Previous slide">‹</button>
+        <button class="slider-arrow next" aria-label="Next slide">›</button>
+
+        <!-- Slide Counter -->
+        <div class="slide-counter">
+            <span class="current">01</span> / <span class="total">04</span>
+        </div>
+    </main>
+
+    <section class="about hero">
+        <div class="container">
+            <div class="hero-wrap">
+                <div class="hero-card">
+                    <div class="hero-content">
+                        <div class="hero-kicker">
+                            <span style="opacity:.95">⚡</span>
+                            <span>Future-ready • Bilingual • Mobile-first</span>
+                        </div>
+
+                        <h2 class="hero-title">മലയാളഭാഷയുടെ ജ്ഞാന-ഗവേഷണ ഭാവിയിലേക്ക് ഒരു ഡിജിറ്റൽ കവാടം</h2>
+                        <p class="hero-sub">
+                            ഈ ഡിസൈൻ ഒരു <b>ഫ്യൂച്ചറിസ്റ്റിക്, മോടേൺ</b> ലുക്ക് ഉപയോഗിച്ച് സർവകലാശാലയുടെ പ്രധാന
+                            വിഭാഗങ്ങൾ,
+                            പദ്ധതികൾ, വിദ്യാർത്ഥി സേവനങ്ങൾ, ഗവേഷണം, പരീക്ഷ/പ്രവേശനം, കൂടാതെ <b>Events • Tenders •
+                                Orders</b>
+                            എന്നിവയെ ഒരു ഹോം പേജിൽ തന്നെ എളുപ്പത്തിൽ കണ്ടെത്താവുന്ന രീതിയിൽ ക്രമീകരിച്ചിരിക്കുന്നു.
+                        </p>
+
+                        <div class="hero-cta">
+                            <button class="btn primary" onclick="scrollToId('initiatives')">പദ്ധതികളും
+                                സംരംഭങ്ങളും</button>
+                            <button class="btn" onclick="scrollToId('updates')">വിശേഷങ്ങൾ / ദർഘാസ് / ഉത്തരവുകൾ</button>
+                            <button class="btn" onclick="scrollToId('quick')">പ്രധാന ലിങ്കുകൾ</button>
+                        </div>
+
+                        <div class="hero-stats" aria-label="Highlights">
+                            <div class="stat">
+                                <strong>ബൈലിംഗ്വൽ</strong>
+                                <span>English / മലയാളം ടോഗിൾ</span>
+                            </div>
+                            <div class="stat">
+                                <strong>മെഗാ മെനു</strong>
+                                <span>വലിയ മെനുവുകൾക്കും ശരിയായ UI</span>
+                            </div>
+                            <div class="stat">
+                                <strong>ഡൈനാമിക് Updates</strong>
+                                <span>Events / Tenders / Orders</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- NOTIFICATIONS MARQUEE -->
+                <div class="notifications-panel">
+                    <div class="notifications-header">
+                        <h3>📢 അറിയിപ്പുകൾ / Notifications</h3>
+                        <span class="live-badge">LIVE</span>
+                    </div>
+
+                    <!-- Replace the notifications-container div with this: -->
+                    <div class="notifications-container" id="notificationsContainer">
+                        <div class="notifications-track" id="notificationsTrack">
+                            <!-- Notification items will be added here -->
+                        </div>
+                    </div>
+
+                    <div class="notifications-controls">
+                        <button class="notification-btn pause-btn" id="pauseNotifications"
+                            aria-label="Pause notifications">
+                            ⏸️
+                        </button>
+                        <button class="notification-btn" onclick="showAllNotifications()"
+                            aria-label="View all notifications">
+                            View All
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <script>
+            // NOTIFICATIONS SYSTEM - IMPROVED
+            const notifications = {
+                items: [],
+                isPaused: false,
+
+                init() {
+                    // Sample notification data
+                    this.items = [
+                        {
+                            id: 1,
+                            type: 'urgent',
+                            title: 'പ്രവേശന റജിസ്ട്രേഷൻ അവസാന തീയതി',
+                            description: 'PG പ്രോഗ്രാമുകൾക്കുള്ള അപേക്ഷാ അവസാന തീയതി: 2024-06-30',
+                            date: '2024-06-20',
+                            link: '#admissions'
+                        },
+                        {
+                            id: 2,
+                            type: 'warning',
+                            title: 'പരീക്ഷാ സമയക്രമം പുറത്തുവിട്ടു',
+                            description: 'മേയ്-ജൂൺ 2024 സെമസ്റ്റർ പരീക്ഷാ സമയക്രമം ഡൗൺലോഡ് ചെയ്യുക',
+                            date: '2024-06-18',
+                            link: '#exams'
+                        },
+                        {
+                            id: 3,
+                            type: 'info',
+                            title: 'ലൈബ്രറി അവധി അറിയിപ്പ്',
+                            description: '15.06.2024 ന് ലൈബ്രറി ദിവസം മുഴുവൻ അടച്ചിരിക്കും',
+                            date: '2024-06-15',
+                            link: '#library'
+                        },
+                        {
+                            id: 4,
+                            type: 'urgent',
+                            title: 'ടെൻഡർ അവസാന തീയതി നീട്ടിവെച്ചു',
+                            description: 'കാമ്പസ് വയർലെസ് നെറ്റ്‌വർക്ക് ടെൻഡർ അവസാന തീയതി 25.06.2024 വരെ',
+                            date: '2024-06-15',
+                            link: '#updates'
+                        },
+                        {
+                            id: 5,
+                            type: 'info',
+                            title: 'വിദ്യാർത്ഥി സമ്മേളനം 2024',
+                            description: 'വാർഷിക വിദ്യാർത്ഥി സമ്മേളനം 20-22 ജൂൺ 2024 തീയതികളിൽ',
+                            date: '2024-06-10',
+                            link: '#events'
+                        }
+                    ];
+
+                    this.renderNotifications();
+                    this.setupControls();
+                    this.setupHoverPause();
+                },
+
+                renderNotifications() {
+                    const track = $('#notificationsTrack');
+                    if (!track) return;
+
+                    track.innerHTML = '';
+
+                    // Only need one set of notifications since we're scrolling only 50%
+                    this.items.forEach(item => {
+                        const notification = document.createElement('div');
+                        notification.className = `notification-item ${item.type}`;
+                        notification.innerHTML = `
+                <span class="notification-badge ${item.type}">${this.getBadgeText(item.type)}</span>
+                <h4 class="notification-title">${item.title}</h4>
+                <p class="notification-desc">${item.description}</p>
+                <div class="notification-meta">
+                    <span class="notification-date">
+                        📅 ${item.date}
+                    </span>
+                    <a href="${item.link}" class="notification-link" onclick="event.stopPropagation(); scrollToId('${item.link.replace('#', '')}'); return false;">
+                        Read More →
+                    </a>
+                </div>
+            `;
+
+                        notification.addEventListener('click', (e) => {
+                            e.preventDefault();
+                            const targetId = item.link.replace('#', '');
+                            if (targetId) {
+                                scrollToId(targetId);
+                            }
+                        });
+
+                        track.appendChild(notification);
+                    });
+                },
+
+                getBadgeText(type) {
+                    switch (type) {
+                        case 'urgent': return 'Urgent';
+                        case 'warning': return 'Important';
+                        case 'info': return 'Information';
+                        default: return 'Notice';
+                    }
+                },
+
+                setupControls() {
+                    const pauseBtn = $('#pauseNotifications');
+                    if (pauseBtn) {
+                        pauseBtn.addEventListener('click', (e) => {
+                            e.stopPropagation(); // Prevent triggering hover pause
+                            this.togglePause();
+                        });
+                    }
+                },
+
+                setupHoverPause() {
+                    const container = $('#notificationsContainer');
+                    const track = $('#notificationsTrack');
+
+                    if (container && track) {
+                        // Pause on hover
+                        container.addEventListener('mouseenter', () => {
+                            if (!this.isPaused) {
+                                track.style.animationPlayState = 'paused';
+                            }
+                        });
+
+                        // Resume on mouse leave
+                        container.addEventListener('mouseleave', () => {
+                            if (!this.isPaused) {
+                                track.style.animationPlayState = 'running';
+                            }
+                        });
+
+                        // Touch support for mobile
+                        container.addEventListener('touchstart', () => {
+                            if (!this.isPaused) {
+                                track.style.animationPlayState = 'paused';
+                            }
+                        });
+
+                        container.addEventListener('touchend', () => {
+                            if (!this.isPaused) {
+                                setTimeout(() => {
+                                    track.style.animationPlayState = 'running';
+                                }, 2000); // Resume after 2 seconds
+                            }
+                        });
+                    }
+                },
+
+                togglePause() {
+                    const track = $('#notificationsTrack');
+                    const pauseBtn = $('#pauseNotifications');
+
+                    this.isPaused = !this.isPaused;
+
+                    if (track) {
+                        if (this.isPaused) {
+                            track.classList.add('paused');
+                            track.style.animationPlayState = 'paused';
+                            if (pauseBtn) {
+                                pauseBtn.innerHTML = '▶️';
+                                pauseBtn.setAttribute('aria-label', 'Resume notifications');
+                            }
+                        } else {
+                            track.classList.remove('paused');
+                            track.style.animationPlayState = 'running';
+                            if (pauseBtn) {
+                                pauseBtn.innerHTML = '⏸️';
+                                pauseBtn.setAttribute('aria-label', 'Pause notifications');
+                            }
+                        }
+                    }
+                }
+            };
+
+            // Function to show all notifications
+            function showAllNotifications() {
+                showToast('All notifications can be displayed in a separate page. This is a demo feature.');
+                // In a real implementation, this could open a modal or navigate to a notifications page
+            }
+
+            // Initialize notifications when DOM is loaded
+            document.addEventListener('DOMContentLoaded', () => {
+                notifications.init();
+            });
+        </script>
+    </section>
+
+    <!-- NEWS SLIDER SECTION -->
+    <section class="news-slider-section" id="news">
+        <div class="container">
+            <div class="section-head">
+                <div>
+                    <h2>📰 വാർത്തകൾ / Latest News & Announcements</h2>
+                    <p>Stay updated with the latest happenings, events, and important notices from Malayalam University
+                    </p>
+                </div>
+                <a href="#all-news" class="btn">View All News →</a>
+            </div>
+
+            <div class="news-slider-container">
+                <div class="news-slider-track" id="newsSliderTrack">
+                    <!-- News items will be added here dynamically -->
+                </div>
+
+                <!-- Navigation Arrows -->
+                <button class="news-arrow prev" aria-label="Previous news">
+                    ‹
+                </button>
+                <button class="news-arrow next" aria-label="Next news">
+                    ›
+                </button>
+
+                <!-- Navigation Dots -->
+                <div class="news-dots" id="newsDots">
+                    <!-- Dots will be added dynamically -->
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <script>
+        // NEWS SLIDER SYSTEM - SIMPLIFIED (NO CATEGORIES)
+        const newsSlider = {
+            items: [],
+            currentIndex: 0,
+            itemsPerView: 3,
+            autoSlideInterval: null,
+
+            init() {
+                // Sample news data - English content
+                this.items = [
+                    {
+                        id: 1,
+                        title: 'New PG Programs Approved',
+                        excerpt: 'University Grants Commission has approved two new Post Graduate programs in Malayalam Studies and Digital Humanities starting from next academic year.',
+                        date: '2024-06-20',
+                        time: '10:30 AM',
+                        author: 'Academic Council',
+                        image: null,
+                        badge: 'Academic'
+                    },
+                    {
+                        id: 2,
+                        title: 'Annual Literary Festival 2024',
+                        excerpt: 'Join us for the 5th Annual Literary Festival themed "The Future of Malayalam Literature" featuring renowned authors, poets, and literary critics.',
+                        date: '2024-06-18',
+                        time: '2:45 PM',
+                        author: 'Cultural Committee',
+                        image: 'https://images.unsplash.com/photo-1511578314322-379afb476865?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
+                        badge: 'Event'
+                    },
+                    {
+                        id: 3,
+                        title: 'Research Fellowship Announcement',
+                        excerpt: 'Applications are invited for Junior Research Fellowships in Malayalam Language Technology. Last date for submission: 30th June 2024.',
+                        date: '2024-06-15',
+                        time: '11:15 AM',
+                        author: 'Research Council',
+                        image: null,
+                        badge: 'Research'
+                    },
+                    {
+                        id: 4,
+                        title: 'Annual Sports Meet 2024',
+                        excerpt: 'University Annual Sports Competition will be held from July 5-10. Registrations are now open for all students.',
+                        date: '2024-06-12',
+                        time: '4:20 PM',
+                        author: 'Sports Council',
+                        image: 'https://images.unsplash.com/photo-1546519638-68e109498ffc?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
+                        badge: 'Student Life'
+                    },
+                    {
+                        id: 5,
+                        title: 'Summer Library Hours',
+                        excerpt: 'Library summer timings: 8:30 AM to 8:00 PM. All seven days open. Extended hours for exam preparation.',
+                        date: '2024-06-10',
+                        time: '9:00 AM',
+                        author: 'Library Department',
+                        image: null,
+                        badge: 'Announcement'
+                    },
+                    {
+                        id: 6,
+                        title: 'Semester Exam Results Published',
+                        excerpt: 'January-April 2024 semester examination results have been published on the official university website.',
+                        date: '2024-06-08',
+                        time: '3:30 PM',
+                        author: 'Examination Cell',
+                        image: 'https://images.unsplash.com/photo-1434030216411-0b793f4b4173?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
+                        badge: 'Academic'
+                    }
+                ];
+
+                this.renderNews();
+                this.setupNavigation();
+                this.setupAutoSlide();
+                this.updateItemsPerView();
+
+                // Update on window resize
+                window.addEventListener('resize', () => this.updateItemsPerView());
+            },
+
+            updateItemsPerView() {
+                if (window.innerWidth <= 768) {
+                    this.itemsPerView = 1;
+                } else if (window.innerWidth <= 1200) {
+                    this.itemsPerView = 2;
+                } else {
+                    this.itemsPerView = 3;
+                }
+                this.updateDots();
+                this.goToSlide(this.currentIndex);
+            },
+
+            renderNews() {
+                const track = $('#newsSliderTrack');
+                const dotsContainer = $('#newsDots');
+
+                if (!track || !dotsContainer) return;
+
+                track.innerHTML = '';
+                dotsContainer.innerHTML = '';
+
+                // Calculate total slides
+                const totalSlides = Math.ceil(this.items.length / this.itemsPerView);
+
+                // Create slides
+                for (let i = 0; i < totalSlides; i++) {
+                    const slideNews = this.items.slice(i * this.itemsPerView, (i + 1) * this.itemsPerView);
+
+                    const slide = document.createElement('div');
+                    slide.className = 'news-slide';
+                    slide.style.display = 'flex';
+                    slide.style.gap = '20px';
+                    slide.style.width = '100%';
+
+                    slideNews.forEach(news => {
+                        const card = document.createElement('article');
+                        card.className = 'news-card';
+
+                        // Format time for display
+                        const timeAgo = this.getTimeAgo(news.date, news.time);
+
+                        card.innerHTML = `
+                            <div class="news-image">
+                                ${news.image ?
+                                `<img src="${news.image}" alt="${news.title}" loading="lazy">` :
+                                `<div class="news-image-placeholder">MU</div>`
+                            }
+                                <span class="news-badge">${news.badge}</span>
+                            </div>
+                            <div class="news-content">
+                                <div class="news-date">
+                                    <span>📅 ${news.date}</span>
+                                </div>
+                                <h3 class="news-title">${news.title}</h3>
+                                <p class="news-excerpt">${news.excerpt}</p>
+                                <div class="news-meta">
+                                    <div class="news-author">
+                                        
+                                    </div>
+                                    <a href="#news-detail" class="news-read-more" onclick="event.preventDefault(); showNewsDetail(${news.id})">
+                                        Read More →
+                                    </a>
+                                </div>
+                            </div>
+                        `;
+
+                        card.addEventListener('click', () => this.showNewsDetail(news.id));
+                        slide.appendChild(card);
+                    });
+
+                    track.appendChild(slide);
+
+                    // Create dot
+                    const dot = document.createElement('button');
+                    dot.className = 'news-dot' + (i === 0 ? ' active' : '');
+                    dot.setAttribute('aria-label', `Go to slide ${i + 1}`);
+                    dot.addEventListener('click', () => this.goToSlide(i));
+                    dotsContainer.appendChild(dot);
+                }
+            },
+
+            getTimeAgo(dateString, timeString) {
+                const newsDate = new Date(`${dateString}T${timeString}`);
+                const now = new Date();
+                const diffMs = now - newsDate;
+                const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
+
+                if (diffHours < 1) {
+                    return 'Just now';
+                } else if (diffHours < 24) {
+                    return `${diffHours} hour${diffHours > 1 ? 's' : ''} ago`;
+                } else {
+                    const diffDays = Math.floor(diffHours / 24);
+                    return `${diffDays} day${diffDays > 1 ? 's' : ''} ago`;
+                }
+            },
+
+            setupNavigation() {
+                // Arrow navigation
+                $$('.news-arrow.prev').forEach(btn => {
+                    btn.addEventListener('click', () => this.prevSlide());
+                });
+
+                $$('.news-arrow.next').forEach(btn => {
+                    btn.addEventListener('click', () => this.nextSlide());
+                });
+
+                // Touch/swipe for mobile
+                const track = $('#newsSliderTrack');
+                if (track) {
+                    let touchStartX = 0;
+                    let touchEndX = 0;
+
+                    track.addEventListener('touchstart', (e) => {
+                        touchStartX = e.changedTouches[0].screenX;
+                        this.stopAutoSlide();
+                    });
+
+                    track.addEventListener('touchend', (e) => {
+                        touchEndX = e.changedTouches[0].screenX;
+                        this.handleSwipe(touchStartX, touchEndX);
+                        this.startAutoSlide();
+                    });
+
+                    // Pause auto slide on hover
+                    track.addEventListener('mouseenter', () => this.stopAutoSlide());
+                    track.addEventListener('mouseleave', () => this.startAutoSlide());
+                }
+            },
+
+            goToSlide(index) {
+                const track = $('#newsSliderTrack');
+                const slides = $$('.news-slide');
+                const dots = $$('.news-dot');
+                const totalSlides = slides.length;
+
+                if (!track || totalSlides === 0) return;
+
+                // Wrap around
+                this.currentIndex = (index + totalSlides) % totalSlides;
+
+                // Calculate scroll position
+                const slideWidth = slides[0].offsetWidth + 20; // Include gap
+                track.scrollLeft = this.currentIndex * slideWidth;
+
+                // Update dots
+                dots.forEach((dot, i) => {
+                    dot.classList.toggle('active', i === this.currentIndex);
+                });
+
+                // Reset auto slide timer
+                this.resetAutoSlide();
+            },
+
+            nextSlide() {
+                this.goToSlide(this.currentIndex + 1);
+            },
+
+            prevSlide() {
+                this.goToSlide(this.currentIndex - 1);
+            },
+
+            handleSwipe(startX, endX) {
+                const swipeThreshold = 50;
+                const diff = startX - endX;
+
+                if (Math.abs(diff) > swipeThreshold) {
+                    if (diff > 0) {
+                        this.nextSlide(); // Swipe left
+                    } else {
+                        this.prevSlide(); // Swipe right
+                    }
+                }
+            },
+
+            startAutoSlide() {
+                this.stopAutoSlide();
+                this.autoSlideInterval = setInterval(() => this.nextSlide(), 8000); // 8 seconds
+            },
+
+            stopAutoSlide() {
+                if (this.autoSlideInterval) {
+                    clearInterval(this.autoSlideInterval);
+                    this.autoSlideInterval = null;
+                }
+            },
+
+            setupAutoSlide() {
+                this.startAutoSlide();
+            },
+
+            resetAutoSlide() {
+                this.stopAutoSlide();
+                this.startAutoSlide();
+            },
+
+            updateDots() {
+                const totalSlides = Math.ceil(this.items.length / this.itemsPerView);
+                const dotsContainer = $('#newsDots');
+
+                if (!dotsContainer) return;
+
+                dotsContainer.innerHTML = '';
+
+                for (let i = 0; i < totalSlides; i++) {
+                    const dot = document.createElement('button');
+                    dot.className = 'news-dot' + (i === this.currentIndex ? ' active' : '');
+                    dot.setAttribute('aria-label', `Go to slide ${i + 1}`);
+                    dot.addEventListener('click', () => this.goToSlide(i));
+                    dotsContainer.appendChild(dot);
+                }
+            },
+
+            showNewsDetail(id) {
+                const news = this.items.find(item => item.id === id);
+                if (news) {
+                    showToast(`Opening: "${news.title}" - ${news.excerpt}`);
+                    // In real implementation: window.location.href = `/news/${id}`;
+                }
+            }
+        };
+
+        // Helper function to show news detail
+        function showNewsDetail(id) {
+            newsSlider.showNewsDetail(id);
+        }
+
+        // Initialize news slider when DOM is loaded
+        document.addEventListener('DOMContentLoaded', () => {
+            newsSlider.init();
+        });
+    </script>
+
+    <!-- UNIVERSITY OVERVIEW -->
+    <section id="about" class="section">
+        <div class="container">
+            <div class="section-head">
+                <div>
+                    <h2>സർവകലാശാല</h2>
+                    <p>ചരിത്രം, ലക്ഷ്യം, ദൗത്യം, നിയമപരമായ അടിത്തറ എന്നിവ കൃത്യമായി ക്രമീകരിച്ച വിവരങ്ങൾ.</p>
+                </div>
+                <a class="btn" href="#contact">Directory / Contact</a>
+            </div>
+
+            <div class="grid">
+                <article class="card">
+                    <div class="icon">⟡</div>
+                    <h3>ആദർശം</h3>
+                    <p>മലയാള ഭാഷാ-സാംസ്കാരിക പാരമ്പര്യത്തെ ഭാവിയിലേക്കുള്ള അറിവ് സംവിധാനമാക്കുക.</p>
+                    <div class="meta">
+                        <span class="pill">Vision</span>
+                        <a class="link" href="#development">Explore →</a>
+                    </div>
+                </article>
+
+                <article class="card" id="acts">
+                    <div class="icon">⌁</div>
+                    <h3>ആക്റ്റും സ്റ്റാറ്റ്യുട്ടും</h3>
+                    <p>സർവകലാശാലയുടെ നിയമങ്ങൾ, ചട്ടങ്ങൾ, ഭരണരീതികൾ എന്നിവയ്‌ക്കുള്ള കേന്ദ്രം.</p>
+                    <div class="meta">
+                        <span class="pill">Acts</span>
+                        <a class="link" href="#governance">View →</a>
+                    </div>
+                </article>
+
+                <article class="card" id="development">
+                    <div class="icon">⟁</div>
+                    <h3>സ്ഥാപന വികസന പദ്ധതി</h3>
+                    <p>ശാസ്ത്രീയമായ വളർച്ചാ റോഡ്മാപ്പ്, അക്കാദമിക്-റിസർച്ച് ഉന്നമനം, ഡിജിറ്റൽ ട്രാൻസ്ഫോർമേഷൻ.</p>
+                    <div class="meta">
+                        <span class="pill">Roadmap</span>
+                        <a class="link" href="#updates">Latest →</a>
+                    </div>
+                </article>
+
+                <article class="card" id="rti">
+                    <div class="icon">◎</div>
+                    <h3>വിവരാവകാശം (RTI)</h3>
+                    <p>RTI മാർഗനിർദ്ദേശങ്ങൾ, ഉദ്യോഗസ്ഥർ, അപേക്ഷാ വിശദാംശങ്ങൾ തുടങ്ങിയ വിവരങ്ങൾ.</p>
+                    <div class="meta">
+                        <span class="pill">RTI</span>
+                        <a class="link" href="#contact">Help →</a>
+                    </div>
+                </article>
+
+                <article class="card" id="governance">
+                    <div class="icon">◈</div>
+                    <h3>ഭരണം</h3>
+                    <p>ചാൻസലർ, പ്രോ-ചാൻസലർ, വൈസ് ചാൻസലർ, പൊതുസഭ, സമിതി, കൗൺസിലുകൾ.</p>
+                    <div class="meta">
+                        <span class="pill">Admin</span>
+                        <a class="link" href="#campus">Committees →</a>
+                    </div>
+                </article>
+
+                <article class="card" id="publications">
+                    <div class="icon">✶</div>
+                    <h3>പ്രസാധനം</h3>
+                    <p>പുസ്തകങ്ങൾ, ജേണൽ, എഴുത്തോല, പരിഭാഷാപദ്ധതി, വാർഷിക റിപ്പോർട്ട്.</p>
+                    <div class="meta">
+                        <span class="pill">Publications</span>
+                        <a class="link" href="#quick">Links →</a>
+                    </div>
+                </article>
+            </div>
+        </div>
+    </section>
+
+    <!-- PRINCIPLES BANNER -->
+    <section class="principles-banner" id="principles">
+        <div class="container">
+            <div class="principles-statement">
+                <h2>ഇതൊരു പുകയിലവിരുദ്ധ, ലഹരിവിരുദ്ധ, റാഗിങ്ങ് രഹിത, ഹരിത കാമ്പസ്‌ ആണ്</h2>
+                <p>മലയാള സർവകലാശാലയിൽ, എല്ലാ വിദ്യാർത്ഥികൾക്കും ഉദ്യോഗസ്ഥർക്കും അധ്യാപകർക്കും സുരക്ഷിതവും സൗഹൃദപരവും
+                    പരിസ്ഥിതി സൗഹൃദപരവുമായ ഒരു പഠന-ജോലി അന്തരീക്ഷം നൽകുന്നതിന് ഞങ്ങൾ പ്രതിജ്ഞാബദ്ധരാണ്.</p>
+            </div>
+        </div>
+    </section>
+
+
+
+    <!-- ACADEMICS -->
+    <section id="academics">
+        <div class="container">
+            <div class="section-head">
+                <div>
+                    <h2>അക്കാദമികം</h2>
+                    <p>ഫാക്കൽറ്റികൾ, പ്രോഗ്രാമുകൾ, അക്കാദമിക് കലണ്ടർ, ലൈബ്രറി, LMS — എല്ലാം ഒറ്റ ഇക്കോസിസ്റ്റം പോലെ.</p>
+                </div>
+                <a class="btn" href="#programs">Programs</a>
+            </div>
+
+            <div class="grid">
+                <article class="card">
+                    <div class="icon">⌬</div>
+                    <h3>ഫാക്കൽറ്റികൾ</h3>
+                    <p>വിഭാഗങ്ങളെയും പഠനമേഖലകളെയും കേന്ദ്രീകരിച്ച ഫാക്കൽറ്റി/സ്കൂൾ വിവരങ്ങൾ.</p>
+                    <div class="meta">
+                        <span class="pill">Faculty</span>
+                        <a class="link" href="#programs">Open →</a>
+                    </div>
+                </article>
+
+                <article class="card" id="programs">
+                    <div class="icon">⟠</div>
+                    <h3>പ്രോഗ്രാമുകൾ</h3>
+                    <p>UG / PG / Ph.D പ്രോഗ്രാമുകൾ — യോഗ്യത, ദൈർഘ്യം, സിലബസ് തുടങ്ങിയവ.</p>
+                    <div class="meta">
+                        <span class="pill">UG • PG • PhD</span>
+                        <a class="link" href="#admissions">Apply →</a>
+                    </div>
+                </article>
+
+                <article class="card" id="calendar">
+                    <div class="icon">⏣</div>
+                    <h3>അക്കാദമിക് കലണ്ടർ</h3>
+                    <p>സെമസ്റ്റർ ഷെഡ്യൂൾ, അവധി, പ്രധാന തീയതികൾ, അക്കാദമിക് പ്രവർത്തനങ്ങൾ.</p>
+                    <div class="meta">
+                        <span class="pill">Calendar</span>
+                        <a class="link" href="#updates">Updates →</a>
+                    </div>
+                </article>
+
+                <article class="card" id="library">
+                    <div class="icon">⟟</div>
+                    <h3>ലൈബ്രറി</h3>
+                    <p>ലൈബ്രറി സേവനങ്ങൾ, കാറ്റലോഗ്, ഡിജിറ്റൽ വിഭവങ്ങൾ, റഫറൻസ് സഹായം.</p>
+                    <div class="meta">
+                        <span class="pill">Library</span>
+                        <a class="link" href="https://mulibrary.temu.ac.in/" target="_blank" rel="noreferrer">Catalog
+                            →</a>
+                    </div>
+                </article>
+
+                <article class="card" id="lms">
+                    <div class="icon">⌁</div>
+                    <h3>എൽ.എം.എസ്</h3>
+                    <p>കോഴ്സുകൾ, ലേണിങ് മെറ്റീരിയൽ, അസൈൻമെന്റുകൾ, ഓൺലൈൻ ക്ലാസ് ആക്സസ്.</p>
+                    <div class="meta">
+                        <span class="pill">LMS</span>
+                        <a class="link" href="https://lms.temu.ac.in/" target="_blank" rel="noreferrer">Go →</a>
+                    </div>
+                </article>
+
+                <article class="card">
+                    <div class="icon">⟁</div>
+                    <h3>ഇ-ലേർണിംഗ് അവസരങ്ങൾ</h3>
+                    <p>SWAYAM, SWAYAM PRABHA, e-PG Pathshala പോലുള്ള പ്ലാറ്റ്ഫോം ലിങ്കുകൾ.</p>
+                    <div class="meta">
+                        <span class="pill">MOOCs</span>
+                        <a class="link" href="#quick">Open →</a>
+                    </div>
+                </article>
+            </div>
+        </div>
+    </section>
+
+    <!-- ADMISSIONS + EXAMS + RESEARCH -->
+    <section id="admissions">
+        <div class="container">
+            <div class="section-head">
+                <div>
+                    <h2>പ്രവേശനം • പരീക്ഷ • ഗവേഷണം</h2>
+                    <p>Admissions, exams, research — മൂന്ന് പ്രധാന യാത്രകൾ ഒറ്റ UX സ്റ്റാക്കിൽ.</p>
+                </div>
+                <a class="btn" href="#research">Research</a>
+            </div>
+
+            <div class="grid">
+                <article class="card">
+                    <div class="icon">⟡</div>
+                    <h3>പ്രവേശനം</h3>
+                    <p>പ്രവേശന വിജ്ഞാപനം, പ്രോസ്പക്ടസ്, UG/PG/PhD പ്രവേശനം, ഫീസ് റൂൾസ്, പിന്തുണ.</p>
+                    <div class="meta">
+                        <span class="pill">Admissions</span>
+                        <a class="link" href="#updates">Notices →</a>
+                    </div>
+                </article>
+
+                <article class="card" id="exams">
+                    <div class="icon">◎</div>
+                    <h3>പരീക്ഷ</h3>
+                    <p>പരീക്ഷാ വിജ്ഞാപനം, മാന്വൽ, ഗൈഡ് ലൈൻസ്, കലണ്ടർ, സമയക്രമം, ഫലം, ചോദ്യപേപ്പറുകൾ.</p>
+                    <div class="meta">
+                        <span class="pill">Exams</span>
+                        <a class="link" href="#updates">Latest →</a>
+                    </div>
+                </article>
+
+                <article class="card" id="research">
+                    <div class="icon">✶</div>
+                    <h3>ഗവേഷണം</h3>
+                    <p>Ph.D പ്രവേശനം, ഗവേഷണ കൗൺസിൽ, RDC, ഗവേഷണ നയം, Shodhganga/otri ലിങ്കുകൾ.</p>
+                    <div class="meta">
+                        <span class="pill">Research</span>
+                        <a class="link" href="#quick">Portals →</a>
+                    </div>
+                </article>
+            </div>
+        </div>
+    </section>
+
+    <!-- STUDENT SUPPORT + CAMPUS HARMONY -->
+    <section id="student-support">
+        <div class="container">
+            <div class="section-head">
+                <div>
+                    <h2>വിദ്യാർത്ഥി പിന്തുണ • കാമ്പസ് സൗഹൃദം</h2>
+                    <p>Scholarships, insurance, NSS, portals, grievance committees, anti-ragging, ICC, OBC/SC-ST cells
+                        എന്നിവ.</p>
+                </div>
+                <a class="btn" href="#campus">Committees</a>
+            </div>
+
+            <div class="grid">
+                <article class="card">
+                    <div class="icon">⟠</div>
+                    <h3>വിദ്യാർത്ഥികൾക്കുള്ള സേവനങ്ങൾ</h3>
+                    <p>ഇൻഷുറൻസ് പദ്ധതി, നക്ഷത്ര സ്കോളർഷിപ്പ്, പുസ്തകരചനാ പ്രോത്സാഹനം, NSS എന്നിവ.</p>
+                    <div class="meta">
+                        <span class="pill">Services</span>
+                        <a class="link" href="#quick">Links →</a>
+                    </div>
+                </article>
+
+                <article class="card">
+                    <div class="icon">⌬</div>
+                    <h3>വിദ്യാർത്ഥി മണ്ഡലം</h3>
+                    <p>Academic Bank of Credits, DigiLocker NAD, National Scholarship Portal പോലുള്ള പ്രധാന പോർട്ടലുകൾ.
+                    </p>
+                    <div class="meta">
+                        <span class="pill">Portals</span>
+                        <a class="link" href="#quick">Open →</a>
+                    </div>
+                </article>
+
+                <article class="card" id="campus">
+                    <div class="icon">◈</div>
+                    <h3>കാമ്പസ് സൗഹൃദം</h3>
+                    <p>Student Grievance, Ombudsperson, ICC, Anti-ragging, OBC / Equal Opportunity, SC/ST, Gender
+                        Justice.</p>
+                    <div class="meta">
+                        <span class="pill">Committees</span>
+                        <a class="link" href="#contact">Help →</a>
+                    </div>
+                </article>
+            </div>
+        </div>
+    </section>
+
+    <!-- INITIATIVES / CENTERS -->
+    <section id="initiatives">
+        <div class="container">
+            <div class="section-head">
+                <div>
+                    <h2>പദ്ധതികളും സംരംഭങ്ങളും</h2>
+                    <p>നിങ്ങൾ നൽകിയ പട്ടിക അനുസരിച്ച്, ഓരോ കേന്ദ്രത്തിനും ഒരു “Feature Card” രൂപത്തിൽ.</p>
+                </div>
+                <span class="pill">Centers • Chairs • Museum</span>
+            </div>
+
+            <div class="grid">
+                <article class="card">
+                    <div class="icon">📚</div>
+                    <h3>എഴുത്തച്ഛൻ പഠനകേന്ദ്രം</h3>
+                    <p>എഴുത്തച്ഛനെ കേന്ദ്രീകരിച്ച ആഴമേറിയ പഠനങ്ങളും ഗവേഷണവും കേന്ദ്രം ഉന്നം വെയ്ക്കുന്നു.</p>
+                    <div class="meta"><span class="pill">Center</span><a class="link" href="#">Read →</a></div>
+                </article>
+
+                <article class="card">
+                    <div class="icon">💡</div>
+                    <h3>ഭാഷാ ടെക്‌നോളജി കേന്ദ്രം</h3>
+                    <p>മലയാളഭാഷാപോഷണത്തിനുതകുന്ന അടിസ്ഥാന ഡിജിറ്റൽ വിഭവവികസനമാണ് മുഖ്യലക്ഷ്യം.</p>
+                    <div class="meta"><span class="pill">Tech</span><a class="link" href="#">Read →</a></div>
+                </article>
+
+                <article class="card">
+                    <div class="icon">📖</div>
+                    <h3>ഗുണ്ടർട്ട് ചെയർ</h3>
+                    <p>ട്യൂബിങ്ഗൻ സർവകലാശാലയുടെ സഹകരണത്തോടെ ജർമ്മനിയിൽ ഗുണ്ടർട്ട് ചെയർ സ്ഥാപിച്ചു.</p>
+                    <div class="meta"><span class="pill">Chair</span><a class="link" href="#">Read →</a></div>
+                </article>
+
+                <article class="card">
+                    <div class="icon">🏛️</div>
+                    <h3>പൈതൃക മ്യൂസിയം</h3>
+                    <p>സർവകലാശാലാ കാമ്പസിൽ പൈതൃക മ്യൂസിയം ഒരുക്കിയിട്ടുണ്ട് (മ്യൂസിയം പ്രോജക്ട് ഭാഗം).</p>
+                    <div class="meta"><span class="pill">Museum</span><a class="link" href="#">Read →</a></div>
+                </article>
+
+                <article class="card">
+                    <div class="icon">🕌</div>
+                    <h3>അറബിമലയാള പഠന കേന്ദ്രം</h3>
+                    <p>അറബിമലയാളഭാഷാകൃതികളുടെ ഭാഷാപഠനം പ്രോത്സാഹിപ്പിക്കുക; സാഹിത്യചരിത്രം നിർമ്മിക്കുക.</p>
+                    <div class="meta"><span class="pill">Center</span><a class="link" href="#">Read →</a></div>
+                </article>
+
+                <article class="card">
+                    <div class="icon">🌸</div>
+                    <h3>സ്‌ത്രീ സാഹിത്യ പഠനകേന്ദ്രം</h3>
+                    <p>സാഹിത്യത്തിലെ സ്ത്രീസ്വത്വം പഠനവിധേയമാക്കാനും സ്ത്രീപക്ഷ സാഹിത്യത്തിൽ മലയാളത്തിന്റെ സ്ഥാനം
+                        നിർണയിക്കാനും.</p>
+                    <div class="meta"><span class="pill">Center</span><a class="link" href="#">Read →</a></div>
+                </article>
+
+                <article class="card">
+                    <div class="icon">🖋️</div>
+                    <h3>വള്ളത്തോൾ ചെയർ</h3>
+                    <p>മലയാളസർവകലാശാലയിൽ വള്ളത്തോൾ ചെയർ പ്രവർത്തിച്ചു വരുന്നു.</p>
+                    <div class="meta"><span class="pill">Chair</span><a class="link" href="#">Read →</a></div>
+                </article>
+
+                <article class="card">
+                    <div class="icon">🌐</div>
+                    <h3>നവ സാമൂഹ്യ പഠനകേന്ദ്രം</h3>
+                    <p>മലയാളസർവകലാശാലയിൽ നവ സാമൂഹ്യ പഠനകേന്ദ്രം പ്രവർത്തിച്ചു വരുന്നു.</p>
+                    <div class="meta"><span class="pill">Center</span><a class="link" href="#">Read →</a></div>
+                </article>
+            </div>
+        </div>
+    </section>
+
+    <!-- UPDATES: Events / Tenders / Orders -->
+    <section id="updates">
+        <div class="container">
+            <div class="section-head">
+                <div>
+                    <h2>വിശേഷങ്ങൾ / Events • ദർഘാസ് / Tenders • ഉത്തരവുകൾ / Orders</h2>
+                    <p>ഹോം പേജിലെ ഏറ്റവും പ്രധാനപ്പെട്ട “Dynamic Updates” ബ്ലോക്ക്. CMS/DBയിൽ നിന്നും ലിസ്റ്റിംഗ് വരാൻ
+                        തയ്യാറാണ്.</p>
+                </div>
+                <button class="btn"
+                    onclick="showToast('ഇത് ഡെമോ ഡാറ്റയാണ്. CMS/WordPress ൽ നിന്ന് റിയൽ ഡാറ്റ ലോഡ് ചെയ്യാം.')">How it
+                    works</button>
+            </div>
+
+            <div class="tri">
+                <div class="list-card">
+                    <header>
+                        <h3>വിശേഷങ്ങൾ / Events</h3>
+                        <span class="badge blue">Live</span>
+                    </header>
+                    <div class="list">
+                        <div class="item">
+                            <div>
+                                <strong>റിസർച്ച് കോൺക്ലേവ്-2026</strong>
+                                <span>2026 • രജിസ്ട്രേഷൻ / വിശദാംശങ്ങൾ</span>
+                            </div>
+                            <span class="badge blue">Event</span>
+                        </div>
+                        <div class="item">
+                            <div>
+                                <strong>അക്കാദമിക് സെഷൻ അപ്ഡേറ്റ്</strong>
+                                <span>സെമസ്റ്റർ മാറ്റങ്ങൾ / അറിയിപ്പ്</span>
+                            </div>
+                            <span class="badge blue">Notice</span>
+                        </div>
+                        <div class="item">
+                            <div>
+                                <strong>പ്രസാധന റിലീസ്</strong>
+                                <span>പുതിയ പുസ്തകങ്ങൾ / ജേണൽ അപ്ഡേറ്റ്</span>
+                            </div>
+                            <span class="badge blue">News</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="list-card">
+                    <header>
+                        <h3>ദർഘാസ് / Tenders</h3>
+                        <span class="badge gold">Open</span>
+                    </header>
+                    <div class="list">
+                        <div class="item">
+                            <div>
+                                <strong>ടെൻഡർ: സേവന/സപ്ലൈ</strong>
+                                <span>അവസാന തീയതി: DD/MM/YYYY</span>
+                            </div>
+                            <span class="badge gold">Tender</span>
+                        </div>
+                        <div class="item">
+                            <div>
+                                <strong>ടെൻഡർ: കാമ്പസ് മെന്റനൻസ്</strong>
+                                <span>ഡോക്യുമെന്റ് PDF</span>
+                            </div>
+                            <span class="badge gold">PDF</span>
+                        </div>
+                        <div class="item">
+                            <div>
+                                <strong>Quotation Request</strong>
+                                <span>ക്വട്ടേഷൻ ക്ഷണം</span>
+                            </div>
+                            <span class="badge gold">RFQ</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="list-card">
+                    <header>
+                        <h3>ഉത്തരവുകൾ / Orders</h3>
+                        <span class="badge red">New</span>
+                    </header>
+                    <div class="list">
+                        <div class="item">
+                            <div>
+                                <strong>ഓഫീസ് ഉത്തരവ് #001</strong>
+                                <span>ഡൗൺലോഡ് / വിശദാംശങ്ങൾ</span>
+                            </div>
+                            <span class="badge red">Order</span>
+                        </div>
+                        <div class="item">
+                            <div>
+                                <strong>പരീക്ഷാ സംബന്ധ ഉത്തരവ്</strong>
+                                <span>ഭേദഗതി / പ്രാബല്യം</span>
+                            </div>
+                            <span class="badge red">Update</span>
+                        </div>
+                        <div class="item">
+                            <div>
+                                <strong>വിദ്യാർത്ഥി ക്ഷേമ ഉത്തരവ്</strong>
+                                <span>സ്കോളർഷിപ്പ് / സേവനങ്ങൾ</span>
+                            </div>
+                            <span class="badge red">Govt</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- IMPORTANT LINKS (from your bottom section) -->
+    <section id="quick">
+        <div class="container">
+            <div class="section-head">
+                <div>
+                    <h2>പ്രധാന ലിങ്കുകൾ</h2>
+                    <p>നിങ്ങൾ നൽകിയ “important links” സെക്ഷൻ — futuristic tiles ആയി പുനർരൂപകൽപ്പന ചെയ്തു.</p>
+                </div>
+                <span class="pill">External • Internal</span>
+            </div>
+
+            <div class="link-grid">
+                <a class="link-tile" href="https://keralabattlescovid.in/" target="_blank" rel="noreferrer">
+                    <strong>കേരള ബാറ്റിൽസ് കോവിഡ്</strong><span>Portal / Campaign</span>
+                </a>
+                <a class="link-tile" href="https://lms.temu.ac.in/" target="_blank" rel="noreferrer">
+                    <strong>എൽ.എം.എസ്</strong><span>Learning Management</span>
+                </a>
+                <a class="link-tile" href="#student-support">
+                    <strong>വിദ്യാർത്ഥിക്ഷേമം</strong><span>Support services</span>
+                </a>
+                <a class="link-tile" href="#student-support">
+                    <strong>വിദ്യാർത്ഥി യൂണിയൻ</strong><span>Union & activities</span>
+                </a>
+                <a class="link-tile" href="#">
+                    <strong>വീഡിയോ ഗാലറി</strong><span>Videos & media</span>
+                </a>
+                <a class="link-tile" href="#campus">
+                    <strong>ക്യാമ്പസ്</strong><span>Facilities & committees</span>
+                </a>
+
+                <a class="link-tile" href="#">
+                    <strong>സാമൂഹിക പ്രതിബദ്ധത</strong><span>Outreach programs</span>
+                </a>
+                <a class="link-tile" href="http://highereducation.kerala.gov.in/" target="_blank" rel="noreferrer">
+                    <strong>ഉന്നത വിദ്യാഭ്യാസ വകുപ്പ്</strong><span>Kerala Govt</span>
+                </a>
+                <a class="link-tile" href="https://www.youtube.com/" target="_blank" rel="noreferrer">
+                    <strong>അക്ഷരം യൂട്യൂബ് ചാനൽ</strong><span>Channel</span>
+                </a>
+                <a class="link-tile" href="https://www.aiu.ac.in/" target="_blank" rel="noreferrer">
+                    <strong>AIU</strong><span>Association of Indian Universities</span>
+                </a>
+                <a class="link-tile" href="https://mulibrary.temu.ac.in/" target="_blank" rel="noreferrer">
+                    <strong>ലൈബ്രറി കാറ്റലോഗ്</strong><span>Search catalog</span>
+                </a>
+                <a class="link-tile" href="http://www.cmo.kerala.gov.in/" target="_blank" rel="noreferrer">
+                    <strong>CMO Kerala</strong><span>Public grievance / relief</span>
+                </a>
+
+                <a class="link-tile" href="https://swayam.gov.in/" target="_blank" rel="noreferrer">
+                    <strong>SWAYAM</strong><span>MOOC platform</span>
+                </a>
+                <a class="link-tile" href="https://www.swayamprabha.gov.in/" target="_blank" rel="noreferrer">
+                    <strong>SWAYAM PRABHA</strong><span>DTH educational</span>
+                </a>
+                <a class="link-tile" href="http://epgp.inflibnet.ac.in/" target="_blank" rel="noreferrer">
+                    <strong>ഇ-പി ജി പഥശാല</strong><span>e-content</span>
+                </a>
+                <a class="link-tile" href="https://www.ugc.gov.in/" target="_blank" rel="noreferrer">
+                    <strong>UGC</strong><span>University Grants Commission</span>
+                </a>
+                <a class="link-tile" href="https://www.onlinesbi.sbi/sbicollect/icollecthome.htm?corpID=873070"
+                    target="_blank" rel="noreferrer">
+                    <strong>ഫീസ് പേയ്‌മെന്റ്</strong><span>SBI Collect</span>
+                </a>
+                <a class="link-tile" href="#">
+                    <strong>No To Drugs</strong><span>Awareness</span>
+                </a>
+
+                <a class="link-tile" href="https://glossary.temu.ac.in/" target="_blank" rel="noreferrer">
+                    <strong>സർവകലാശാല ഭരണനിഘണ്ടു</strong><span>Glossary portal</span>
+                </a>
+                <a class="link-tile" href="https://malayalamuniversity.samarth.ac.in/" target="_blank" rel="noreferrer">
+                    <strong>സമർത് പോർട്ടൽ</strong><span>Samarth portal</span>
+                </a>
+                <a class="link-tile" href="https://shodhganga.inflibnet.ac.in/" target="_blank" rel="noreferrer">
+                    <strong>ശോധ് ഗംഗ</strong><span>Thesis repository</span>
+                </a>
+                <a class="link-tile" href="https://shodhgangotri.inflibnet.ac.in/" target="_blank" rel="noreferrer">
+                    <strong>ശോധ് ഗംഗോത്രി</strong><span>Research proposals</span>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer>
+        <div class="container">
+            <div class="footer-grid">
+                <div class="foot-card">
+                    <h4>Malayalam University</h4>
+                    <p>
+                        Futuristic UI demo template.
+                        NAAC/Accreditation content intentionally removed.
+                        CMS/WordPress integration-ready (menus, posts, notices).
+                    </p>
+                    <div class="mini-links">
+                        <a href="#home">Home</a>
+                        <a href="#initiatives">Centers</a>
+                        <a href="#updates">Updates</a>
+                        <a href="#quick">Links</a>
+                    </div>
+                </div>
+
+                <div class="foot-card">
+                    <h4>Student Portals</h4>
+                    <p>
+                        ABC • DigiLocker • Scholarships • Samarth • UTSHA
+                    </p>
+                    <div class="mini-links">
+                        <a href="https://www.abc.gov.in/" target="_blank" rel="noreferrer">ABC</a>
+                        <a href="https://nad.digilocker.gov.in/" target="_blank" rel="noreferrer">DigiLocker</a>
+                        <a href="https://scholarships.gov.in/" target="_blank" rel="noreferrer">Scholarships</a>
+                        <a href="https://malayalamuniversity.samarth.ac.in/" target="_blank"
+                            rel="noreferrer">Samarth</a>
+                        <a href="https://utsah.ugc.ac.in/" target="_blank" rel="noreferrer">UTSHA</a>
+                    </div>
+                </div>
+
+                <div class="foot-card">
+                    <h4>Accessibility</h4>
+                    <p>
+                        Keyboard-friendly menus • High contrast cards • Responsive layout
+                    </p>
+                    <div class="mini-links">
+                        <a href="#"
+                            onclick="showToast('Contrast mode (demo). You can implement real contrast toggle.)'); return false;">Contrast</a>
+                        <a href="#"
+                            onclick="showToast('Font-size controls can be added easily.)'); return false;">Font</a>
+                        <a href="#"
+                            onclick="showToast('Screen-reader labels already included in key areas.)'); return false;">ARIA</a>
+                    </div>
+                </div>
+            </div>
+
+            <div style="margin-top:14px;color:rgba(255,255,255,.45);font-size:12px">
+                &copy; <span id="year"></span> Malayalam University • Developed by <a target="_blank"
+                    href="https://sprdh.com">SPRDH SOLUTIONS PVT LTD.</a>
+            </div>
+        </div>
+    </footer>
+
+    <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+    <script>
+        // Helpers
+        const $ = (q, root = document) => root.querySelector(q);
+        const $$ = (q, root = document) => Array.from(root.querySelectorAll(q));
+
+        function scrollToId(id) {
+            const el = document.getElementById(id);
+            if (!el) return;
+            const y = el.getBoundingClientRect().top + window.scrollY - 86;
+            window.scrollTo({ top: y, behavior: "smooth" });
+        }
+
+        function showToast(message) {
+            const t = $("#toast");
+            t.innerHTML = `<strong>Info:</strong> ${message}`;
+            t.classList.add("show");
+            clearTimeout(window.__toastTimer);
+            window.__toastTimer = setTimeout(() => t.classList.remove("show"), 2800);
+        }
+
+        // Year
+        $("#year").textContent = new Date().getFullYear();
+
+        // Desktop dropdown handling
+        const ddItems = $$("[data-dd]");
+        function closeAllDropdowns() {
+            ddItems.forEach(i => i.classList.remove("open"));
+            ddItems.forEach(i => {
+                const btn = i.querySelector(".nav-link[role='button']");
+                if (btn) btn.setAttribute("aria-expanded", "false");
+            });
+        }
+
+        ddItems.forEach(item => {
+            const btn = item.querySelector(".nav-link[role='button']");
+            const drop = item.querySelector(".dropdown");
+            if (!btn || !drop) return;
+
+            const open = () => {
+                closeAllDropdowns();
+                item.classList.add("open");
+                btn.setAttribute("aria-expanded", "true");
+            };
+            const toggle = () => {
+                const isOpen = item.classList.contains("open");
+                closeAllDropdowns();
+                if (!isOpen) {
+                    item.classList.add("open");
+                    btn.setAttribute("aria-expanded", "true");
+                }
+            };
+
+            btn.addEventListener("click", (e) => { e.preventDefault(); toggle(); });
+            btn.addEventListener("keydown", (e) => {
+                if (e.key === "Enter" || e.key === " ") {
+                    e.preventDefault();
+                    toggle();
+                }
+                if (e.key === "Escape") {
+                    closeAllDropdowns();
+                    btn.blur();
+                }
+            });
+
+            // Keep open when hovering (desktop feel)
+            item.addEventListener("mouseenter", () => open());
+            item.addEventListener("mouseleave", () => closeAllDropdowns());
+        });
+
+        document.addEventListener("click", (e) => {
+            if (!e.target.closest("[data-dd]")) closeAllDropdowns();
+        });
+
+        // Mobile menu
+        const burger = $("#burger");
+        const sheet = $("#mobileSheet");
+        const closeBtn = $("#closeMobile");
+
+        function openMobile() {
+            sheet.classList.add("open");
+            sheet.setAttribute("aria-hidden", "false");
+        }
+        function closeMobile() {
+            sheet.classList.remove("open");
+            sheet.setAttribute("aria-hidden", "true");
+        }
+
+        burger?.addEventListener("click", openMobile);
+        closeBtn?.addEventListener("click", closeMobile);
+        sheet?.addEventListener("click", (e) => {
+            if (e.target === sheet) closeMobile();
+        });
+        window.closeMobile = closeMobile;
+
+        // Fake language toggle (demo)
+        const langToggle = $("#langToggle");
+        const langLabel = $("#langLabel");
+        let lang = "ML";
+        langToggle?.addEventListener("click", () => {
+            lang = (lang === "ML") ? "EN" : "ML";
+            langLabel.textContent = lang;
+            showToast(`Language switched to ${lang} (demo). Content can be loaded from bilingual CMS fields.`);
+        });
+
+        // Smooth hash scroll on page load
+        window.addEventListener("load", () => {
+            if (location.hash) {
+                const id = location.hash.replace("#", "");
+                setTimeout(() => scrollToId(id), 60);
+            }
+        });
+
+        // SLIDER FUNCTIONALITY
+        const slider = {
+            currentSlide: 0,
+            totalSlides: 0,
+            slides: [],
+            dots: [],
+            interval: null,
+
+            init() {
+                this.slides = $$('.slide');
+                this.dots = $$('.slider-dots .dot');
+                this.totalSlides = this.slides.length;
+
+                if (this.slides.length === 0) return;
+
+                // Initialize counter
+                $('.slide-counter .total').textContent = this.totalSlides.toString().padStart(2, '0');
+
+                // Set up event listeners
+                $$('.slider-arrow.prev').forEach(btn => btn.addEventListener('click', () => this.prev()));
+                $$('.slider-arrow.next').forEach(btn => btn.addEventListener('click', () => this.next()));
+
+                this.dots.forEach((dot, index) => {
+                    dot.addEventListener('click', () => this.goToSlide(index));
+                });
+
+                // Start auto slide
+                this.startAutoSlide();
+
+                // Pause on hover
+                const sliderContainer = $('.hero-slider');
+                sliderContainer.addEventListener('mouseenter', () => this.stopAutoSlide());
+                sliderContainer.addEventListener('mouseleave', () => this.startAutoSlide());
+
+                // Touch support for mobile
+                let touchStartX = 0;
+                let touchEndX = 0;
+
+                sliderContainer.addEventListener('touchstart', (e) => {
+                    touchStartX = e.changedTouches[0].screenX;
+                    this.stopAutoSlide();
+                });
+
+                sliderContainer.addEventListener('touchend', (e) => {
+                    touchEndX = e.changedTouches[0].screenX;
+                    this.handleSwipe(touchStartX, touchEndX);
+                    this.startAutoSlide();
+                });
+            },
+
+            goToSlide(index) {
+                // Remove active class from current slide and dot
+                this.slides[this.currentSlide].classList.remove('active');
+                this.dots[this.currentSlide].classList.remove('active');
+
+                // Update current slide
+                this.currentSlide = (index + this.totalSlides) % this.totalSlides;
+
+                // Add active class to new slide and dot
+                this.slides[this.currentSlide].classList.add('active');
+                this.dots[this.currentSlide].classList.add('active');
+
+                // Update counter
+                $('.slide-counter .current').textContent = (this.currentSlide + 1).toString().padStart(2, '0');
+            },
+
+            next() {
+                this.goToSlide(this.currentSlide + 1);  // FIXED: Changed from +0 to +1
+            },
+
+            prev() {
+                this.goToSlide(this.currentSlide - 1);
+            },
+
+            startAutoSlide() {
+                this.stopAutoSlide();
+                this.interval = setInterval(() => this.next(), 6000); // Change slide every 6 seconds
+            },
+
+            stopAutoSlide() {
+                if (this.interval) {
+                    clearInterval(this.interval);
+                    this.interval = null;
+                }
+            },
+
+            handleSwipe(startX, endX) {
+                const swipeThreshold = 50;
+                const diff = startX - endX;
+
+                if (Math.abs(diff) > swipeThreshold) {
+                    if (diff > 0) {
+                        this.next(); // Swipe left
+                    } else {
+                        this.prev(); // Swipe right
+                    }
+                }
+            }
+        };
+
+        // Initialize slider when DOM is loaded
+        document.addEventListener('DOMContentLoaded', () => {
+            slider.init();
+        });
+
+        // Update the existing load event
+        window.addEventListener('load', () => {
+            // Initialize slider (already done in DOMContentLoaded, but keep for safety)
+            if (slider.slides.length === 0) {
+                slider.init();
+            }
+
+            // Handle hash scroll
+            if (location.hash) {
+                const id = location.hash.replace("#", "");
+                setTimeout(() => scrollToId(id), 100);
+            }
+        });
+    </script>
+</body>
+
+</html>
+:root {
+--bg0: #f8f9fa;
+--bg1: #ffffff;
+--card: rgba(255, 255, 255, 0.95);
+--card2: rgba(255, 255, 255, 0.98);
+--stroke: rgba(51, 51, 51, 0.12);
+--text: #333333;
+--muted: #666666;
+--muted2: #888888;
+--primary: #ac2629;
+--secondary: #3a7549;
+--accent: #f1af47;
+--neutral: #333333;
+--warn: #d9534f;
+--success: #5cb85c;
+--info: #5bc0de;
+
+--radius: 16px;
+--shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
+--shadow2: 0 4px 20px rgba(0, 0, 0, 0.05);
+--blur: 10px;
+--container: 1200px;
+--navH: 72px;
+}
+
+* {
+box-sizing: border-box;
+}
+
+html,
+body {
+height: 100%;
+}
+
+body {
+margin: 0;
+font-family: Inter, "Noto Sans Malayalam", system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+color: var(--text);
+background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
+overflow-x: hidden;
+}
+
+/* Light grid background */
+.grid-bg {
+position: fixed;
+inset: 0;
+pointer-events: none;
+opacity: .04;
+background-image:
+linear-gradient(rgba(51, 51, 51, 0.1) 1px, transparent 1px),
+linear-gradient(90deg, rgba(51, 51, 51, 0.08) 1px, transparent 1px);
+background-size: 56px 56px;
+mask-image: radial-gradient(closest-side at 50% 25%, rgba(0, 0, 0, 0.8), rgba(0, 0, 0, 0.1));
+transform: translateZ(0);
+animation: drift 25s linear infinite;
+}
+
+@keyframes drift {
+0% {
+transform: translateY(0);
+}
+
+100% {
+transform: translateY(56px);
+}
+}
+
+/* Topbar - Light theme */
+.topbar {
+position: sticky;
+top: 0;
+z-index: 1000;
+height: var(--navH);
+backdrop-filter: blur(var(--blur));
+background: rgba(255, 255, 255, 0.92);
+border-bottom: 1px solid rgba(51, 51, 51, 0.08);
+box-shadow: 0 2px 20px rgba(0, 0, 0, 0.05);
+}
+
+.brand h1 {
+color: var(--primary);
+font-weight: 800;
+}
+
+.brand small {
+color: var(--muted);
+}
+
+/* ===== TWO-PART HEADER ===== */
+.header {
+position: sticky;
+top: 0;
+z-index: 1000;
+background: rgba(255, 255, 255, 0.98);
+box-shadow: 0 4px 30px rgba(0, 0, 0, 0.08);
+backdrop-filter: blur(10px);
+}
+
+/* TOP SECTION */
+.header-top {
+padding: 8px 0;
+border-bottom: 1px solid rgba(51, 51, 51, 0.1);
+background: rgba(255, 255, 255, 0.98);
+}
+
+.header-top-inner {
+display: flex;
+justify-content: space-between;
+align-items: center;
+gap: 20px;
+}
+
+/* Compact Logo */
+.logo-link {
+display: flex;
+align-items: center;
+gap: 12px;
+text-decoration: none;
+color: inherit;
+}
+
+.logo-link img {
+width: 300px;
+height: auto;
+object-fit: cover;
+}
+
+.logo-compact {
+width: 45px;
+height: 45px;
+flex-shrink: 0;
+position: relative;
+}
+
+.logo-inner {
+width: 100%;
+height: 100%;
+border-radius: 12px;
+background: linear-gradient(135deg, var(--primary), #c03939);
+display: flex;
+align-items: center;
+justify-content: center;
+color: white;
+font-weight: 900;
+font-size: 18px;
+font-family: "Noto Sans Malayalam", sans-serif;
+border: 2px solid white;
+box-shadow: 0 8px 25px rgba(172, 38, 41, 0.2);
+position: relative;
+overflow: hidden;
+}
+
+.logo-inner::after {
+content: '';
+position: absolute;
+top: -50%;
+left: -50%;
+width: 200%;
+height: 200%;
+background: linear-gradient(to right,
+transparent 30%,
+rgba(255, 255, 255, 0.3) 50%,
+transparent 70%);
+transform: rotate(30deg);
+animation: shine 3s infinite linear;
+}
+
+@keyframes shine {
+0% {
+transform: translateX(-100%) rotate(30deg);
+}
+
+100% {
+transform: translateX(100%) rotate(30deg);
+}
+}
+
+.logo-symbol {
+position: relative;
+z-index: 1;
+}
+
+.logo-text h1 {
+margin: 0;
+font-size: 16px;
+font-weight: 800;
+color: var(--primary);
+line-height: 1.2;
+}
+
+.logo-text small {
+display: block;
+font-size: 11px;
+color: var(--muted);
+margin-top: 2px;
+line-height: 1.3;
+}
+
+/* Quick Actions */
+.quick-actions {
+display: flex;
+align-items: center;
+gap: 30px;
+}
+
+.contact-info {
+display: flex;
+gap: 20px;
+}
+
+.contact-item {
+display: flex;
+align-items: center;
+gap: 8px;
+font-size: 13px;
+color: var(--muted);
+white-space: nowrap;
+}
+
+.action-buttons {
+display: flex;
+align-items: center;
+gap: 10px;
+}
+
+.btn-small {
+padding: 8px 16px;
+font-size: 13px;
+border-radius: 10px;
+border: 1px solid rgba(51, 51, 51, 0.15);
+background: rgba(255, 255, 255, 0.9);
+color: var(--text);
+text-decoration: none;
+display: inline-flex;
+align-items: center;
+gap: 6px;
+transition: all 0.2s ease;
+}
+
+.btn-small:hover {
+background: rgba(172, 38, 41, 0.05);
+border-color: rgba(172, 38, 41, 0.3);
+transform: translateY(-1px);
+}
+
+/* BOTTOM SECTION */
+.header-bottom {
+padding: 0;
+background: rgba(255, 255, 255, 0.98);
+}
+
+.main-nav {
+position: relative;
+}
+
+.nav-menu {
+display: flex;
+align-items: center;
+list-style: none;
+margin: 0;
+padding: 0;
+gap: 2px;
+justify-content: center;
+}
+
+.nav-item {
+position: relative;
+}
+
+.nav-item.has-megamenu {
+position: static;
+}
+
+.nav-link {
+display: flex;
+align-items: center;
+gap: 8px;
+padding: 16px 18px;
+color: var(--muted);
+font-weight: 600;
+font-size: 14px;
+text-decoration: none;
+transition: all 0.2s ease;
+border-radius: 10px;
+white-space: nowrap;
+}
+
+.nav-link:hover {
+color: var(--primary);
+background: rgba(172, 38, 41, 0.05);
+}
+
+.dropdown-arrow {
+font-size: 10px;
+opacity: 0.6;
+margin-left: 2px;
+}
+
+.nav-item.cta .nav-link {
+background: linear-gradient(135deg, var(--primary), #c03939);
+color: white;
+padding: 16px 24px;
+border-radius: 12px;
+margin-left: 10px;
+box-shadow: 0 8px 25px rgba(172, 38, 41, 0.25);
+}
+
+.nav-item.cta .nav-link:hover {
+background: linear-gradient(135deg, #c03939, var(--primary));
+transform: translateY(-2px);
+box-shadow: 0 12px 30px rgba(172, 38, 41, 0.35);
+}
+
+/* Dropdown Menu */
+.dropdown-menu {
+position: absolute;
+top: 100%;
+left: 0;
+min-width: 320px;
+background: rgba(255, 255, 255, 0.98);
+border-radius: 16px;
+box-shadow: 0 25px 60px rgba(0, 0, 0, 0.15);
+border: 1px solid rgba(51, 51, 51, 0.1);
+padding: 20px;
+opacity: 0;
+visibility: hidden;
+transform: translateY(10px);
+transition: all 0.3s ease;
+z-index: 1000;
+backdrop-filter: blur(10px);
+}
+
+.has-dropdown:hover .dropdown-menu {
+opacity: 1;
+visibility: visible;
+transform: translateY(0);
+}
+
+.dropdown-header {
+font-size: 12px;
+font-weight: 700;
+color: var(--secondary);
+text-transform: uppercase;
+letter-spacing: 0.5px;
+margin-bottom: 16px;
+padding-bottom: 8px;
+border-bottom: 1px solid rgba(58, 117, 73, 0.1);
+}
+
+.dropdown-grid {
+display: flex;
+flex-direction: column;
+gap: 12px;
+}
+
+.dropdown-item {
+display: flex;
+align-items: center;
+gap: 12px;
+padding: 12px;
+border-radius: 12px;
+text-decoration: none;
+transition: all 0.2s ease;
+border: 1px solid rgba(51, 51, 51, 0.08);
+background: rgba(255, 255, 255, 0.7);
+}
+
+.dropdown-item:hover {
+background: rgba(172, 38, 41, 0.05);
+border-color: rgba(172, 38, 41, 0.2);
+transform: translateX(5px);
+}
+
+.item-icon {
+font-size: 20px;
+opacity: 0.8;
+}
+
+.dropdown-item div {
+flex: 1;
+}
+
+.dropdown-item strong {
+display: block;
+font-size: 14px;
+color: var(--neutral);
+margin-bottom: 4px;
+}
+
+.dropdown-item span {
+display: block;
+font-size: 12px;
+color: var(--muted);
+line-height: 1.4;
+}
+
+/* Megamenu */
+.megamenu {
+position: absolute;
+top: 100%;
+left: 0;
+width: 100%;
+transform: translateY(10px);
+background: rgba(255, 255, 255, 0.98);
+border-radius: 0 0 20px 20px;
+box-shadow: 0 30px 80px rgba(0, 0, 0, 0.2);
+border: 1px solid rgba(51, 51, 51, 0.1);
+border-top: none;
+padding: 30px 0;
+opacity: 0;
+visibility: hidden;
+transition: all 0.3s ease;
+z-index: 1000;
+backdrop-filter: blur(10px);
+}
+
+.has-megamenu:hover .megamenu {
+opacity: 1;
+visibility: visible;
+transform: translateY(0);
+}
+
+.megamenu-header {
+margin-bottom: 30px;
+text-align: center;
+}
+
+.megamenu-header h3 {
+margin: 0 0 8px 0;
+font-size: 20px;
+color: var(--primary);
+font-weight: 800;
+}
+
+.megamenu-header p {
+margin: 0;
+color: var(--muted);
+font-size: 14px;
+}
+
+.megamenu-grid {
+display: grid;
+grid-template-columns: repeat(4, 1fr);
+gap: 30px;
+max-width: var(--container);
+margin: 0 auto;
+padding: 0 20px;
+}
+
+.megamenu-col {
+padding: 20px;
+border-radius: 16px;
+background: rgba(255, 255, 255, 0.7);
+border: 1px solid rgba(51, 51, 51, 0.08);
+}
+
+.megamenu-col.highlight {
+background: linear-gradient(135deg, rgba(172, 38, 41, 0.05), rgba(58, 117, 73, 0.05));
+border-color: rgba(172, 38, 41, 0.1);
+}
+
+.megamenu-col h4 {
+margin: 0 0 16px 0;
+font-size: 16px;
+color: var(--secondary);
+font-weight: 700;
+padding-bottom: 10px;
+border-bottom: 1px solid rgba(58, 117, 73, 0.1);
+}
+
+.megamenu-links {
+display: flex;
+flex-direction: column;
+gap: 12px;
+}
+
+.megamenu-links a {
+display: flex;
+flex-direction: column;
+padding: 12px;
+border-radius: 10px;
+text-decoration: none;
+transition: all 0.2s ease;
+border: 1px solid rgba(51, 51, 51, 0.06);
+background: rgba(255, 255, 255, 0.9);
+}
+
+.megamenu-links a:hover {
+background: rgba(172, 38, 41, 0.05);
+border-color: rgba(172, 38, 41, 0.2);
+transform: translateY(-2px);
+}
+
+.highlight-link {
+background: rgba(255, 255, 255, 0.95) !important;
+}
+
+.megamenu-links strong {
+font-size: 14px;
+color: var(--neutral);
+margin-bottom: 4px;
+}
+
+.megamenu-links span {
+font-size: 12px;
+color: var(--muted);
+line-height: 1.4;
+}
+
+/* Mobile Toggle */
+.mobile-toggle {
+display: none;
+width: 50px;
+height: 50px;
+border-radius: 12px;
+border: 1px solid rgba(51, 51, 51, 0.15);
+background: rgba(255, 255, 255, 0.9);
+flex-direction: column;
+justify-content: center;
+align-items: center;
+gap: 5px;
+cursor: pointer;
+padding: 0;
+margin-left: 10px;
+}
+
+.mobile-toggle .bar {
+width: 24px;
+height: 2px;
+background: var(--primary);
+border-radius: 2px;
+transition: all 0.3s ease;
+}
+
+/* Responsive */
+@media (max-width: 1200px) {
+.megamenu-grid {
+grid-template-columns: repeat(2, 1fr);
+}
+
+.contact-info {
+display: none;
+}
+}
+
+@media (max-width: 980px) {
+.header-top {
+padding: 12px 0;
+}
+
+.quick-actions {
+display: none;
+}
+
+.mobile-toggle {
+display: flex;
+}
+
+.nav-menu {
+display: none;
+}
+
+.header-bottom {
+padding: 10px 0;
+border-top: 1px solid rgba(51, 51, 51, 0.1);
+}
+
+.mobile-toggle.active .bar:nth-child(1) {
+transform: rotate(45deg) translate(6px, 6px);
+}
+
+.mobile-toggle.active .bar:nth-child(2) {
+opacity: 0;
+}
+
+.mobile-toggle.active .bar:nth-child(3) {
+transform: rotate(-45deg) translate(6px, -6px);
+}
+}
+
+@media (max-width: 768px) {
+.logo-text h1 {
+font-size: 14px;
+}
+
+.logo-text small {
+font-size: 10px;
+}
+
+.logo-compact {
+width: 40px;
+height: 40px;
+}
+
+.logo-inner {
+font-size: 16px;
+}
+}
+
+@media (max-width: 480px) {
+.logo-text h1 {
+font-size: 12px;
+}
+
+.logo-text small {
+display: none;
+}
+
+.logo-compact {
+width: 36px;
+height: 36px;
+}
+
+.logo-inner {
+font-size: 14px;
+}
+}
+
+/* Buttons */
+.btn {
+border: 1px solid rgba(51, 51, 51, 0.15);
+background: rgba(255, 255, 255, 0.9);
+color: var(--text);
+transition: all 0.2s ease;
+}
+
+.btn:hover {
+transform: translateY(-2px);
+background: rgba(255, 255, 255, 1);
+box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
+}
+
+.btn.primary {
+border-color: rgba(172, 38, 41, 0.3);
+background: linear-gradient(135deg, var(--primary) 0%, #c03939 100%);
+color: white;
+box-shadow: 0 8px 25px rgba(172, 38, 41, 0.25);
+}
+
+.btn.primary:hover {
+background: linear-gradient(135deg, #c03939 0%, var(--primary) 100%);
+box-shadow: 0 12px 30px rgba(172, 38, 41, 0.35);
+}
+
+.toggle {
+border: 1px solid rgba(51, 51, 51, 0.15);
+background: rgba(255, 255, 255, 0.9);
+color: var(--muted);
+}
+
+.dot {
+background: var(--secondary);
+box-shadow: 0 0 12px rgba(58, 117, 73, 0.4);
+}
+
+/* Mobile panel */
+.mobile-panel {
+background: rgba(255, 255, 255, 0.98);
+border-left: 1px solid rgba(51, 51, 51, 0.1);
+box-shadow: var(--shadow);
+}
+
+.mobile-head {
+border-bottom: 1px solid rgba(51, 51, 51, 0.1);
+}
+
+details {
+border: 1px solid rgba(51, 51, 51, 0.1);
+background: rgba(255, 255, 255, 0.9);
+}
+
+summary {
+color: var(--neutral);
+}
+
+.detail-body {
+border-top: 1px solid rgba(51, 51, 51, 0.08);
+}
+
+.mobile-link {
+border: 1px solid rgba(51, 51, 51, 0.1);
+background: rgba(255, 255, 255, 0.8);
+color: var(--muted);
+font-weight: 600;
+}
+
+.mobile-link:hover {
+background: rgba(172, 38, 41, 0.05);
+color: var(--primary);
+}
+
+/* Hero section */
+.hero-card {
+border: 1px solid rgba(51, 51, 51, 0.1);
+background: linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0.85));
+backdrop-filter: blur(var(--blur));
+box-shadow: var(--shadow);
+position: relative;
+}
+
+.hero-card:before {
+content: "";
+position: absolute;
+inset: -40%;
+background: radial-gradient(circle at 20% 20%, rgba(172, 38, 41, 0.08), transparent 50%),
+radial-gradient(circle at 80% 40%, rgba(58, 117, 73, 0.06), transparent 45%),
+radial-gradient(circle at 40% 90%, rgba(241, 175, 71, 0.05), transparent 55%);
+transform: translateZ(0);
+filter: blur(2px);
+}
+
+.hero-kicker {
+border: 1px solid rgba(51, 51, 51, 0.12);
+background: rgba(255, 255, 255, 0.9);
+color: var(--muted);
+}
+
+.hero-title {
+color: var(--neutral);
+}
+
+.hero-sub {
+color: var(--muted);
+}
+
+.hero-sub b {
+color: var(--primary);
+}
+
+.stat {
+padding: 16px;
+border-radius: 14px;
+border: 1px solid rgba(51, 51, 51, 0.1);
+background: rgba(255, 255, 255, 0.8);
+transition: all 0.2s ease;
+}
+
+.stat:hover {
+border-color: rgba(172, 38, 41, 0.2);
+background: rgba(255, 255, 255, 0.95);
+transform: translateY(-2px);
+}
+
+.stat strong {
+color: var(--primary);
+}
+
+.side-card {
+border: 1px solid rgba(51, 51, 51, 0.1);
+background: rgba(255, 255, 255, 0.9);
+backdrop-filter: blur(var(--blur));
+box-shadow: var(--shadow2);
+}
+
+.side-card h3 {
+color: var(--secondary);
+}
+
+/* NOTIFICATIONS PANEL - UPDATED */
+.notifications-panel {
+height: auto;
+border-radius: 22px;
+border: 1px solid rgba(51, 51, 51, 0.12);
+background: rgba(255, 255, 255, 0.95);
+backdrop-filter: blur(var(--blur));
+box-shadow: var(--shadow);
+padding: 20px;
+display: flex;
+flex-direction: column;
+position: relative;
+overflow: hidden;
+}
+
+.notifications-header {
+display: flex;
+justify-content: space-between;
+align-items: center;
+margin-bottom: 20px;
+padding-bottom: 15px;
+border-bottom: 2px solid rgba(172, 38, 41, 0.1);
+}
+
+.notifications-header h3 {
+margin: 0;
+font-size: 16px;
+color: var(--primary);
+font-weight: 700;
+display: flex;
+align-items: center;
+gap: 8px;
+}
+
+.live-badge {
+background: linear-gradient(135deg, var(--primary), #c03939);
+color: white;
+padding: 4px 12px;
+border-radius: 20px;
+font-size: 11px;
+font-weight: 700;
+letter-spacing: 0.5px;
+animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+
+0%,
+100% {
+opacity: 1;
+}
+
+50% {
+opacity: 0.7;
+}
+}
+
+.notifications-container {
+flex: 1;
+position: relative;
+overflow: hidden;
+border-radius: 16px;
+background: rgba(255, 255, 255, 0.7);
+border: 1px solid rgba(51, 51, 51, 0.08);
+}
+
+.notifications-track {
+position: absolute;
+top: 0;
+left: 0;
+width: 100%;
+padding: 10px;
+animation: scrollNotifications 10s linear infinite;
+animation-delay: -10s;
+/* Start from middle */
+}
+
+.notifications-track.paused {
+animation-play-state: paused !important;
+}
+
+.notifications-container:hover .notifications-track:not(.paused) {
+animation-play-state: paused !important;
+}
+
+@keyframes scrollNotifications {
+0% {
+transform: translateY(0);
+}
+
+100% {
+transform: translateY(-50%);
+/* Only scroll half way since we have duplicates */
+}
+}
+
+.notification-item {
+background: rgba(255, 255, 255, 0.95);
+border-radius: 14px;
+padding: 16px;
+margin-bottom: 12px;
+border: 1px solid rgba(51, 51, 51, 0.1);
+box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+transition: all 0.3s ease;
+position: relative;
+overflow: hidden;
+cursor: pointer;
+}
+
+.notification-item:hover {
+transform: translateY(-2px);
+box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+border-color: rgba(172, 38, 41, 0.2);
+}
+
+.notification-item::before {
+content: '';
+position: absolute;
+top: 0;
+left: 0;
+width: 4px;
+height: 100%;
+background: var(--primary);
+border-radius: 4px 0 0 4px;
+}
+
+.notification-item.urgent::before {
+background: var(--primary);
+animation: urgentPulse 1s infinite;
+}
+
+.notification-item.warning::before {
+background: var(--accent);
+}
+
+.notification-item.info::before {
+background: var(--secondary);
+}
+
+@keyframes urgentPulse {
+
+0%,
+100% {
+opacity: 1;
+}
+
+50% {
+opacity: 0.5;
+}
+}
+
+.notification-badge {
+display: inline-block;
+padding: 4px 10px;
+border-radius: 20px;
+font-size: 11px;
+font-weight: 700;
+margin-bottom: 8px;
+text-transform: uppercase;
+letter-spacing: 0.5px;
+}
+
+.notification-badge.urgent {
+background: rgba(172, 38, 41, 0.1);
+color: var(--primary);
+border: 1px solid rgba(172, 38, 41, 0.2);
+}
+
+.notification-badge.warning {
+background: rgba(241, 175, 71, 0.1);
+color: #b07d2a;
+border: 1px solid rgba(241, 175, 71, 0.2);
+}
+
+.notification-badge.info {
+background: rgba(58, 117, 73, 0.1);
+color: var(--secondary);
+border: 1px solid rgba(58, 117, 73, 0.2);
+}
+
+.notification-title {
+font-size: 14px;
+font-weight: 700;
+color: var(--neutral);
+margin: 0 0 6px 0;
+line-height: 1.4;
+}
+
+.notification-desc {
+font-size: 13px;
+color: var(--muted);
+margin: 0 0 10px 0;
+line-height: 1.5;
+}
+
+.notification-meta {
+display: flex;
+justify-content: space-between;
+align-items: center;
+font-size: 12px;
+color: var(--muted2);
+}
+
+.notification-date {
+display: flex;
+align-items: center;
+gap: 4px;
+}
+
+.notification-link {
+color: var(--primary);
+font-weight: 700;
+font-size: 12px;
+text-decoration: none;
+display: inline-flex;
+align-items: center;
+gap: 4px;
+transition: all 0.2s ease;
+}
+
+.notification-link:hover {
+color: #c03939;
+gap: 6px;
+}
+
+.notifications-controls {
+display: flex;
+justify-content: space-between;
+align-items: center;
+margin-top: 20px;
+padding-top: 15px;
+border-top: 1px solid rgba(51, 51, 51, 0.1);
+}
+
+.notification-btn {
+padding: 8px 16px;
+border-radius: 12px;
+border: 1px solid rgba(51, 51, 51, 0.15);
+background: rgba(255, 255, 255, 0.9);
+color: var(--text);
+font-size: 13px;
+font-weight: 600;
+cursor: pointer;
+transition: all 0.2s ease;
+display: flex;
+align-items: center;
+gap: 6px;
+}
+
+.notification-btn:hover {
+background: rgba(172, 38, 41, 0.05);
+border-color: rgba(172, 38, 41, 0.3);
+transform: translateY(-1px);
+}
+
+.pause-btn {
+padding: 8px 12px;
+}
+
+/* Responsive */
+@media (max-width: 980px) {
+.notifications-panel {
+margin-top: 20px;
+}
+
+.hero-wrap {
+grid-template-columns: 1fr;
+}
+
+.notifications-track {
+animation-duration: 50s;
+}
+}
+
+@media (max-width: 768px) {
+.notifications-panel {
+height: 300px;
+}
+
+.notifications-track {
+animation-duration: 60s;
+}
+}
+
+@media (max-width: 480px) {
+.notifications-panel {
+padding: 15px;
+}
+
+.notification-item {
+padding: 14px;
+}
+
+.notification-title {
+font-size: 13px;
+}
+
+.notification-desc {
+font-size: 12px;
+}
+}
+
+/* Cards */
+.card {
+border: 1px solid rgba(51, 51, 51, 0.12);
+background: rgba(255, 255, 255, 0.9);
+backdrop-filter: blur(var(--blur));
+box-shadow: var(--shadow2);
+transition: all 0.2s ease;
+}
+
+.card:hover {
+transform: translateY(-4px);
+border-color: rgba(172, 38, 41, 0.25);
+background: rgba(255, 255, 255, 0.98);
+box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+}
+
+.card .icon {
+border: 1px solid rgba(51, 51, 51, 0.15);
+background: linear-gradient(135deg, rgba(172, 38, 41, 0.15), rgba(58, 117, 73, 0.1));
+color: var(--primary);
+font-weight: 700;
+}
+
+.card h3 {
+color: var(--neutral);
+}
+
+.card p {
+color: var(--muted);
+}
+
+.meta {
+border-top: 1px solid rgba(51, 51, 51, 0.1);
+}
+
+.pill {
+color: var(--muted);
+border: 1px solid rgba(51, 51, 51, 0.15);
+background: rgba(255, 255, 255, 0.8);
+}
+
+.link {
+color: var(--primary);
+font-weight: 700;
+}
+
+/* List cards */
+.list-card {
+border: 1px solid rgba(51, 51, 51, 0.12);
+background: rgba(255, 255, 255, 0.9);
+backdrop-filter: blur(var(--blur));
+box-shadow: var(--shadow2);
+}
+
+.list-card header {
+border-bottom: 1px solid rgba(51, 51, 51, 0.1);
+background: rgba(58, 117, 73, 0.03);
+}
+
+.list-card header h3 {
+color: var(--secondary);
+}
+
+.item {
+border: 1px solid rgba(51, 51, 51, 0.1);
+background: rgba(255, 255, 255, 0.7);
+transition: all 0.2s ease;
+}
+
+.item:hover {
+border-color: rgba(241, 175, 71, 0.3);
+background: rgba(241, 175, 71, 0.05);
+}
+
+.item strong {
+color: var(--neutral);
+}
+
+.badge {
+border: 1px solid rgba(51, 51, 51, 0.15);
+background: rgba(255, 255, 255, 0.8);
+color: var(--muted);
+}
+
+.badge.red {
+border-color: rgba(172, 38, 41, 0.3);
+color: var(--primary);
+background: rgba(172, 38, 41, 0.05);
+}
+
+.badge.gold {
+border-color: rgba(241, 175, 71, 0.3);
+color: #b07d2a;
+background: rgba(241, 175, 71, 0.05);
+}
+
+.badge.blue {
+border-color: rgba(58, 117, 73, 0.3);
+color: var(--secondary);
+background: rgba(58, 117, 73, 0.05);
+}
+
+/* Link tiles */
+.link-tile {
+border: 1px solid rgba(51, 51, 51, 0.12);
+background: rgba(255, 255, 255, 0.9);
+backdrop-filter: blur(var(--blur));
+transition: all 0.2s ease;
+}
+
+.link-tile:hover {
+transform: translateY(-4px);
+border-color: rgba(172, 38, 41, 0.25);
+background: rgba(255, 255, 255, 1);
+box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+}
+
+.link-tile strong {
+color: var(--neutral);
+}
+
+/* Footer */
+footer {
+margin-top: 26px;
+border-top: 1px solid rgba(51, 51, 51, 0.1);
+background: #1F2133;
+backdrop-filter: blur(var(--blur));
+}
+
+.foot-card {
+border: 1px solid rgba(51, 51, 51, 0.1);
+background: rgba(255, 255, 255, 0.9);
+}
+
+.foot-card h4 {
+color: var(--secondary);
+}
+
+.foot-card p {
+color: var(--muted);
+}
+
+.mini-links a {
+padding: 8px 12px;
+border-radius: 999px;
+border: 1px solid rgba(51, 51, 51, 0.12);
+background: rgba(255, 255, 255, 0.8);
+font-size: 12px;
+color: var(--muted);
+font-weight: 600;
+transition: all 0.2s ease;
+}
+
+.mini-links a:hover {
+color: var(--primary);
+background: rgba(172, 38, 41, 0.05);
+border-color: rgba(172, 38, 41, 0.2);
+}
+
+/* Toast */
+.toast {
+background: rgba(255, 255, 255, 0.95);
+border: 1px solid rgba(51, 51, 51, 0.15);
+box-shadow: var(--shadow2);
+font-size: 13px;
+color: var(--muted);
+backdrop-filter: blur(var(--blur));
+}
+
+.toast strong {
+color: var(--primary);
+}
+
+/* Form elements */
+input,
+textarea {
+border: 1px solid rgba(51, 51, 51, 0.15);
+background: rgba(255, 255, 255, 0.9);
+color: var(--text);
+outline: none;
+}
+
+input:focus,
+textarea:focus {
+border-color: rgba(172, 38, 41, 0.4);
+box-shadow: 0 0 0 3px rgba(172, 38, 41, 0.1);
+}
+
+/* Section headers */
+.section-head h2 {
+color: var(--primary);
+font-weight: 800;
+}
+
+.section-head p {
+color: var(--muted);
+}
+
+/* Additional hero stat colors */
+.hero-stats .stat:nth-child(2) strong {
+color: var(--secondary);
+}
+
+.hero-stats .stat:nth-child(3) strong {
+color: var(--accent);
+}
+
+/* Burger button in light theme */
+.burger {
+border: 1px solid rgba(51, 51, 51, 0.15);
+background: rgba(255, 255, 255, 0.9);
+color: var(--text);
+}
+
+.burger:hover {
+background: rgba(255, 255, 255, 1);
+border-color: rgba(172, 38, 41, 0.3);
+}
+
+/* Mobile sheet overlay */
+.mobile-sheet {
+background: rgba(0, 0, 0, 0.4);
+}
+
+/* Scrollbar styling for light theme */
+::-webkit-scrollbar {
+width: 10px;
+}
+
+::-webkit-scrollbar-track {
+background: rgba(51, 51, 51, 0.05);
+}
+
+::-webkit-scrollbar-thumb {
+background: rgba(172, 38, 41, 0.3);
+border-radius: 5px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+background: rgba(172, 38, 41, 0.5);
+}
+
+/* PRINCIPLES BANNER */
+.principles-banner {
+padding: 60px 0 40px;
+position: relative;
+overflow: hidden;
+}
+
+.principles-banner:before {
+content: "";
+position: absolute;
+top: 0;
+left: 0;
+right: 0;
+height: 100%;
+background: linear-gradient(135deg, rgba(172, 38, 41, 0.03) 0%, rgba(58, 117, 73, 0.03) 100%);
+z-index: -1;
+}
+
+.principles-grid {
+display: grid;
+grid-template-columns: repeat(4, 1fr);
+gap: 20px;
+margin-bottom: 40px;
+}
+
+@media (max-width: 980px) {
+.principles-grid {
+grid-template-columns: repeat(2, 1fr);
+}
+}
+
+@media (max-width: 560px) {
+.principles-grid {
+grid-template-columns: 1fr;
+}
+}
+
+.principle-card {
+position: relative;
+padding: 24px 20px;
+border-radius: 20px;
+background: rgba(255, 255, 255, 0.95);
+border: 1px solid rgba(51, 51, 51, 0.1);
+box-shadow: var(--shadow);
+display: flex;
+align-items: center;
+gap: 18px;
+transition: all 0.3s ease;
+overflow: hidden;
+}
+
+.principle-card:hover {
+transform: translateY(-6px);
+box-shadow: 0 20px 40px rgba(0, 0, 0, 0.12);
+}
+
+.principle-card[data-color="primary"] {
+border-top: 4px solid var(--primary);
+}
+
+.principle-card[data-color="secondary"] {
+border-top: 4px solid var(--secondary);
+}
+
+.principle-card[data-color="accent"] {
+border-top: 4px solid var(--accent);
+}
+
+.principle-card[data-color="success"] {
+border-top: 4px solid var(--secondary);
+}
+
+.principle-card:hover .principle-glow {
+opacity: 1;
+transform: scale(1.2);
+}
+
+.principle-glow {
+position: absolute;
+top: 0;
+left: 0;
+right: 0;
+height: 100%;
+background: radial-gradient(circle at center, rgba(255, 255, 255, 0.4), transparent 70%);
+opacity: 0;
+transition: all 0.4s ease;
+z-index: 0;
+}
+
+.principle-icon {
+font-size: 40px;
+width: 70px;
+height: 70px;
+display: flex;
+align-items: center;
+justify-content: center;
+border-radius: 16px;
+background: rgba(255, 255, 255, 0.9);
+flex-shrink: 0;
+position: relative;
+z-index: 1;
+}
+
+.principle-card[data-color="primary"] .principle-icon {
+border: 2px solid rgba(172, 38, 41, 0.2);
+background: rgba(172, 38, 41, 0.05);
+color: var(--primary);
+}
+
+.principle-card[data-color="secondary"] .principle-icon {
+border: 2px solid rgba(58, 117, 73, 0.2);
+background: rgba(58, 117, 73, 0.05);
+color: var(--secondary);
+}
+
+.principle-card[data-color="accent"] .principle-icon {
+border: 2px solid rgba(241, 175, 71, 0.2);
+background: rgba(241, 175, 71, 0.05);
+color: #b07d2a;
+}
+
+.principle-card[data-color="success"] .principle-icon {
+border: 2px solid rgba(58, 117, 73, 0.2);
+background: rgba(58, 117, 73, 0.05);
+color: var(--secondary);
+}
+
+.principle-content {
+position: relative;
+z-index: 1;
+flex-grow: 1;
+}
+
+.principle-content h3 {
+margin: 0 0 6px 0;
+font-size: 18px;
+font-weight: 800;
+color: var(--neutral);
+font-family: "Noto Sans Malayalam", Inter, sans-serif;
+}
+
+.principle-content p {
+margin: 0;
+font-size: 13px;
+color: var(--muted);
+line-height: 1.4;
+}
+
+.principles-statement {
+text-align: center;
+max-width: 900px;
+margin: 0 auto;
+padding: 40px;
+border-radius: 24px;
+background: linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0.85));
+border: 1px solid rgba(51, 51, 51, 0.1);
+box-shadow: var(--shadow);
+position: relative;
+overflow: hidden;
+}
+
+.principles-statement h2 {
+margin: 0 0 16px 0;
+font-size: 28px;
+line-height: 1.3;
+color: var(--primary);
+font-weight: 800;
+font-family: "Noto Sans Malayalam", Inter, sans-serif;
+}
+
+.principles-statement p {
+margin: 0;
+font-size: 16px;
+line-height: 1.6;
+color: var(--muted);
+max-width: 80ch;
+margin-left: auto;
+margin-right: auto;
+}
+
+/* Animation for the cards */
+@keyframes fadeInUp {
+from {
+opacity: 0;
+transform: translateY(20px);
+}
+
+to {
+opacity: 1;
+transform: translateY(0);
+}
+}
+
+.principle-card {
+animation: fadeInUp 0.6s ease forwards;
+opacity: 0;
+}
+
+.principle-card:nth-child(1) {
+animation-delay: 0.1s;
+}
+
+.principle-card:nth-child(2) {
+animation-delay: 0.2s;
+}
+
+.principle-card:nth-child(3) {
+animation-delay: 0.3s;
+}
+
+.principle-card:nth-child(4) {
+animation-delay: 0.4s;
+}
+
+/* SLIDER HERO - IMPROVED LAYOUT */
+.hero-slider {
+position: relative;
+height: 85vh;
+min-height: 650px;
+max-height: 900px;
+overflow: hidden;
+}
+
+.slider-container {
+position: relative;
+width: 100%;
+height: 100%;
+}
+
+.slide {
+position: absolute;
+top: 0;
+left: 0;
+width: 100%;
+height: 100%;
+opacity: 0;
+transition: opacity 0.8s ease-in-out;
+display: flex;
+align-items: center;
+}
+
+.slide.active {
+opacity: 1;
+z-index: 1;
+}
+
+.slide-bg {
+position: absolute;
+top: 0;
+left: 0;
+width: 100%;
+height: 100%;
+background-size: cover;
+background-position: center;
+background-repeat: no-repeat;
+z-index: 0;
+}
+
+.slide-bg::after {
+content: '';
+position: absolute;
+top: 0;
+left: 0;
+width: 100%;
+height: 100%;
+background: linear-gradient(90deg,
+rgba(255, 255, 255, 0.95) 0%,
+rgba(255, 255, 255, 0.85) 40%,
+rgba(255, 255, 255, 0.3) 70%,
+transparent 100%);
+z-index: 1;
+}
+
+.slide-content-wrapper {
+display: grid;
+grid-template-columns: 1fr 1fr;
+gap: 60px;
+align-items: center;
+position: relative;
+z-index: 2;
+padding: 40px 0;
+}
+
+.slide-content {
+animation: slideInLeft 0.8s ease-out;
+}
+
+.slide-image-preview {
+animation: slideInRight 0.8s ease-out;
+}
+
+@keyframes slideInLeft {
+from {
+opacity: 0;
+transform: translateX(-30px);
+}
+
+to {
+opacity: 1;
+transform: translateX(0);
+}
+}
+
+@keyframes slideInRight {
+from {
+opacity: 0;
+transform: translateX(30px);
+}
+
+to {
+opacity: 1;
+transform: translateX(0);
+}
+}
+
+.slide-kicker {
+display: inline-flex;
+align-items: center;
+gap: 10px;
+padding: 12px 20px;
+border-radius: 50px;
+border: 2px solid rgba(172, 38, 41, 0.2);
+background: rgba(255, 255, 255, 0.9);
+color: var(--primary);
+font-weight: 700;
+font-size: 14px;
+letter-spacing: 0.25px;
+margin-bottom: 25px;
+box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+}
+
+.slide-title {
+margin: 0 0 25px 0;
+font-size: 35px;
+line-height: 1.2;
+color: var(--neutral);
+font-weight: 800;
+font-family: "Noto Sans Malayalam", Inter, sans-serif;
+}
+
+.slide-sub {
+margin: 0 0 35px 0;
+color: var(--muted);
+font-size: 18px;
+line-height: 1.7;
+max-width: 65ch;
+}
+
+.slide-cta {
+display: flex;
+flex-wrap: wrap;
+gap: 20px;
+}
+
+.preview-frame {
+position: relative;
+width: 100%;
+height: 400px;
+border-radius: 24px;
+overflow: hidden;
+box-shadow: 0 25px 60px rgba(0, 0, 0, 0.2);
+border: 8px solid rgba(255, 255, 255, 0.95);
+background: white;
+transform: perspective(1000px) rotateY(-8deg);
+transition: transform 0.5s ease;
+}
+
+.slide.active .preview-frame {
+transform: perspective(1000px) rotateY(0deg);
+}
+
+.preview-image {
+width: 100%;
+height: 100%;
+background-size: cover;
+background-position: center;
+background-repeat: no-repeat;
+}
+
+/* Navigation Dots */
+.slider-dots {
+position: absolute;
+bottom: 40px;
+left: 50%;
+transform: translateX(-50%);
+display: flex;
+gap: 15px;
+z-index: 10;
+}
+
+.slider-dots .dot {
+width: 14px;
+height: 14px;
+border-radius: 50%;
+border: 2px solid rgba(255, 255, 255, 0.9);
+background: rgba(255, 255, 255, 0.3);
+cursor: pointer;
+transition: all 0.3s ease;
+padding: 0;
+}
+
+.slider-dots .dot.active {
+background: var(--primary);
+border-color: var(--primary);
+transform: scale(1.3);
+box-shadow: 0 0 20px rgba(172, 38, 41, 0.5);
+}
+
+.slider-dots .dot:hover {
+background: rgba(255, 255, 255, 0.8);
+}
+
+/* Navigation Arrows */
+.slider-arrow {
+position: absolute;
+top: 50%;
+transform: translateY(-50%);
+width: 70px;
+height: 70px;
+border-radius: 50%;
+background: rgba(255, 255, 255, 0.95);
+border: 2px solid rgba(51, 51, 51, 0.1);
+color: var(--primary);
+font-size: 32px;
+display: flex;
+align-items: center;
+justify-content: center;
+cursor: pointer;
+z-index: 10;
+transition: all 0.3s ease;
+box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+}
+
+.slider-arrow:hover {
+background: var(--primary);
+color: white;
+transform: translateY(-50%) scale(1.1);
+box-shadow: 0 15px 40px rgba(172, 38, 41, 0.3);
+}
+
+.slider-arrow.prev {
+left: 40px;
+}
+
+.slider-arrow.next {
+right: 40px;
+}
+
+/* Slide Counter */
+.slide-counter {
+position: absolute;
+bottom: 40px;
+right: 40px;
+background: rgba(255, 255, 255, 0.95);
+padding: 12px 24px;
+border-radius: 50px;
+font-size: 18px;
+font-weight: 700;
+color: var(--primary);
+border: 2px solid rgba(51, 51, 51, 0.1);
+z-index: 10;
+backdrop-filter: blur(5px);
+box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+}
+
+.slide-counter .current {
+color: var(--primary);
+}
+
+.slide-counter .total {
+color: var(--muted);
+}
+
+/* Responsive Adjustments */
+@media (max-width: 1200px) {
+.slide-content-wrapper {
+gap: 40px;
+}
+
+.slide-title {
+font-size: 36px;
+}
+
+.slide-sub {
+font-size: 17px;
+}
+
+.preview-frame {
+height: 350px;
+}
+}
+
+@media (max-width: 980px) {
+.slide-content-wrapper {
+grid-template-columns: 1fr;
+gap: 40px;
+text-align: center;
+}
+
+.slide-content {
+max-width: 800px;
+margin: 0 auto;
+}
+
+.slide-image-preview {
+max-width: 600px;
+margin: 0 auto;
+}
+
+.preview-frame {
+height: 300px;
+transform: perspective(1000px) rotateY(0deg);
+}
+
+.slide-bg::after {
+background: linear-gradient(to bottom,
+rgba(255, 255, 255, 0.95) 0%,
+rgba(255, 255, 255, 0.9) 30%,
+rgba(255, 255, 255, 0.5) 70%,
+transparent 100%);
+}
+
+.slider-arrow {
+width: 60px;
+height: 60px;
+font-size: 28px;
+}
+
+.slider-arrow.prev {
+left: 20px;
+}
+
+.slider-arrow.next {
+right: 20px;
+}
+}
+
+@media (max-width: 768px) {
+.hero-slider {
+height: auto;
+min-height: 600px;
+}
+
+.slide-content-wrapper {
+padding: 60px 0 40px;
+}
+
+.slide-title {
+font-size: 30px;
+}
+
+.slide-sub {
+font-size: 16px;
+}
+
+.slide-cta {
+justify-content: center;
+}
+
+.preview-frame {
+height: 250px;
+}
+
+.slider-arrow {
+width: 50px;
+height: 50px;
+font-size: 24px;
+}
+
+.slide-counter {
+bottom: 30px;
+right: 20px;
+padding: 10px 20px;
+font-size: 16px;
+}
+
+.slider-dots {
+bottom: 30px;
+}
+}
+
+@media (max-width: 560px) {
+.hero-slider {
+min-height: 550px;
+}
+
+.slide-content-wrapper {
+padding: 50px 0 30px;
+}
+
+.slide-title {
+font-size: 26px;
+}
+
+.slide-sub {
+font-size: 15px;
+}
+
+.slide-cta {
+flex-direction: column;
+align-items: center;
+}
+
+.slide-cta .btn {
+width: 100%;
+max-width: 300px;
+}
+
+.preview-frame {
+height: 200px;
+border-width: 5px;
+}
+
+.slider-arrow {
+width: 45px;
+height: 45px;
+font-size: 20px;
+display: none;
+}
+
+.slider-dots .dot {
+width: 12px;
+height: 12px;
+}
+}
+
+.section {
+padding: 50px 0;
+}
+
+/* NEWS SLIDER SECTION */
+.news-slider-section {
+padding: 60px 0 40px;
+background: linear-gradient(135deg, rgba(172, 38, 41, 0.02), rgba(58, 117, 73, 0.02));
+position: relative;
+overflow: hidden;
+}
+
+.news-slider-section::before {
+content: '';
+position: absolute;
+top: 0;
+left: 0;
+right: 0;
+height: 1px;
+background: linear-gradient(90deg,
+transparent,
+rgba(172, 38, 41, 0.2),
+rgba(58, 117, 73, 0.2),
+transparent);
+}
+
+.news-slider-container {
+position: relative;
+padding: 20px 0 60px;
+margin: 0 -10px;
+}
+
+.news-slider-track {
+display: flex;
+gap: 20px;
+transition: transform 0.5s ease-in-out;
+padding: 10px;
+scroll-behavior: smooth;
+overflow-x: auto;
+scrollbar-width: none;
+/* Firefox */
+-ms-overflow-style: none;
+/* IE/Edge */
+}
+
+.news-slider-track::-webkit-scrollbar {
+display: none;
+/* Chrome/Safari */
+}
+
+.news-card {
+flex: 0 0 calc(33.333% - 20px);
+min-width: 320px;
+border-radius: 20px;
+border: 1px solid rgba(51, 51, 51, 0.12);
+background: rgba(255, 255, 255, 0.95);
+backdrop-filter: blur(var(--blur));
+box-shadow: var(--shadow2);
+overflow: hidden;
+transition: all 0.3s ease;
+position: relative;
+}
+
+.news-card:hover {
+transform: translateY(-8px);
+box-shadow: 0 25px 50px rgba(0, 0, 0, 0.15);
+border-color: rgba(172, 38, 41, 0.2);
+}
+
+.news-image {
+width: 100%;
+height: 200px;
+background: linear-gradient(135deg, rgba(172, 38, 41, 0.1), rgba(58, 117, 73, 0.1));
+position: relative;
+overflow: hidden;
+}
+
+.news-image img {
+width: 100%;
+height: 100%;
+object-fit: cover;
+transition: transform 0.5s ease;
+}
+
+.news-card:hover .news-image img {
+transform: scale(1.05);
+}
+
+.news-image-placeholder {
+width: 100%;
+height: 100%;
+display: flex;
+align-items: center;
+justify-content: center;
+background: linear-gradient(135deg, var(--primary), var(--secondary));
+color: white;
+font-size: 48px;
+font-weight: 700;
+font-family: "Noto Sans Malayalam", sans-serif;
+}
+
+.news-badge {
+position: absolute;
+top: 15px;
+right: 15px;
+padding: 6px 12px;
+border-radius: 20px;
+font-size: 11px;
+font-weight: 700;
+text-transform: uppercase;
+letter-spacing: 0.5px;
+z-index: 2;
+}
+
+.news-badge.academic {
+background: rgba(58, 117, 73, 0.9);
+color: white;
+}
+
+.news-badge.events {
+background: rgba(241, 175, 71, 0.9);
+color: #333;
+}
+
+.news-badge.research {
+background: rgba(172, 38, 41, 0.9);
+color: white;
+}
+
+.news-badge.student {
+background: rgba(91, 44, 111, 0.9);
+color: white;
+}
+
+.news-badge.announcement {
+background: rgba(41, 128, 185, 0.9);
+color: white;
+}
+
+.news-content {
+padding: 25px;
+}
+
+.news-date {
+display: flex;
+align-items: center;
+gap: 8px;
+font-size: 13px;
+color: var(--muted);
+margin-bottom: 12px;
+font-weight: 600;
+}
+
+.news-date .time {
+background: rgba(172, 38, 41, 0.1);
+color: var(--primary);
+padding: 4px 10px;
+border-radius: 12px;
+font-size: 12px;
+font-weight: 700;
+}
+
+.news-title {
+margin: 0 0 15px 0;
+font-size: 18px;
+line-height: 1.4;
+color: var(--neutral);
+font-weight: 700;
+font-family: "Noto Sans Malayalam", sans-serif;
+min-height: 60px;
+}
+
+.news-excerpt {
+margin: 0 0 20px 0;
+color: var(--muted);
+font-size: 14px;
+line-height: 1.6;
+display: -webkit-box;
+-webkit-line-clamp: 3;
+-webkit-box-orient: vertical;
+overflow: hidden;
+}
+
+.news-meta {
+display: flex;
+justify-content: space-between;
+align-items: center;
+padding-top: 20px;
+border-top: 1px solid rgba(51, 51, 51, 0.1);
+}
+
+.news-author {
+display: flex;
+align-items: center;
+gap: 8px;
+font-size: 13px;
+color: var(--muted2);
+}
+
+.author-avatar {
+width: 32px;
+height: 32px;
+border-radius: 50%;
+background: linear-gradient(135deg, var(--primary), var(--secondary));
+display: flex;
+align-items: center;
+justify-content: center;
+color: white;
+font-weight: 700;
+font-size: 14px;
+}
+
+.news-read-more {
+color: var(--primary);
+font-weight: 700;
+font-size: 14px;
+text-decoration: none;
+display: inline-flex;
+align-items: center;
+gap: 6px;
+transition: all 0.2s ease;
+}
+
+.news-read-more:hover {
+color: #c03939;
+gap: 8px;
+}
+
+/* News Navigation */
+.news-arrow {
+position: absolute;
+top: 50%;
+transform: translateY(-50%);
+width: 60px;
+height: 60px;
+border-radius: 50%;
+background: rgba(255, 255, 255, 0.95);
+border: 1px solid rgba(51, 51, 51, 0.15);
+color: var(--primary);
+font-size: 28px;
+display: flex;
+align-items: center;
+justify-content: center;
+cursor: pointer;
+z-index: 10;
+transition: all 0.3s ease;
+box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+}
+
+.news-arrow:hover {
+background: var(--primary);
+color: white;
+transform: translateY(-50%) scale(1.1);
+box-shadow: 0 15px 40px rgba(172, 38, 41, 0.3);
+}
+
+.news-arrow.prev {
+left: -30px;
+}
+
+.news-arrow.next {
+right: -30px;
+}
+
+.news-dots {
+display: flex;
+justify-content: center;
+gap: 12px;
+margin-top: 40px;
+}
+
+.news-dot {
+width: 12px;
+height: 12px;
+border-radius: 50%;
+border: 2px solid rgba(51, 51, 51, 0.2);
+background: transparent;
+cursor: pointer;
+transition: all 0.3s ease;
+padding: 0;
+}
+
+.news-dot.active {
+background: var(--primary);
+border-color: var(--primary);
+transform: scale(1.3);
+}
+
+.news-dot:hover {
+border-color: var(--primary);
+background: rgba(172, 38, 41, 0.2);
+}
+
+/* News Categories */
+.news-categories {
+display: flex;
+justify-content: center;
+flex-wrap: wrap;
+gap: 12px;
+margin-top: 40px;
+padding-top: 30px;
+border-top: 1px solid rgba(51, 51, 51, 0.1);
+}
+
+.category-btn {
+padding: 10px 20px;
+border-radius: 50px;
+border: 2px solid rgba(51, 51, 51, 0.15);
+background: rgba(255, 255, 255, 0.9);
+color: var(--muted);
+font-size: 14px;
+font-weight: 600;
+cursor: pointer;
+transition: all 0.3s ease;
+}
+
+.category-btn:hover {
+background: rgba(172, 38, 41, 0.05);
+border-color: rgba(172, 38, 41, 0.3);
+color: var(--primary);
+transform: translateY(-2px);
+}
+
+.category-btn.active {
+background: linear-gradient(135deg, var(--primary), #c03939);
+color: white;
+border-color: var(--primary);
+box-shadow: 0 8px 25px rgba(172, 38, 41, 0.25);
+}
+
+/* Responsive Design */
+@media (max-width: 1200px) {
+.news-card {
+flex: 0 0 calc(50% - 20px);
+min-width: 280px;
+}
+
+.news-arrow.prev {
+left: 10px;
+}
+
+.news-arrow.next {
+right: 10px;
+}
+}
+
+@media (max-width: 768px) {
+.news-card {
+flex: 0 0 calc(100% - 20px);
+min-width: 100%;
+}
+
+.news-arrow {
+width: 50px;
+height: 50px;
+font-size: 24px;
+display: none;
+/* Hide on mobile, use swipe instead */
+}
+
+.news-title {
+font-size: 16px;
+min-height: auto;
+}
+
+.news-excerpt {
+font-size: 13px;
+}
+
+.category-btn {
+padding: 8px 16px;
+font-size: 13px;
+}
+}
+
+@media (max-width: 480px) {
+.news-slider-container {
+margin: 0;
+}
+
+.news-content {
+padding: 20px;
+}
+
+.news-categories {
+gap: 8px;
+}
+
+.category-btn {
+padding: 6px 12px;
+font-size: 12px;
+}
+}

@@ -1,0 +1,1490 @@
+<!DOCTYPE html>
+<html lang="ml">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>മലയാള സർവകലാശാല | Light theme + merged support/facilities</title>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+Malayalam:wght@400;500;600;700&display=swap"
+        rel="stylesheet" />
+
+    <style>
+        /* === YOUR EXACT LIGHT THEME VARIABLES (preserved) === */
+        :root {
+            --bg0: #f8f9fa;
+            --bg1: #ffffff;
+            --card: rgba(255, 255, 255, 0.95);
+            --card2: rgba(255, 255, 255, 0.98);
+            --stroke: rgba(51, 51, 51, 0.12);
+            --text: #333333;
+            --muted: #666666;
+            --muted2: #888888;
+            --primary: #ac2629;
+            --secondary: #3a7549;
+            --accent: #f1af47;
+            --neutral: #333333;
+            --warn: #d9534f;
+            --success: #5cb85c;
+            --info: #5bc0de;
+
+            --radius: 16px;
+            --shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
+            --shadow2: 0 4px 20px rgba(0, 0, 0, 0.05);
+            --blur: 10px;
+            --container: 1200px;
+            --navH: 72px;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        html,
+        body {
+            height: 100%;
+        }
+
+        body {
+            margin: 0;
+            font-family: Inter, "Noto Sans Malayalam", system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+            color: var(--text);
+            background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
+            overflow-x: hidden;
+        }
+
+        /* Light grid background */
+        .grid-bg {
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            opacity: .04;
+            background-image:
+                linear-gradient(rgba(51, 51, 51, 0.1) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(51, 51, 51, 0.08) 1px, transparent 1px);
+            background-size: 56px 56px;
+            mask-image: radial-gradient(closest-side at 50% 25%, rgba(0, 0, 0, 0.8), rgba(0, 0, 0, 0.1));
+            transform: translateZ(0);
+            animation: drift 25s linear infinite;
+        }
+
+        @keyframes drift {
+            0% {
+                transform: translateY(0);
+            }
+
+            100% {
+                transform: translateY(56px);
+            }
+        }
+
+        /* ===== TWO-PART HEADER (light, exact) ===== */
+        .header {
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            background: rgba(255, 255, 255, 0.98);
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.08);
+            backdrop-filter: blur(10px);
+        }
+
+        .header-top {
+            padding: 8px 0;
+            border-bottom: 1px solid rgba(51, 51, 51, 0.1);
+            background: rgba(255, 255, 255, 0.98);
+        }
+
+        .header-top-inner {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 20px;
+            max-width: var(--container);
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        .logo-link {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-decoration: none;
+            color: inherit;
+        }
+
+        .logo-link img {
+            width: 300px;
+            height: auto;
+            object-fit: cover;
+        }
+
+        /* Quick Actions */
+        .quick-actions {
+            display: flex;
+            align-items: center;
+            gap: 30px;
+        }
+
+        .action-buttons {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .btn-small {
+            padding: 8px 16px;
+            font-size: 13px;
+            border-radius: 10px;
+            border: 1px solid rgba(51, 51, 51, 0.15);
+            background: rgba(255, 255, 255, 0.9);
+            color: var(--text);
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.2s ease;
+            cursor: pointer;
+        }
+
+        .btn-small:hover {
+            background: rgba(172, 38, 41, 0.05);
+            border-color: rgba(172, 38, 41, 0.3);
+            transform: translateY(-1px);
+        }
+
+        .toggle {
+            border: 1px solid rgba(51, 51, 51, 0.15);
+            background: rgba(255, 255, 255, 0.9);
+            color: var(--muted);
+            width: 65px;
+            height: 32px;
+            border-radius: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 3px;
+            cursor: pointer;
+        }
+
+        .toggle .dot {
+            width: 26px;
+            height: 26px;
+            background: var(--secondary);
+            border-radius: 50%;
+            transition: 0.2s;
+            box-shadow: 0 0 8px var(--secondary);
+        }
+
+        #langLabel {
+            padding-right: 8px;
+            font-weight: 600;
+            color: var(--muted);
+        }
+
+        /* ===== NEW: merged quick-dropdown for STUDENT SUPPORT + FACILITIES ===== */
+        .quick-dropdown-trigger {
+            position: relative;
+        }
+
+        .quick-dropdown-menu {
+            position: absolute;
+            top: 45px;
+            right: 0;
+            background: rgba(255, 255, 255, 0.98);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(51, 51, 51, 0.15);
+            border-radius: 24px;
+            padding: 24px;
+            min-width: 620px;
+            opacity: 0;
+            visibility: hidden;
+            transition: 0.2s;
+            box-shadow: var(--shadow);
+            z-index: 12000;
+            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.15);
+        }
+
+        .quick-dropdown-trigger:hover .quick-dropdown-menu {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .quick-dropdown-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+        }
+
+        .quick-col h4 {
+            color: var(--secondary);
+            font-size: 16px;
+            margin: 0 0 16px 0;
+            padding-bottom: 8px;
+            border-bottom: 1px solid rgba(58, 117, 73, 0.2);
+            font-weight: 700;
+        }
+
+        .quick-col .menu-links {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .quick-col a {
+            display: block;
+            padding: 8px 12px;
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.7);
+            border: 1px solid rgba(51, 51, 51, 0.08);
+            color: var(--muted);
+            text-decoration: none;
+            font-size: 13px;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+
+        .quick-col a:hover {
+            background: rgba(172, 38, 41, 0.05);
+            border-color: rgba(172, 38, 41, 0.2);
+            color: var(--primary);
+            transform: translateX(4px);
+        }
+
+        /* BOTTOM SECTION (main navigation, original, but we removed SUPPORT/FACILITIES from here) */
+        .header-bottom {
+            padding: 0;
+            background: rgba(255, 255, 255, 0.98);
+        }
+
+        .main-nav {
+            position: relative;
+            max-width: var(--container);
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        .nav-menu {
+            display: flex;
+            align-items: center;
+            list-style: none;
+            margin: 0;
+            padding: 0;
+            gap: 2px;
+            justify-content: center;
+        }
+
+        .nav-item {
+            position: relative;
+        }
+
+        .nav-item.has-megamenu {
+            position: static;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 16px 18px;
+            color: var(--muted);
+            font-weight: 600;
+            font-size: 14px;
+            text-decoration: none;
+            transition: all 0.2s ease;
+            border-radius: 10px;
+            white-space: nowrap;
+        }
+
+        .nav-link:hover {
+            color: var(--primary);
+            background: rgba(172, 38, 41, 0.05);
+        }
+
+        .dropdown-arrow {
+            font-size: 10px;
+            opacity: 0.6;
+            margin-left: 2px;
+        }
+
+        /* Dropdown & megamenu (preserved) */
+        .dropdown-menu {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            min-width: 320px;
+            background: rgba(255, 255, 255, 0.98);
+            border-radius: 16px;
+            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.15);
+            border: 1px solid rgba(51, 51, 51, 0.1);
+            padding: 20px;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(10px);
+            transition: all 0.3s ease;
+            z-index: 1000;
+            backdrop-filter: blur(10px);
+        }
+
+        .has-dropdown:hover .dropdown-menu {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+
+        .dropdown-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .dropdown-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px;
+            border-radius: 12px;
+            text-decoration: none;
+            transition: all 0.2s ease;
+            border: 1px solid rgba(51, 51, 51, 0.08);
+            background: rgba(255, 255, 255, 0.7);
+        }
+
+        .dropdown-item:hover {
+            background: rgba(172, 38, 41, 0.05);
+            border-color: rgba(172, 38, 41, 0.2);
+            transform: translateX(5px);
+        }
+
+        .megamenu {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            width: 100%;
+            transform: translateY(10px);
+            background: rgba(255, 255, 255, 0.98);
+            border-radius: 0 0 20px 20px;
+            box-shadow: 0 30px 80px rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(51, 51, 51, 0.1);
+            border-top: none;
+            padding: 30px 0;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+            z-index: 1000;
+            backdrop-filter: blur(10px);
+        }
+
+        .has-megamenu:hover .megamenu {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+
+        .megamenu-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 30px;
+            max-width: var(--container);
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        .megamenu-col {
+            padding: 20px;
+            border-radius: 16px;
+            background: rgba(255, 255, 255, 0.7);
+            border: 1px solid rgba(51, 51, 51, 0.08);
+        }
+
+        .megamenu-col h4 {
+            margin: 0 0 16px 0;
+            font-size: 16px;
+            color: var(--secondary);
+            font-weight: 700;
+            padding-bottom: 10px;
+            border-bottom: 1px solid rgba(58, 117, 73, 0.1);
+        }
+
+        .megamenu-links {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .megamenu-links a {
+            display: flex;
+            flex-direction: column;
+            padding: 12px;
+            border-radius: 10px;
+            text-decoration: none;
+            transition: all 0.2s ease;
+            border: 1px solid rgba(51, 51, 51, 0.06);
+            background: rgba(255, 255, 255, 0.9);
+        }
+
+        .megamenu-links a:hover {
+            background: rgba(172, 38, 41, 0.05);
+            border-color: rgba(172, 38, 41, 0.2);
+        }
+
+        /* Mobile toggle (unchanged) */
+        .mobile-toggle {
+            display: none;
+            width: 50px;
+            height: 50px;
+            border-radius: 12px;
+            border: 1px solid rgba(51, 51, 51, 0.15);
+            background: rgba(255, 255, 255, 0.9);
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            gap: 5px;
+            cursor: pointer;
+        }
+
+        .mobile-toggle .bar {
+            width: 24px;
+            height: 2px;
+            background: var(--primary);
+            border-radius: 2px;
+        }
+
+        /* Responsive: hide main nav items if needed (preserved) */
+        @media (max-width: 1200px) {
+            .megamenu-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 980px) {
+            .quick-actions {
+                display: none;
+            }
+
+            .mobile-toggle {
+                display: flex;
+            }
+
+            .nav-menu {
+                display: none;
+            }
+        }
+
+        /* sample hero area to see header */
+        .hero-demo {
+            height: 60vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            color: var(--primary);
+            background: rgba(255, 255, 255, 0.6);
+            margin: 20px;
+            border-radius: 32px;
+            border: 1px solid rgba(0, 0, 0, 0.05);
+            box-shadow: var(--shadow);
+        }
+    </style>
+</head>
+
+<body>
+    <div class="grid-bg"></div>
+
+    <header class="header">
+        <div class="header-top">
+            <div class="header-top-inner">
+                <!-- Logo (using inline SVG as placeholder) -->
+                <a class="logo-link" href="#home">
+                    <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 300 50'%3E%3Crect width='300' height='50' fill='%23ac2629' rx='8'/%3E%3Ctext x='20' y='35' fill='white' font-size='22' font-family='Inter' font-weight='700'%3Eമലയാള സർവകലാശാല%3C/text%3E%3C/svg%3E"
+                        alt="Logo">
+                </a>
+
+                <!-- Quick actions: merged dropdown for SUPPORT + FACILITIES + LMS + lang -->
+                <div class="quick-actions">
+                    <div class="action-buttons">
+                        <!-- MERGED DROPDOWN (STUDENT SUPPORT + FACILITIES) -->
+                        <div class="quick-dropdown-trigger">
+                            <span class="btn-small" style="cursor:pointer;">📋 RESOURCES ▼</span>
+                            <div class="quick-dropdown-menu">
+                                <div class="quick-dropdown-grid">
+                                    <!-- Student support column -->
+                                    <div class="quick-col">
+                                        <h4>STUDENT SUPPORT</h4>
+                                        <div class="menu-links">
+                                            <a href="#">Scholarship</a>
+                                            <a href="#">NSS</a>
+                                            <a href="#">PTA</a>
+                                            <a href="#">Student Union</a>
+                                            <a href="#">Internship</a>
+                                            <a href="#">Placement</a>
+                                            <a href="#">Civil Services Academy</a>
+                                            <a href="#">Grievance Redressal</a>
+                                            <a href="#">Anti Ragging</a>
+                                            <a href="#">OBC / Minority</a>
+                                            <a href="#">SC/ST / ICC</a>
+                                            <a href="#">Gender Justice</a>
+                                            <a href="#">Counselling Cell</a>
+                                            <a href="#">RTI</a>
+                                        </div>
+                                    </div>
+                                    <!-- Facilities column -->
+                                    <div class="quick-col">
+                                        <h4>FACILITIES / RESOURCES</h4>
+                                        <div class="menu-links">
+                                            <a href="#">Labs</a>
+                                            <a href="#">Museum</a>
+                                            <a href="#">Theatre</a>
+                                            <a href="#">Transportation</a>
+                                            <a href="#">IT Services</a>
+                                            <a href="#">Seminar Hall</a>
+                                            <a href="#">Cafeteria</a>
+                                            <a href="#">Hostel</a>
+                                            <a href="#">Stadium & Sports</a>
+                                            <a href="#">Health & Wellness</a>
+                                            <a href="#">Placement Cell</a>
+                                            <a href="#">Outreach / Cultural</a>
+                                            <a href="#">Academic Support</a>
+                                            <a href="#">Training Programmes</a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <a href="#" class="btn-small" target="_blank">LMS</a>
+                        <div class="toggle" id="langToggle">
+                            <span class="dot"></span>
+                            <span id="langLabel">ML</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- BOTTOM NAVIGATION (now WITHOUT Student Support & Facilities items – they moved to quick menu) -->
+        <div class="header-bottom">
+            <div class="container-fluid">
+                <nav class="main-nav" aria-label="Primary Navigation">
+                    <ul class="nav-menu justify-content-center">
+
+                        <!-- HOME PAGE -->
+                        <li class="nav-item has-dropdown" data-dd>
+                            <a class="nav-link" href="#home" aria-haspopup="true" aria-expanded="false">
+                                HOME
+                            </a>
+                        </li>
+
+                        <!-- UNIVERSITY & ADMINISTRATION (MEGA MENU) -->
+                        <li class="nav-item has-megamenu" data-dd>
+                            <a class="nav-link" href="#" aria-haspopup="true" aria-expanded="false">
+                                UNIVERSITY <span class="dropdown-arrow">▼</span>
+                            </a>
+                            <div class="megamenu">
+                                <div class="megamenu-grid">
+                                    <!-- UNIVERSITY Column -->
+                                    <div class="megamenu-col">
+                                        <h4>University</h4>
+                                        <div class="megamenu-links">
+                                            <a href="#"><strong>Vision & Mission</strong></a>
+                                            <a href="#"><strong>Chancellor’s Message</strong></a>
+                                            <a href="#"><strong>Objectives and Policies</strong></a>
+                                            <a href="#"><strong>Acts, Statutes, Ordinance & Regulations</strong></a>
+                                            <a href="#"><strong>Annual Reports</strong></a>
+                                            <a href="#"><strong>Milestones</strong></a>
+                                            <a href="#"><strong>Dynamic Hierarchical Profiles with
+                                                    Photographs</strong></a>
+                                        </div>
+                                    </div>
+                                    <!-- ADMINISTRATION Column -->
+                                    <div class="megamenu-col">
+                                        <h4>Administration</h4>
+                                        <div class="megamenu-links">
+                                            <a href="#"><strong>Chancellor</strong></a>
+                                            <a href="#"><strong>Pro Chancellor</strong></a>
+                                            <a href="#"><strong>Vice Chancellor</strong></a>
+                                            <a href="#"><strong>Statutory Bodies</strong></a>
+                                            <a href="#"><strong>Statutory Officers</strong></a>
+                                            <a href="#"><strong>Statutory Committees</strong></a>
+                                            <a href="#"><strong>Succession List</strong></a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </li>
+
+
+                        <!-- ACADEMICS (MEGA MENU) -->
+                        <li class="nav-item has-megamenu" data-dd>
+                            <a class="nav-link" href="#" aria-haspopup="true" aria-expanded="false">
+                                ACADEMICS <span class="dropdown-arrow">▼</span>
+                            </a>
+                            <div class="megamenu">
+                                <div class="megamenu-grid">
+                                    <div class="megamenu-col">
+                                        <h4>Academics</h4>
+                                        <div class="megamenu-links">
+                                            <a href="#"><strong>Programmes</strong></a>
+                                            <a href="#"><strong>Roll of Honour</strong></a>
+                                            <a href="#"><strong>Academic / Cultural Highlights</strong></a>
+                                        </div>
+                                    </div>
+                                    <div class="megamenu-col">
+                                        <h4>Schools</h4>
+                                        <div class="megamenu-links">
+                                            <a href="#"><strong>Faculties</strong></a>
+                                            <a href="#"><strong>Departmental Activities</strong></a>
+                                            <a href="#"><strong>Syllabus</strong></a>
+                                            <a href="#"><strong>Academic Calendar</strong></a>
+                                            <a href="#"><strong>Extracurricular Activity Details</strong></a>
+                                            <a href="#"><strong>Gallery for Department / Student Activities</strong></a>
+                                        </div>
+                                    </div>
+                                    <div class="megamenu-col">
+                                        <h4>Research</h4>
+                                        <div class="megamenu-links">
+                                            <a href="#"><strong>Research Council</strong></a>
+                                            <a href="#"><strong>Advisory Board</strong></a>
+                                            <a href="#"><strong>Research Development Cell</strong></a>
+                                            <a href="#"><strong>Research Policies</strong></a>
+                                            <a href="#"><strong>List of Research Guides</strong></a>
+                                            <a href="#"><strong>PhD Awardees</strong></a>
+                                            <a href="#"><strong>PhD Model Question Papers</strong></a>
+                                            <a href="#"><strong>Research Highlights</strong></a>
+                                            <a href="#"><strong>Coursework and PQE</strong></a>
+                                            <a href="#"><strong>Fellowships</strong></a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </li>
+
+                        <!-- ADMISSION -->
+                        <li class="nav-item has-dropdown" data-dd>
+                            <a class="nav-link" href="#" aria-haspopup="true" aria-expanded="false">
+                                ADMISSION <span class="dropdown-arrow">▼</span>
+                            </a>
+                            <div class="dropdown-menu">
+                                <div class="dropdown-grid">
+                                    <a href="#" class="dropdown-item">
+                                        <div><strong>Programmes & Regulations</strong></div>
+                                    </a>
+                                    <a href="#" class="dropdown-item">
+                                        <div><strong>FYUG, PG, PhD</strong></div>
+                                    </a>
+                                    <a href="#" class="dropdown-item">
+                                        <div><strong>Admission Procedures & Fee Structures</strong></div>
+                                    </a>
+                                    <a href="#" class="dropdown-item">
+                                        <div><strong>Prospectus</strong></div>
+                                    </a>
+                                </div>
+                            </div>
+                        </li>
+
+                        <!-- NAAC -->
+                        <li class="nav-item has-dropdown" data-dd>
+                            <a class="nav-link" href="#" aria-haspopup="true" aria-expanded="false">
+                                NAAC <span class="dropdown-arrow">▼</span>
+                            </a>
+                            <div class="dropdown-menu">
+                                <div class="dropdown-grid">
+                                    <a href="#" class="dropdown-item">
+                                        <div><strong>Grading</strong></div>
+                                    </a>
+                                    <a href="#" class="dropdown-item">
+                                        <div><strong>NAAC Certificate</strong></div>
+                                    </a>
+                                    <a href="#" class="dropdown-item">
+                                        <div><strong>Self Study Report</strong></div>
+                                    </a>
+                                    <a href="#" class="dropdown-item">
+                                        <div><strong>Peer Team Report</strong></div>
+                                    </a>
+                                    <a href="#" class="dropdown-item">
+                                        <div><strong>Accreditation Status</strong></div>
+                                    </a>
+                                </div>
+                            </div>
+                        </li>
+
+                        <!-- IQAC -->
+                        <li class="nav-item has-dropdown" data-dd>
+                            <a class="nav-link" href="#" aria-haspopup="true" aria-expanded="false">
+                                IQAC <span class="dropdown-arrow">▼</span>
+                            </a>
+                            <div class="dropdown-menu">
+                                <div class="dropdown-grid">
+                                    <a href="#" class="dropdown-item">
+                                        <div><strong>Objectives</strong></div>
+                                    </a>
+                                    <a href="#" class="dropdown-item">
+                                        <div><strong>Members</strong></div>
+                                    </a>
+                                    <a href="#" class="dropdown-item">
+                                        <div><strong>Photo & Video Gallery</strong></div>
+                                    </a>
+                                    <a href="#" class="dropdown-item">
+                                        <div><strong>Reports</strong></div>
+                                    </a>
+                                    <a href="#" class="dropdown-item">
+                                        <div><strong>AQAR</strong></div>
+                                    </a>
+                                    <a href="#" class="dropdown-item">
+                                        <div><strong>Audits</strong></div>
+                                    </a>
+                                    <a href="#" class="dropdown-item">
+                                        <div><strong>Weblink</strong></div>
+                                    </a>
+                                    <a href="#" class="dropdown-item">
+                                        <div><strong>Newsletters</strong></div>
+                                    </a>
+                                    <a href="#" class="dropdown-item">
+                                        <div><strong>IQAC Committees</strong></div>
+                                    </a>
+                                    <a href="#" class="dropdown-item">
+                                        <div><strong>Performance of the Institution</strong></div>
+                                    </a>
+                                    <a href="#" class="dropdown-item">
+                                        <div><strong>Quality Profile</strong></div>
+                                    </a>
+                                    <a href="#" class="dropdown-item">
+                                        <div><strong>Best Practices</strong></div>
+                                    </a>
+                                    <a href="#" class="dropdown-item">
+                                        <div><strong>Benchmark Reports</strong></div>
+                                    </a>
+                                    <a href="#" class="dropdown-item">
+                                        <div><strong>Code of Conduct</strong></div>
+                                    </a>
+                                </div>
+                            </div>
+                        </li>
+
+                        <!-- RESEARCH -->
+                        <li class="nav-item has-dropdown" data-dd>
+                            <a class="nav-link" href="#" aria-haspopup="true" aria-expanded="false">
+                                RESEARCH <span class="dropdown-arrow">▼</span>
+                            </a>
+                            <div class="dropdown-menu">
+                                <div class="dropdown-grid">
+                                    <a href="#" class="dropdown-item">
+                                        <div><strong>Research Council</strong></div>
+                                    </a>
+                                    <a href="#" class="dropdown-item">
+                                        <div><strong>Advisory Board</strong></div>
+                                    </a>
+                                    <a href="#" class="dropdown-item">
+                                        <div><strong>Research Development Cell</strong></div>
+                                    </a>
+                                    <a href="#" class="dropdown-item">
+                                        <div><strong>Research Policies</strong></div>
+                                    </a>
+                                    <a href="#" class="dropdown-item">
+                                        <div><strong>List of Research Guides</strong></div>
+                                    </a>
+                                    <a href="#" class="dropdown-item">
+                                        <div><strong>PhD Awardees</strong></div>
+                                    </a>
+                                    <a href="#" class="dropdown-item">
+                                        <div><strong>PhD Model Question Papers</strong></div>
+                                    </a>
+                                    <a href="#" class="dropdown-item">
+                                        <div><strong>Research Highlights</strong></div>
+                                    </a>
+                                    <a href="#" class="dropdown-item">
+                                        <div><strong>Coursework and PQE</strong></div>
+                                    </a>
+                                    <a href="#" class="dropdown-item">
+                                        <div><strong>Fellowships</strong></div>
+                                    </a>
+                                </div>
+                            </div>
+                        </li>
+
+                        <!-- EXAMINATION -->
+                        <li class="nav-item has-dropdown" data-dd>
+                            <a class="nav-link" href="#" aria-haspopup="true" aria-expanded="false">
+                                EXAMINATION <span class="dropdown-arrow">▼</span>
+                            </a>
+                            <div class="dropdown-menu">
+                                <div class="dropdown-grid">
+                                    <a href="#" class="dropdown-item">
+                                        <div><strong>Notifications</strong></div>
+                                    </a>
+                                    <a href="#" class="dropdown-item">
+                                        <div><strong>Registration</strong></div>
+                                    </a>
+                                    <a href="#" class="dropdown-item">
+                                        <div><strong>Regular / Supplementary Examination</strong></div>
+                                    </a>
+                                    <a href="#" class="dropdown-item">
+                                        <div><strong>Revaluation</strong></div>
+                                    </a>
+                                    <a href="#" class="dropdown-item">
+                                        <div><strong>Time Table</strong></div>
+                                    </a>
+                                    <a href="#" class="dropdown-item">
+                                        <div><strong>Results</strong></div>
+                                    </a>
+                                    <a href="#" class="dropdown-item">
+                                        <div><strong>Calendar</strong></div>
+                                    </a>
+                                    <a href="#" class="dropdown-item">
+                                        <div><strong>Model Question Papers</strong></div>
+                                    </a>
+                                    <a href="#" class="dropdown-item">
+                                        <div><strong>Toppers</strong></div>
+                                    </a>
+                                </div>
+                            </div>
+                        </li>
+
+                        <!-- STUDENT SUPPORT -->
+
+
+                        <!-- LIBRARY -->
+                        <li class="nav-item has-dropdown" data-dd>
+                            <a class="nav-link" href="#" aria-haspopup="true" aria-expanded="false">
+                                LIBRARY <span class="dropdown-arrow">▼</span>
+                            </a>
+                            <div class="dropdown-menu">
+                                <div class="dropdown-grid">
+                                    <a href="#" class="dropdown-item">
+                                        <div><strong>E Resources</strong></div>
+                                    </a>
+                                    <a href="#" class="dropdown-item">
+                                        <div><strong>List of Journals</strong></div>
+                                    </a>
+                                    <a href="#" class="dropdown-item">
+                                        <div><strong>E Journals</strong></div>
+                                    </a>
+                                    <a href="#" class="dropdown-item">
+                                        <div><strong>E Books</strong></div>
+                                    </a>
+                                    <a href="#" class="dropdown-item">
+                                        <div><strong>Library Rules</strong></div>
+                                    </a>
+                                    <a href="#" class="dropdown-item">
+                                        <div><strong>Question Papers</strong></div>
+                                    </a>
+                                </div>
+                            </div>
+                        </li>
+
+                        <!-- PUBLICATION -->
+                        <li class="nav-item has-dropdown last" data-dd>
+                            <a class="nav-link" href="#" aria-haspopup="true" aria-expanded="false">
+                                PUBLICATION <span class="dropdown-arrow">▼</span>
+                            </a>
+                            <div class="dropdown-menu">
+                                <div class="dropdown-grid">
+                                    <a href="#" class="dropdown-item">
+                                        <div><strong>In-house Publication</strong></div>
+                                    </a>
+                                    <a href="#" class="dropdown-item">
+                                        <div><strong>Journals</strong></div>
+                                    </a>
+                                </div>
+                            </div>
+                        </li>
+
+
+
+                        <!-- ALUMNI -->
+                        <li class="nav-item has-dropdown last" data-dd>
+                            <a class="nav-link" href="#" aria-haspopup="true" aria-expanded="false">
+                                ALUMNI <span class="dropdown-arrow">▼</span>
+                            </a>
+                            <div class="dropdown-menu">
+                                <div class="dropdown-grid">
+                                    <a href="#" class="dropdown-item">
+                                        <div><strong>Activities</strong></div>
+                                    </a>
+                                    <a href="#" class="dropdown-item">
+                                        <div><strong>Prominent Alumni</strong></div>
+                                    </a>
+                                    <a href="#" class="dropdown-item">
+                                        <div><strong>Alumni Events</strong></div>
+                                    </a>
+                                    <a href="#" class="dropdown-item">
+                                        <div><strong>Contributions</strong></div>
+                                    </a>
+                                </div>
+                            </div>
+                        </li>
+
+                        <!-- CONTACT US -->
+                        <li class="nav-item has-dropdown" data-dd>
+                            <a class="nav-link" href="#" aria-haspopup="true" aria-expanded="false">
+                                CONTACT US
+                            </a>
+                        </li>
+
+                    </ul>
+
+
+
+                    <!-- Mobile Toggle -->
+                    <button class="mobile-toggle" id="burger" aria-label="Open menu">
+                        <span class="bar"></span>
+                        <span class="bar"></span>
+                        <span class="bar"></span>
+                    </button>
+                </nav>
+
+            </div>
+        </div>
+    </header>
+
+    <!-- main content to show header works -->
+    <div class="hero-demo">
+        <span>🌿 Student Support & Facilities moved to top "RESOURCES" dropdown</span>
+    </div>
+
+
+    <style>
+        /* === YOUR EXISTING LIGHT THEME VARIABLES (just for demo) === */
+        :root {
+            --bg0: #f8f9fa;
+            --bg1: #ffffff;
+            --card: rgba(255, 255, 255, 0.95);
+            --card2: rgba(255, 255, 255, 0.98);
+            --stroke: rgba(51, 51, 51, 0.12);
+            --text: #333333;
+            --muted: #666666;
+            --muted2: #888888;
+            --primary: #ac2629;
+            --secondary: #3a7549;
+            --accent: #f1af47;
+            --neutral: #333333;
+            --warn: #d9534f;
+            --success: #5cb85c;
+            --info: #5bc0de;
+
+            --radius: 16px;
+            --shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
+            --shadow2: 0 4px 20px rgba(0, 0, 0, 0.05);
+            --blur: 10px;
+            --container: 1200px;
+            --navH: 72px;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: Inter, "Noto Sans Malayalam", sans-serif;
+            background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
+            color: var(--text);
+            padding: 40px 20px;
+        }
+
+        .container {
+            max-width: var(--container);
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        .section-head {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .section-head h2 {
+            color: var(--primary);
+            font-size: 2rem;
+            font-weight: 800;
+            margin-bottom: 12px;
+            font-family: "Noto Sans Malayalam", Inter, sans-serif;
+        }
+
+        .section-head p {
+            color: var(--muted);
+            font-size: 1.1rem;
+            max-width: 700px;
+            margin: 0 auto;
+        }
+
+        /* ===== NEW CAMPUS LIFE SECTION ===== */
+        .campus-section {
+            padding: 60px 0;
+            position: relative;
+            background: rgba(255, 255, 255, 0.5);
+            backdrop-filter: blur(2px);
+            border-radius: 48px;
+            margin: 30px 0;
+            border: 1px solid var(--stroke);
+        }
+
+        /* highlight cards */
+        .campus-highlights {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 24px;
+            margin-bottom: 60px;
+        }
+
+        .campus-card {
+            background: var(--card);
+            border: 1px solid var(--stroke);
+            border-radius: var(--radius);
+            padding: 32px 20px;
+            text-align: center;
+            backdrop-filter: blur(var(--blur));
+            box-shadow: var(--shadow);
+            transition: transform 0.2s ease, border-color 0.2s;
+        }
+
+        .campus-card:hover {
+            transform: translateY(-6px);
+            border-color: var(--primary);
+            background: var(--card2);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+        }
+
+        .card-icon {
+            font-size: 48px;
+            margin-bottom: 20px;
+            background: rgba(172, 38, 41, 0.05);
+            width: 80px;
+            height: 80px;
+            line-height: 80px;
+            border-radius: 50%;
+            margin-left: auto;
+            margin-right: auto;
+            border: 2px solid rgba(172, 38, 41, 0.1);
+            color: var(--primary);
+        }
+
+        .campus-card h3 {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--neutral);
+            margin-bottom: 12px;
+        }
+
+        .campus-card p {
+            color: var(--muted);
+            font-size: 14px;
+            line-height: 1.5;
+            margin-bottom: 20px;
+        }
+
+        .badge-count {
+            display: inline-block;
+            background: var(--secondary);
+            color: white;
+            padding: 4px 16px;
+            border-radius: 40px;
+            font-size: 14px;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        /* gallery grid */
+        .campus-gallery {
+            margin: 50px 0;
+        }
+
+        .gallery-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+        }
+
+        @media (max-width: 980px) {
+            .gallery-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 560px) {
+            .gallery-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .gallery-item {
+            position: relative;
+            border-radius: 24px;
+            overflow: hidden;
+            aspect-ratio: 4/3;
+            border: 1px solid var(--stroke);
+            background: var(--card);
+            box-shadow: var(--shadow2);
+            transition: all 0.3s ease;
+        }
+
+        .gallery-item:hover {
+            transform: scale(1.02);
+            border-color: var(--primary);
+            box-shadow: 0 20px 30px rgba(172, 38, 41, 0.1);
+        }
+
+        .gallery-img {
+            width: 100%;
+            height: 100%;
+            background-size: cover;
+            background-position: center;
+            transition: transform 0.4s;
+        }
+
+        .gallery-item:hover .gallery-img {
+            transform: scale(1.05);
+        }
+
+        .gallery-caption {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: linear-gradient(to top, rgba(0, 0, 0, 0.7), transparent);
+            color: white;
+            padding: 20px 15px 15px;
+            font-weight: 600;
+            font-size: 14px;
+            transform: translateY(100%);
+            transition: transform 0.3s ease;
+        }
+
+        .gallery-item:hover .gallery-caption {
+            transform: translateY(0);
+        }
+
+        /* facilities list */
+        .facility-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 15px;
+            margin-top: 30px;
+        }
+
+        @media (max-width: 980px) {
+            .facility-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+
+        @media (max-width: 560px) {
+            .facility-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        .facility-item {
+            background: var(--card);
+            border: 1px solid var(--stroke);
+            border-radius: 60px;
+            padding: 12px 15px;
+            text-align: center;
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--muted);
+            backdrop-filter: blur(4px);
+            box-shadow: var(--shadow2);
+            transition: all 0.2s;
+            white-space: nowrap;
+        }
+
+        .facility-item:hover {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(172, 38, 41, 0.2);
+        }
+
+        /* testimonials / student voice */
+        .testimonials {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 25px;
+            margin: 60px 0 20px;
+        }
+
+        @media (max-width: 980px) {
+            .testimonials {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 560px) {
+            .testimonials {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .testimonial-card {
+            background: var(--card2);
+            border: 1px solid var(--stroke);
+            border-radius: 28px;
+            padding: 28px 22px;
+            box-shadow: var(--shadow);
+            backdrop-filter: blur(5px);
+        }
+
+        .testimonial-card:hover {
+            border-color: var(--accent);
+        }
+
+        .quote {
+            font-size: 32px;
+            color: var(--accent);
+            opacity: 0.5;
+            line-height: 1;
+            margin-bottom: 10px;
+        }
+
+        .testimonial-text {
+            font-size: 15px;
+            color: var(--text);
+            line-height: 1.6;
+            margin-bottom: 20px;
+            font-style: italic;
+        }
+
+        .student {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .student-avatar {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 700;
+            font-size: 18px;
+            border: 2px solid white;
+        }
+
+        .student-info h4 {
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--neutral);
+        }
+
+        .student-info p {
+            font-size: 13px;
+            color: var(--muted2);
+        }
+
+        /* cta banner */
+        .campus-cta {
+            margin-top: 60px;
+            padding: 48px;
+            border-radius: 40px;
+            background: linear-gradient(135deg, rgba(172, 38, 41, 0.03), rgba(58, 117, 73, 0.03));
+            border: 1px solid var(--stroke);
+            text-align: center;
+        }
+
+        .campus-cta h3 {
+            font-size: 28px;
+            color: var(--primary);
+            font-weight: 800;
+            margin-bottom: 15px;
+        }
+
+        .campus-cta p {
+            color: var(--muted);
+            max-width: 600px;
+            margin: 0 auto 25px;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 14px 38px;
+            border-radius: 60px;
+            font-weight: 700;
+            text-decoration: none;
+            transition: all 0.2s;
+            border: 1px solid rgba(51, 51, 51, 0.15);
+            background: rgba(255, 255, 255, 0.9);
+            color: var(--text);
+        }
+
+        .btn.primary {
+            background: linear-gradient(135deg, var(--primary), #c03939);
+            color: white;
+            border: none;
+            box-shadow: 0 8px 25px rgba(172, 38, 41, 0.25);
+        }
+
+        .btn.primary:hover {
+            background: linear-gradient(135deg, #c03939, var(--primary));
+            transform: translateY(-3px);
+            box-shadow: 0 15px 35px rgba(172, 38, 41, 0.35);
+        }
+    </style>
+    <!-- demo placeholder: imagine this is inside your main content -->
+    <div class="container">
+        <div class="section-head">
+            <h2>കാമ്പസും കാമ്പസ് ജീവിതവും</h2>
+            <p>Campus & Campus Life • immersive, vibrant, and full of opportunities</p>
+        </div>
+    </div>
+
+    <!-- ========== NEW CAMPUS LIFE SECTION ========== -->
+    <!-- copy this entire <section> block and paste where needed -->
+    <section class="campus-section">
+        <div class="container">
+            <!-- Highlight stats / icons -->
+            <div class="campus-highlights">
+                <div class="campus-card">
+                    <div class="card-icon">🌳</div>
+                    <h3>ഹരിത കാമ്പസ്</h3>
+                    <p>45 acres of green, sustainable campus with wildlife corridor</p>
+                    <span class="badge-count">12+ gardens</span>
+                </div>
+                <div class="campus-card">
+                    <div class="card-icon">🏛️</div>
+                    <h3>ആധുനിക സൗകര്യങ്ങൾ</h3>
+                    <p>Smart classrooms, central library, and innovation hub</p>
+                    <span class="badge-count">24/7 access</span>
+                </div>
+                <div class="campus-card">
+                    <div class="card-icon">⚽</div>
+                    <h3>കായിക വിശേഷങ്ങൾ</h3>
+                    <p>International standard stadium, gym, indoor courts</p>
+                    <span class="badge-count">15+ clubs</span>
+                </div>
+                <div class="campus-card">
+                    <div class="card-icon">🎭</div>
+                    <h3>കലാ സാംസ്കാരികം</h3>
+                    <p>Annual cultural fest, theatre, music, and art collective</p>
+                    <span class="badge-count">50+ events</span>
+                </div>
+            </div>
+
+            <!-- Photo gallery grid (campus life) -->
+            <div class="campus-gallery">
+                <div class="gallery-grid">
+                    <div class="gallery-item">
+                        <div class="gallery-img"
+                            style="background-image: url('data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' width=\'400\' height=\'300\' viewBox=\'0 0 400 300\'%3E%3Crect width=\'400\' height=\'300\' fill=\'%233a7549\'/%3E%3Ctext x=\'80\' y=\'160\' fill=\'%23ffffff\' font-size=\'24\' font-family=\'Inter\'%3ELibrary%3C/text%3E%3C/svg%3E')">
+                        </div>
+                        <div class="gallery-caption">Central Library & Study Pods</div>
+                    </div>
+                    <div class="gallery-item">
+                        <div class="gallery-img"
+                            style="background-image: url('data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' width=\'400\' height=\'300\' viewBox=\'0 0 400 300\'%3E%3Crect width=\'400\' height=\'300\' fill=\'%23ac2629\'/%3E%3Ctext x=\'60\' y=\'160\' fill=\'%23ffffff\' font-size=\'24\'%3ESports%3C/text%3E%3C/svg%3E')">
+                        </div>
+                        <div class="gallery-caption">Cricket Ground & Fitness Centre</div>
+                    </div>
+                    <div class="gallery-item">
+                        <div class="gallery-img"
+                            style="background-image: url('data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' width=\'400\' height=\'300\' viewBox=\'0 0 400 300\'%3E%3Crect width=\'400\' height=\'300\' fill=\'%23f1af47\'/%3E%3Ctext x=\'60\' y=\'160\' fill=\'%23333333\' font-size=\'24\'%3ECafeteria%3C/text%3E%3C/svg%3E')">
+                        </div>
+                        <div class="gallery-caption">Food Court & Coffee Shop</div>
+                    </div>
+                    <div class="gallery-item">
+                        <div class="gallery-img"
+                            style="background-image: url('data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' width=\'400\' height=\'300\' viewBox=\'0 0 400 300\'%3E%3Crect width=\'400\' height=\'300\' fill=\'%233a7549\'/%3E%3Ctext x=\'60\' y=\'160\' fill=\'%23ffffff\' font-size=\'24\'%3EHostel%3C/text%3E%3C/svg%3E')">
+                        </div>
+                        <div class="gallery-caption">Boys & Girls Hostel (Wi‑Fi enabled)</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- compact facilities / resources chips (like mini badges) -->
+            <div class="facility-grid">
+                <span class="facility-item">🏥 Health centre</span>
+                <span class="facility-item">🚌 Transport</span>
+                <span class="facility-item">📶 High‑speed WiFi</span>
+                <span class="facility-item">🏧 Bank & ATM</span>
+                <span class="facility-item">📚 Digital library</span>
+                <span class="facility-item">🎤 Open air theatre</span>
+                <span class="facility-item">🍽️ Mess</span>
+                <span class="facility-item">🏋️ Gym</span>
+                <span class="facility-item">🧘 Yoga centre</span>
+                <span class="facility-item">🖨️ Print station</span>
+            </div>
+
+            <!-- Student testimonials / voices -->
+            <div class="testimonials">
+                <div class="testimonial-card">
+                    <div class="quote">“</div>
+                    <div class="testimonial-text">The campus feels like a second home. Greenery everywhere, and the
+                        late‑night library sessions are the best.</div>
+                    <div class="student">
+                        <div class="student-avatar">എം</div>
+                        <div class="student-info">
+                            <h4>മീര</h4>
+                            <p>MA Malayalam, 3rd year</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="testimonial-card">
+                    <div class="quote">“</div>
+                    <div class="testimonial-text">From football tournaments to cultural fests, life here is always
+                        buzzing. Proud to be a part of this university.</div>
+                    <div class="student">
+                        <div class="student-avatar">അ</div>
+                        <div class="student-info">
+                            <h4>അഭിജിത്ത്</h4>
+                            <p>Integrated PG, 2nd year</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="testimonial-card">
+                    <div class="quote">“</div>
+                    <div class="testimonial-text">The new innovation lab and 24/7 workspaces helped me build my
+                        startup while studying. Truly futuristic.</div>
+                    <div class="student">
+                        <div class="student-avatar">ശ്ര</div>
+                        <div class="student-info">
+                            <h4>ശ്രേയ</h4>
+                            <p>PhD Research scholar</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- call to action explore campus -->
+            <div class="campus-cta">
+                <h3>Experience the vibe ✦ നേരിൽ കാണൂ</h3>
+                <p>Schedule a campus tour, talk to current students, or join our open day events.</p>
+                <a href="#" class="btn primary">Explore virtual tour →</a>
+                <a href="#" class="btn" style="margin-left: 15px;">📅 Book a visit</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- note: everything above is the new campus life section, fully styled with your existing variables -->
+    <div style="text-align: center; margin: 50px; color: var(--muted);">
+        ⬆️ Campus & Campus Life section – ready to copy ⬆️
+    </div>
+
+    <script>
+        (function () {
+            // simple language toggle (matches your light style)
+            document.getElementById('langToggle')?.addEventListener('click', function () {
+                let dot = this.querySelector('.dot');
+                let label = document.getElementById('langLabel');
+                if (label.innerText === 'ML') {
+                    label.innerText = 'EN';
+                    dot.style.transform = 'translateX(32px)';
+                } else {
+                    label.innerText = 'ML';
+                    dot.style.transform = 'none';
+                }
+            });
+        })();
+    </script>
+</body>
+
+</html>
