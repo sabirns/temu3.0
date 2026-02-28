@@ -12,7 +12,7 @@
     <link
         href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+Malayalam:wght@400;500;600;700&display=swap"
         rel="stylesheet">
-    <link rel="stylesheet" href="css/style-dark.css">
+    <!-- <link rel="stylesheet" href="css/style-dark.css"> -->
     <link rel="stylesheet" href="css/style.css">
 </head>
 
@@ -36,7 +36,7 @@
                         <!-- Moved FACILITIES / RESOURCES -->
                         <div class="nav-item has-dropdown" data-dd>
                             <a class="btn btn-small" href="#" aria-haspopup="true" aria-expanded="false">
-                                Facilities<span class="dropdown-arrow">▼</span>
+                                Facilities<span class="dropdown-arrow"></span>
                             </a>
                             <div class="dropdown-menu">
                                 <div class="dropdown-grid">
@@ -178,7 +178,7 @@
                             </a> -->
                             <div class="toggle" id="langToggle" title="Language toggle">
                                 <span class="dot" aria-hidden="true"></span>
-                                <span id="langLabel">ML</span>
+                                <span id="langLabel">English</span>
                             </div>
                         </div>
                     </div>
@@ -538,20 +538,18 @@
         
         <!-- News Ticker -->
         <div class="news-ticker-area">
-            <div class="container">
-                <div class="ticker-wrapper">
-                    <div class="ticker-label">
-                        <span>അറിയിപ്പുകൾ</span>
-                    </div>
-                    <div class="ticker-content">
-                        <div class="ticker-scroll">
-                            <a href="#">എസ്.സി/എസ്.ടി. സെൽ വിപുലീകരിച്ച ഉത്തരവ്.</a>
-                            <a href="#">തുഞ്ചത്തെഴുത്തച്ഛൻ മലയാളസർവകലാശാല – നിർവാഹകസമിതി പുനഃസംഘടിപ്പിച്ച ഉത്തരവ്.</a>
-                            <a href="#">അക്കാദമിക് കൗൺസിൽ ഉത്തരവ് 2025.</a>
-                            <a href="#">ഗവേഷണകൗൺസിൽ ഉത്തരവ് -2025.</a>
-                            <a href="#">തുഞ്ചത്തെഴുത്തച്ഛൻ മലയാളസർവകലാശാല – ഫാക്കൽറ്റി ഡീൻ നിയമനം- ഉത്തരവ് 2025.</a>
-                            <a href="#">തുഞ്ചത്തെഴുത്തച്ഛൻ മലയാളസർവകലാശാല – ഫാക്കൽറ്റി ഉപദേശകസമിതികൾ ഉത്തരവ്.</a>
-                        </div>
+            <div class="ticker-wrapper">
+                <div class="ticker-label">
+                    <span>അറിയിപ്പുകൾ</span>
+                </div>
+                <div class="ticker-content">
+                    <div class="ticker-scroll">
+                        <a href="#">എസ്.സി/എസ്.ടി. സെൽ വിപുലീകരിച്ച ഉത്തരവ്.</a>
+                        <a href="#">തുഞ്ചത്തെഴുത്തച്ഛൻ മലയാളസർവകലാശാല – നിർവാഹകസമിതി പുനഃസംഘടിപ്പിച്ച ഉത്തരവ്.</a>
+                        <a href="#">അക്കാദമിക് കൗൺസിൽ ഉത്തരവ് 2025.</a>
+                        <a href="#">ഗവേഷണകൗൺസിൽ ഉത്തരവ് -2025.</a>
+                        <a href="#">തുഞ്ചത്തെഴുത്തച്ഛൻ മലയാളസർവകലാശാല – ഫാക്കൽറ്റി ഡീൻ നിയമനം- ഉത്തരവ് 2025.</a>
+                        <a href="#">തുഞ്ചത്തെഴുത്തച്ഛൻ മലയാളസർവകലാശാല – ഫാക്കൽറ്റി ഉപദേശകസമിതികൾ ഉത്തരവ്.</a>
                     </div>
                 </div>
             </div>

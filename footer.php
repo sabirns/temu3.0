@@ -5,63 +5,97 @@
                 <div class="foot-card">
                     <h4>പ്രധാന ലിങ്കുകൾ</h4>
                     <div class="mini-links">
-                        <a href="https://keralabattlescovid.in/" target="_blank" rel="noreferrer">
-                            <strong>കേരള ബാറ്റിൽസ് കോവിഡ്</strong>
-                        </a>
-                        <a href="https://lms.temu.ac.in/" target="_blank" rel="noreferrer">
-                            <strong>എൽ.എം.എസ്</strong>
-                        </a>
-                        <a href="#student-support">
-                            <strong>വിദ്യാർത്ഥിക്ഷേമം</strong>
-                        </a>
-                        <a href="#student-support">
-                            <strong>വിദ്യാർത്ഥി യൂണിയൻ</strong>
-                        </a>
-                        <a href="#">
-                            <strong>വീഡിയോ ഗാലറി</strong>
-                        </a>
-                        <a href="#campus">
-                            <strong>ക്യാമ്പസ്</strong>
-                        </a>
-
-                        <a href="#">
-                            <strong>സാമൂഹിക പ്രതിബദ്ധത</strong>
-                        </a>
-                        
-                        <a href="#">
-                            <strong>ഫീസ് പേയ്‌മെന്റ്</strong>
-                        </a>
-                        <a href="#">
-                            <strong>ഒഴിവുകൾ / കരിയർ</strong>
-                        </a>
-                        <a href="#">
-                            <strong>വിവരാവകാശം (RTI)</strong>
-                        </a>
-                        <a href="#">
-                            <strong>ഡൗൺലോഡ് ചെയ്യേണ്ട ഫോം</strong>
-                        </a>
-                        <a href="#">
-                            <strong>ഓർഡറുകളും സർക്കുലറുകളും</strong>
-                        </a>
-                        <a href="#">
-                            <strong>പത്രപ്രവർത്തനം</strong>
-                        </a>
-                        <a href="#">
-                            <strong>ഗാലറി / മീഡിയ കവറേജ്</strong>
-                        </a>
-                        <a href="#">
-                            <strong>ആർക്കൈവ്</strong>
-                        </a>
-                        <a href="#">
-                            <strong>ഡയറക്ടറി</strong>
-                        </a>
-                        <a href="#">
-                            <strong>സംശയങ്ങൾ (FAQ)</strong>
-                        </a>
+                        <ul>
+                            <li>
+                                <a href="https://keralabattlescovid.in/" target="_blank" rel="noreferrer">
+                                    <strong>കേരള ബാറ്റിൽസ് കോവിഡ്</strong>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="https://lms.temu.ac.in/" target="_blank" rel="noreferrer">
+                                    <strong>എൽ.എം.എസ്</strong>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="#student-support">
+                                    <strong>വിദ്യാർത്ഥിക്ഷേമം</strong>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="#student-support">
+                                    <strong>വിദ്യാർത്ഥി യൂണിയൻ</strong>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="#">
+                                    <strong>വീഡിയോ ഗാലറി</strong>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="#campus">
+                                    <strong>ക്യാമ്പസ്</strong>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="#">
+                                    <strong>സാമൂഹിക പ്രതിബദ്ധത</strong>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="#">
+                                    <strong>ഫീസ് പേയ്‌മെന്റ്</strong>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="#">
+                                    <strong>ഒഴിവുകൾ / കരിയർ</strong>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="#">
+                                    <strong>വിവരാവകാശം (RTI)</strong>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="#">
+                                    <strong>ഡൗൺലോഡ് ചെയ്യേണ്ട ഫോം</strong>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="#">
+                                    <strong>ഓർഡറുകളും സർക്കുലറുകളും</strong>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="#">
+                                    <strong>പത്രപ്രവർത്തനം</strong>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="#">
+                                    <strong>ഗാലറി / മീഡിയ കവറേജ്</strong>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="#">
+                                    <strong>ആർക്കൈവ്</strong>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="#">
+                                    <strong>ഡയറക്ടറി</strong>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="#">
+                                    <strong>സംശയങ്ങൾ (FAQ)</strong>
+                                </a>
+                            </li>
+                        </ul>
                     </div>
                 </div>
                 <div class="foot-card">
-                    <h4>മറ്റു വെബ്സൈറ്റുകള്‍</h4>
+                    <h4>മറ്റു വെബ്സൈറ്റുകള്</h4>
                     <div class="mini-links">
                         <ul>
                             <li><a href="https://kerala.gov.in/" target="_blank" rel="noopener">കേരള സര്‍ക്കാര്‍ ഔദ്യോഗിക വെബ്‌ പോര്‍ട്ടല്‍</a></li>

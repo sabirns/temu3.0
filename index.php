@@ -149,8 +149,8 @@
         </div>
 
         <!-- Navigation Arrows -->
-        <button class="slider-arrow prev" aria-label="Previous slide">‹</button>
-        <button class="slider-arrow next" aria-label="Next slide">›</button>
+        <button class="slider-arrow prev" aria-label="Previous slide"></button>
+        <button class="slider-arrow next" aria-label="Next slide"></button>
 
         <!-- Slide Counter -->
         <div class="slide-counter">
@@ -178,7 +178,6 @@
                         <div class="hero-cta">
                             <button class="btn primary" onclick="scrollToId('initiatives')">കൂടുതല്‍ വായിക്കുക</button>
                             <button class="btn" onclick="scrollToId('updates')">പദ്ധതികളും സംരംഭങ്ങളും</button>
-                            <button class="btn" onclick="scrollToId('quick')">പ്രധാന ലിങ്കുകൾ</button>
                         </div>
 
                         <div class="hero-stats" aria-label="Highlights">
