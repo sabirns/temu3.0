@@ -1,0 +1,349 @@
+/* Mega Menu Styles - WordPress API Menu */
+
+/* Hide wrapper elements */
+.mega-menu-wrap > div:first-child,
+.mega-menu-toggle,
+.mega-toggle-blocks-left,
+.mega-toggle-blocks-center,
+.mega-toggle-blocks-right,
+.mega-toggle-block,
+.mega-close {
+    display: none !important;
+}
+
+.mega-menu-wrap {
+    width: 100%;
+    background: transparent !important;
+}
+
+/* Ensure dropdowns do not get clipped by overflow of header containers */
+.header, .header * {
+  overflow: visible !important;
+}
+
+/* Ensure top-level menu items sit flush with no gap */
+#mega-menu-custom {
+    gap: 0;
+}
+
+/* Ensure submenus are visible on hover/focus consistently */
+#mega-menu-custom > li.mega-menu-item:hover > ul.mega-sub-menu,
+#mega-menu-custom > li.mega-menu-item:focus-within > ul.mega-sub-menu {
+  display: block !important;
+}
+
+/* Open state for mobile / accessibility */
+.mega-menu-item-has-children.open > ul.mega-sub-menu {
+  display: block !important;
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+/* Main Menu Container */
+#mega-menu-custom {
+    display: flex !important;
+    align-items: center;
+    justify-content: center;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    gap: 0;
+    flex-wrap: wrap;
+}
+
+#mega-menu-custom > li.mega-menu-item {
+    position: relative;
+    margin: 0;
+    padding: 0;
+}
+
+/* Main Menu Links */
+#mega-menu-custom > li.mega-menu-item > a.mega-menu-link {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 13px 15px;
+    font-weight: 600;
+    font-size: 14px;
+    transition: all .2s ease;
+    white-space: nowrap;
+    color: var(--text);
+    text-decoration: none;
+    border-radius: 10px;
+}
+
+#mega-menu-custom > li.mega-menu-item > a.mega-menu-link:hover,
+#mega-menu-custom > li.mega-menu-item > a.mega-menu-link:focus {
+    color: var(--primary);
+    background: rgba(172, 38, 41, .05);
+}
+
+/* Dropdown Arrow */
+.mega-indicator {
+    display: inline-block;
+    width: 12px;
+    height: 12px;
+    margin-left: 4px;
+    background: url(/images/arrow-down.svg) no-repeat center center;
+    background-size: contain;
+    opacity: 0.6;
+    transition: transform .2s ease;
+}
+
+.mega-menu-item-has-children:hover .mega-indicator,
+.mega-menu-item-has-children:focus-within .mega-indicator {
+    transform: rotate(180deg);
+}
+
+/* ===========================================
+   MEGA SUB-MENU (First Level Dropdown)
+   =========================================== */
+.mega-sub-menu {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+/* First level sub-menu - MEGA style */
+#mega-menu-custom > li.mega-menu-item > ul.mega-sub-menu {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    min-width: 700px;
+    background: rgba(255, 255, 255, .98);
+    border-radius: 16px;
+    box-shadow: 0 25px 60px rgba(0, 0, 0, .15);
+    border: 1px solid rgba(51, 51, 51, .10);
+    padding: 25px;
+    z-index: 9999;
+    backdrop-filter: blur(10px);
+    display: none;
+}
+
+/* Show mega sub-menu on hover (desktop) and focus */
+.mega-menu-item-has-children:hover > ul.mega-sub-menu,
+.mega-menu-item-has-children:focus-within > ul.mega-sub-menu {
+    display: block;
+}
+@media (min-width: 1024px) {
+  #mega-menu-custom > li.mega-menu-item > ul.mega-sub-menu {
+    position: fixed;
+    top: calc(var(--navH, 72px));
+    left: 50%;
+    transform: translateX(-50%);
+    width: min(1200px, 100vw);
+    padding: 20px;
+    z-index: 9999;
+  }
+}
+
+/* Mega Menu Row */
+.mega-sub-menu > li.mega-menu-row {
+    width: 100%;
+}
+
+/* Mega Menu Grid inside row */
+.mega-sub-menu > li.mega-menu-row > ul.mega-sub-menu {
+    display: grid !important;
+    grid-template-columns: repeat(12, 1fr);
+    gap: 20px;
+    position: static;
+    box-shadow: none;
+    border: none;
+    padding: 0;
+    min-width: auto;
+    background: transparent;
+}
+
+/* Mega Menu Columns */
+.mega-menu-column {
+    padding: 0;
+}
+
+.mega-menu-columns-3-of-12 {
+    grid-column: span 3;
+}
+.mega-menu-columns-5-of-12 {
+    grid-column: span 5;
+}
+.mega-menu-columns-6-of-12 {
+    grid-column: span 6;
+}
+.mega-menu-columns-7-of-12 {
+    grid-column: span 7;
+}
+.mega-menu-columns-2-of-6 {
+    grid-column: span 4;
+}
+.mega-menu-columns-4-of-12 {
+    grid-column: span 4;
+}
+
+/* Block Title */
+.mega-block-title, .custom-heading {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--secondary);
+    text-transform: uppercase;
+    letter-spacing: .5px;
+    margin: 0 0 12px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid rgba(58, 117, 73, .15);
+}
+
+/* ===========================================
+   SECOND LEVEL - Page Lists
+   =========================================== */
+.mega-sub-menu ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.mega-sub-menu ul li {
+    margin-bottom: 4px;
+}
+
+/* Page Item Links */
+.mega-sub-menu .page_item a,
+.mega-sub-menu ul li a {
+    display: block;
+    padding: 8px 12px;
+    border-radius: 8px;
+    border: none;
+    background: transparent;
+    font-weight: 500;
+    font-size: 13px;
+    color: var(--text);
+    text-decoration: none;
+    transition: all .2s ease;
+}
+
+.mega-sub-menu .page_item a:hover,
+.mega-sub-menu ul li a:hover {
+    background: rgba(172, 38, 41, .08);
+    color: var(--primary);
+    padding-left: 16px;
+}
+
+/* Nested Children */
+.mega-sub-menu ul.children {
+    padding-left: 15px;
+    margin-top: 5px;
+}
+
+.mega-sub-menu ul.children li {
+    margin-bottom: 2px;
+}
+
+.mega-sub-menu ul.children a {
+    font-size: 12px;
+    padding: 6px 10px;
+}
+
+/* ===========================================
+   Widget Styles
+   =========================================== */
+.mega-menu-item-type-widget {
+    padding: 0;
+}
+
+.mega-menu-item-type-widget .textwidget {
+    font-size: 13px;
+    color: var(--muted);
+    padding: 10px;
+}
+
+/* ===========================================
+   Flyout Menu (Non-mega items with children)
+   =========================================== */
+.mega-menu-flyout > ul.mega-sub-menu {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    min-width: 220px;
+    background: rgba(255, 255, 255, .98);
+    border-radius: 12px;
+    box-shadow: 0 15px 40px rgba(0, 0, 0, .12);
+    border: 1px solid rgba(51, 51, 51, .10);
+    padding: 12px;
+    z-index: 9999;
+    display: none;
+}
+
+.mega-menu-flyout:hover > ul.mega-sub-menu {
+    display: block;
+}
+
+.mega-menu-flyout .mega-sub-menu li a {
+    display: block;
+    padding: 10px 14px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text);
+    text-decoration: none;
+    transition: all .2s ease;
+}
+
+.mega-menu-flyout .mega-sub-menu li a:hover {
+    background: rgba(172, 38, 41, .08);
+    color: var(--primary);
+}
+
+/* ===========================================
+   Responsive
+   =========================================== */
+@media (max-width: 992px) {
+    #mega-menu-custom {
+        flex-direction: column;
+        display: none;
+        width: 100%;
+    }
+    
+    #mega-menu-custom.mega-mobile-open {
+        display: flex;
+    }
+    
+    #mega-menu-custom > li.mega-menu-item {
+        width: 100%;
+    }
+    
+    #mega-menu-custom > li.mega-menu-item > a.mega-menu-link {
+        padding: 12px 15px;
+        border-bottom: 1px solid rgba(51, 51, 51, .08);
+    }
+    
+    #mega-menu-custom > li.mega-menu-item > ul.mega-sub-menu,
+    .mega-menu-flyout > ul.mega-sub-menu {
+        position: static;
+        min-width: auto;
+        box-shadow: none;
+        border: none;
+        padding: 10px 20px;
+        display: block;
+        background: rgba(248, 249, 250, 0.5);
+        border-radius: 8px;
+        margin: 5px 0;
+    }
+    
+    .mega-sub-menu > li.mega-menu-row > ul.mega-sub-menu {
+        grid-template-columns: 1fr;
+    }
+    
+    .mega-menu-columns-3-of-12,
+    .mega-menu-columns-2-of-6 {
+        grid-column: span 1;
+    }
+
+    /* Hide hover-triggered submenu on mobile, only show via .open class */
+    #mega-menu-custom > li.mega-menu-item > ul.mega-sub-menu,
+    .mega-menu-flyout > ul.mega-sub-menu {
+        display: none;
+    }
+
+    .mega-menu-item-has-children.open > ul.mega-sub-menu {
+        display: block !important;
+    }
+}

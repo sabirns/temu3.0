@@ -1,0 +1,13 @@
+/* Centered desktop mega-menu dropdown that spans body width without overlapping header */
+@media (min-width: 1024px) {
+  #mega-menu-custom > li.mega-menu-item > ul.mega-sub-menu {
+    position: fixed;
+    top: calc(var(--navH, 72px));
+    left: 50%;
+    transform: translateX(-50%);
+    width: min(1200px, calc(100vw - 40px));
+    min-width: 0;
+    padding: 20px;
+    z-index: 9999;
+  }
+}
