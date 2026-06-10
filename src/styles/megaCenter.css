@@ -5,9 +5,10 @@
     top: calc(var(--navH, 72px));
     left: 50%;
     transform: translateX(-50%);
-    width: min(1200px, calc(100vw - 40px));
+    width: 95%;
     min-width: 0;
     padding: 20px;
     z-index: 9999;
+    border-radius: 10px;
   }
 }

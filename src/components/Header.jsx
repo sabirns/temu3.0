@@ -6,21 +6,6 @@ import { usePageInfo } from '../services/PageInfoContext'
 import '../styles/megaMenu.css'
 import '../styles/megaCenter.css'
 
-const defaultNotifications = {
-  ml: [
-    { id: 1, title: 'എസ്.സി/എസ്.ടി. സെൽ വിപുലീകരിച്ച ഉത്തരവ്.', slug: '' },
-    { id: 2, title: 'തുഞ്ചത്തെഴുത്തച്ഛൻ മലയാളസർവകലാശാല – നിർവാഹകസമിതി പുനഃസംഘടിപ്പിച്ച ഉത്തരവ്.', slug: '' },
-    { id: 3, title: 'അക്കാദമിക് കൗൺസിൽ ഉത്തരവ് 2025.', slug: '' },
-    { id: 4, title: 'ഗവേഷണകൗൺസിൽ ഉത്തരവ് -2025.', slug: '' }
-  ],
-  en: [
-    { id: 1, title: 'SC/ST Cell Extended Order.', slug: '' },
-    { id: 2, title: 'Thunchath Ezhuthachan Malayalam University - Governing Council Reconstituted.', slug: '' },
-    { id: 3, title: 'Academic Council Order 2025.', slug: '' },
-    { id: 4, title: 'Research Council Order - 2025.', slug: '' }
-  ]
-}
-
 
 async function fetchNotificationsFromAPI(lang = 'ml') {
   try {
@@ -30,9 +15,8 @@ async function fetchNotificationsFromAPI(lang = 'ml') {
       lang,
       _t: Date.now()
     })
-    if (WP_CONFIG.NOTIFICATIONS_CATEGORY_ID) {
-      params.set('notification-category', WP_CONFIG.NOTIFICATIONS_CATEGORY_ID)
-    }
+    const termId = lang === 'en' ? '1890' : '1888'
+    params.set('notification_category', termId)
     const response = await fetch(`${WP_CONFIG.API_URL}/notifications?${params}`)
     if (!response.ok) throw new Error('Failed to fetch')
     const data = await response.json()
@@ -63,7 +47,7 @@ function Header() {
     setSiteLanguage(siteLang)
   }, [siteLang])
 
-  const [notifications, setNotifications] = useState(defaultNotifications[siteLang] || defaultNotifications.ml)
+  const [notifications, setNotifications] = useState([])
   const [isLoading, setIsLoading] = useState(true)
   const [megaMenuHtml, setMegaMenuHtml] = useState('')
   const [topMenuItems, setTopMenuItems] = useState([])
@@ -77,11 +61,7 @@ function Header() {
   const loadNotifications = useCallback(async (lang) => {
     setIsLoading(true)
     const data = await fetchNotificationsFromAPI(lang)
-    if (data && data.length > 0) {
-      setNotifications(data)
-    } else {
-      setNotifications(defaultNotifications[lang] || defaultNotifications.ml)
-    }
+    setNotifications(data || [])
     setIsLoading(false)
   }, [])
 
@@ -104,7 +84,7 @@ function Header() {
   useEffect(() => {
     loadNotifications(siteLanguage)
     fetchMegaMenu(siteLanguage)
-    fetchMenuByLocation('top_menu_1').then(setTopMenuItems)
+    fetchMenuByLocation('top_menu_1', siteLanguage).then(setTopMenuItems)
   }, [siteLanguage, loadNotifications, fetchMegaMenu])
 
   // Initialize API mega menu and handle internal navigation
@@ -336,19 +316,31 @@ function Header() {
 
   // Pre-compute translated paths at page load time
   const translationPaths = useMemo(() => {
-    if (!pageInfo.translationSlugs) return null
     const currentPath = location.pathname
-    const buildPath = (targetLang) => {
-      const slug = pageInfo.translationSlugs[targetLang]
-      if (!slug) return null
+    const swapPrefix = (targetLang) => {
       const parts = currentPath.split('/').filter(Boolean)
-      if (parts[0] === 'ml' || parts[0] === 'en') parts.shift()
-      if (parts.length > 0 && !/^\d+$/.test(parts[parts.length - 1])) {
-        parts[parts.length - 1] = slug
+      if (parts[0] === 'ml' || parts[0] === 'en') parts[0] = targetLang
+      else parts.unshift(targetLang)
+      const sectionRoutes = ['nss', 'naac', 'iqac']
+      if (sectionRoutes.includes(parts[1])) {
+        return '/' + [targetLang, parts[1]].join('/')
       }
-      return '/' + [targetLang, ...parts].join('/')
+      return '/' + parts.join('/')
     }
-    return { en: buildPath('en'), ml: buildPath('ml') }
+    if (pageInfo.translationSlugs) {
+      const buildPath = (targetLang) => {
+        const slug = pageInfo.translationSlugs[targetLang]
+        if (!slug) return swapPrefix(targetLang)
+        const parts = currentPath.split('/').filter(Boolean)
+        if (parts[0] === 'ml' || parts[0] === 'en') parts.shift()
+        if (parts.length > 0 && !/^\d+$/.test(parts[parts.length - 1])) {
+          parts[parts.length - 1] = slug
+        }
+        return '/' + [targetLang, ...parts].join('/')
+      }
+      return { en: buildPath('en'), ml: buildPath('ml') }
+    }
+    return { en: swapPrefix('en'), ml: swapPrefix('ml') }
   }, [pageInfo.translationSlugs, location.pathname])
 
   const toggleLang = async () => {
@@ -387,7 +379,13 @@ function Header() {
     // Fallback: just swap the language prefix
     if (pathParts[0] === 'ml' || pathParts[0] === 'en') {
       pathParts[0] = newLang
-      navigate('/' + pathParts.join('/'))
+      // For custom post type pages (nss, naac, iqac), navigate to dashboard if translation isn't available
+      const sectionRoutes = ['nss', 'naac', 'iqac']
+      if (sectionRoutes.includes(pathParts[1])) {
+        navigate('/' + [newLang, pathParts[1]].join('/'))
+      } else {
+        navigate('/' + pathParts.join('/'))
+      }
     } else {
       navigate(`/${newLang}${currentPath === '/' ? '' : currentPath}`)
     }
@@ -549,7 +547,7 @@ function Header() {
         <div className="news-ticker-area" ref={tickerRef}>
           <div className="ticker-wrapper">
             <div className="ticker-label">
-              <span>അറിയിപ്പുകൾ</span>
+              <span>{siteLang === 'ml' ? 'അറിയിപ്പുകൾ' : 'Announcements'}</span>
             </div>
         <div className="ticker-content">
               <div className="ticker-scroll" id="notificationsTrack">

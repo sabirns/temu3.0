@@ -72,7 +72,7 @@ function Footer() {
             <h5>📍 കാമ്പസ് ലൊക്കേഷൻ</h5>
             <p> തുഞ്ചത്തെഴുത്തച്ഛന്‍ മലയാളസര്‍വകലാശാല, <br />  വാക്കാട്, തിരൂര്‍, മലപ്പുറം, പിന്‍:676 502</p>
           </div>
-          <a href="https://maps.google.com" target="_blank" rel="noopener" className="map-link">
+          <a href="https://maps.app.goo.gl/mR1hviU5Whku6FrA9" target="_blank" rel="noopener" className="map-link">
             മാപ്പിൽ കാണുക →
           </a>
         </div>
@@ -80,15 +80,10 @@ function Footer() {
         <div className="footer-bottom">
           <div className="footer-bottom-content">
             <p>© {year} തുഞ്ചത്ത് എഴുത്തച്ഛൻ മലയാള സർവകലാശാല. എല്ലാ അവകാശങ്ങളും നിക്ഷിപ്തം.</p>
-            <div className="footer-legal-links">
-              {['Privacy Policy', 'Terms of Use', 'Sitemap'].map((link, i) => (
-                <a key={i} href="#">{link}</a>
-              ))}
-            </div>
+            <p className="footer-credit">
+              Developed by <a href="https://sprdh.com" target="_blank" rel="noopener">SPRDH SOLUTIONS PVT LTD.</a>
+            </p>
           </div>
-          <p className="footer-credit">
-            Developed by <a href="https://sprdh.com" target="_blank" rel="noopener">SPRDH SOLUTIONS PVT LTD.</a>
-          </p>
         </div>
       </div>
     </footer>

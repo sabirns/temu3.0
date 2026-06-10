@@ -64,38 +64,13 @@ function GallerySingle() {
     }
   }, [slug, lang])
 
-  // Handle images extraction
+  // Handle images extraction — ACF gallery only
   let images = []
-  let cleanContent = gallery?.content || ''
-
   if (gallery?.acf?.photo_gallery?.gallery_images && Array.isArray(gallery.acf.photo_gallery.gallery_images)) {
     const raw = gallery.acf.photo_gallery.gallery_images
     images = Array.isArray(raw[0]) ? raw[0] : raw
   } else if (gallery?.acf?.gallery && Array.isArray(gallery.acf.gallery)) {
     images = gallery.acf.gallery
-  } else if (gallery?.content) {
-    const parser = new DOMParser()
-    const doc = parser.parseFromString(gallery.content, 'text/html')
-    const imgElements = doc.querySelectorAll('img')
-    
-    if (imgElements.length > 0) {
-      imgElements.forEach((img, index) => {
-        const thumbSrc = img.getAttribute('src')
-        const fullSrc = img.getAttribute('data-full-url') || img.getAttribute('data-orig-file') || img.getAttribute('src')
-
-        images.push({
-          url: thumbSrc,
-          full_image_url: fullSrc,
-          alt: img.getAttribute('alt') || `Gallery Image ${index + 1}`,
-          title: img.getAttribute('title') || img.closest('figure')?.querySelector('figcaption')?.textContent || ''
-        })
-      })
-
-      // Optional: Clean content by removing figures/images to avoid duplication
-      const tempDoc = parser.parseFromString(gallery.content, 'text/html')
-      tempDoc.querySelectorAll('figure, img, .wp-block-gallery').forEach(el => el.remove())
-      cleanContent = tempDoc.body.innerHTML.trim()
-    }
   }
 
   const openLightbox = (img, index) => {
@@ -181,20 +156,6 @@ function GallerySingle() {
       </section>
 
       <div className="container" style={{ padding: '60px 0 100px' }}>
-        {cleanContent && (
-          <div 
-            className="gallery-description wordpress-content" 
-            dangerouslySetInnerHTML={{ __html: cleanContent }} 
-            style={{ 
-              marginBottom: '40px',
-              fontSize: '18px',
-              lineHeight: '1.8',
-              color: 'var(--text)',
-              maxWidth: '800px'
-            }} 
-          />
-        )}
-
         {images.length > 0 ? (
           <div className="gallery-grid">
             {images.map((img, index) => {

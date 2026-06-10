@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useSearchParams, Link, useLocation } from 'react-router-dom'
-import { fetchNotifications, fetchNotificationCategories, fetchPosts, getLanguageContext } from '../services/wordpressApi'
+import { fetchNotificationCategories, fetchPosts, getLanguageContext, stripHtml } from '../services/wordpressApi'
+import { WP_CONFIG } from '../config/wpConfig'
 
 function Notifications() {
   const [searchParams] = useSearchParams()
@@ -14,20 +15,53 @@ function Notifications() {
   const [latestNews, setLatestNews] = useState([])
   const [filterId, setFilterId] = useState(null)
   const [loading, setLoading] = useState(true)
+  const [loadingMore, setLoadingMore] = useState(false)
+  const [page, setPage] = useState(1)
+  const [totalPages, setTotalPages] = useState(1)
+
+  const formatNotifications = (data) =>
+    (data || []).map(n => {
+      const embeddedTerms = n._embedded?.['wp:term'] || []
+      const categories = embeddedTerms.flat().filter(t => t.taxonomy === 'notification_category')
+      let primary = categories[0] || null
+      if (categories.length > 1) {
+        const specific = categories.find(c =>
+          c.slug !== 'announcements' && c.name !== 'Announcements' && c.name !== 'അറിയിപ്പുകൾ'
+        )
+        if (specific) primary = specific
+      }
+      return {
+        id: n.id,
+        title: stripHtml(n.title?.rendered || ''),
+        content: n.content?.rendered || '',
+        excerpt: n.excerpt?.rendered || '',
+        link: n.link || '#',
+        date: n.date,
+        slug: n.slug || '',
+        categories: n.notification_category || [],
+        categoryName: primary?.name || null,
+        categorySlug: primary?.slug || null
+      }
+    })
 
   useEffect(() => {
     const loadData = async () => {
       setLoading(true)
       try {
-        const [notifsData, catsData, newsData] = await Promise.all([
-          fetchNotifications({ lang, per_page: 50 }),
+        const [catsData, newsData] = await Promise.all([
           fetchNotificationCategories({ lang }),
           fetchPosts({ lang, per_page: 5 })
         ])
-
         setRawCategories(catsData)
-        setNotifications(notifsData)
         setLatestNews(newsData)
+
+        const notifResponse = await fetch(`${WP_CONFIG.API_URL}/notifications?per_page=10&page=1&lang=${lang}&_embed&_t=${Date.now()}`)
+        const totalPagesFromHeaders = notifResponse.headers.get('X-WP-TotalPages')
+        setTotalPages(totalPagesFromHeaders ? Number(totalPagesFromHeaders) : 1)
+        setPage(1)
+
+        const notifData = notifResponse.ok ? await notifResponse.json() : []
+        setNotifications(formatNotifications(notifData))
       } catch (error) {
         console.error('Error loading data:', error)
       } finally {
@@ -37,6 +71,21 @@ function Notifications() {
 
     loadData()
   }, [lang])
+
+  const loadMore = async () => {
+    setLoadingMore(true)
+    try {
+      const nextPage = page + 1
+      const res = await fetch(`${WP_CONFIG.API_URL}/notifications?per_page=10&page=${nextPage}&lang=${lang}&_embed&_t=${Date.now()}`)
+      const data = res.ok ? await res.json() : []
+      setNotifications(prev => [...prev, ...formatNotifications(data)])
+      setPage(nextPage)
+    } catch (err) {
+      console.error('Load more failed:', err)
+    } finally {
+      setLoadingMore(false)
+    }
+  }
 
   useEffect(() => {
     const revealElements = document.querySelectorAll('.inner-reveal')
@@ -179,6 +228,17 @@ function Notifications() {
                 </div>
               )}
             </div>
+
+            {page < totalPages && (
+            <div className="load-more-wrap">
+              <button onClick={loadMore} disabled={loadingMore} className="btn load-more-btn">
+                {loadingMore
+                  ? (lang === 'ml' ? 'ലോഡ് ചെയ്യുന്നു...' : 'Loading...')
+                  : (lang === 'ml' ? 'കൂടുതൽ ലോഡ് ചെയ്യുക' : 'Load More')
+                }
+              </button>
+            </div>
+            )}
           </div>
 
           {/* Sidebar Column */}
@@ -212,17 +272,7 @@ function Notifications() {
               </div>
             </div>
 
-            <div className="widget inner-reveal reveal-right" style={{ transitionDelay: '0.1s' }}>
-              <h3 className="widget-title">
-                {lang === 'ml' ? 'ദ്രുത കണ്ണികൾ' : 'Quick Links'}
-              </h3>
-              <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                <li><a href="#admissions" style={{ color: 'var(--text)', textDecoration: 'none', fontSize: '14px', fontWeight: '600' }}>→ Admissions 2024</a></li>
-                <li><a href="#exams" style={{ color: 'var(--text)', textDecoration: 'none', fontSize: '14px', fontWeight: '600' }}>→ Examination Results</a></li>
-                <li><a href="#tenders" style={{ color: 'var(--text)', textDecoration: 'none', fontSize: '14px', fontWeight: '600' }}>→ Tenders & Quotations</a></li>
-                <li><a href="#downloads" style={{ color: 'var(--text)', textDecoration: 'none', fontSize: '14px', fontWeight: '600' }}>→ Form Downloads</a></li>
-              </ul>
-            </div>
+
           </aside>
         </div>
       </div>

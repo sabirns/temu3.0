@@ -20,6 +20,8 @@ function WordPressPage() {
   const [page, setPage] = useState(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
+  const [courses, setCourses] = useState([])
+  const [coursesLoading, setCoursesLoading] = useState(false)
 
   useEffect(() => {
     async function loadPage() {
@@ -136,6 +138,29 @@ function WordPressPage() {
             }
           }
           setPage(pageData)
+
+          // Fetch courses if select_course term ID is set
+          const courseTermId = pageData.acf?.select_course
+          if (courseTermId != null && (typeof courseTermId === 'number' || /^\d+$/.test(courseTermId))) {
+            setCoursesLoading(true)
+            try {
+              const courseParams = new URLSearchParams({
+                course_category: courseTermId,
+                _embed: true,
+                per_page: 100,
+                lang
+              })
+              const courseRes = await fetch(`${WP_CONFIG.API_URL}/courses?${courseParams}`)
+              if (courseRes.ok) {
+                const courseData = await courseRes.json()
+                setCourses(courseData)
+              }
+            } catch (e) {
+              console.warn('Failed to fetch courses:', e)
+            } finally {
+              setCoursesLoading(false)
+            }
+          }
         } else {
           setError('Page not found')
         }
@@ -234,6 +259,47 @@ function WordPressPage() {
                   </div>
                 )
               })()}
+
+              {/* Courses section */}
+              {courses.length > 0 && (
+                <div className="courses-section" style={{ marginTop: '50px' }}>
+                  <h2 className="courses-section-title">
+                    {lang === 'ml' ? 'കോഴ്സുകൾ' : 'Courses'}
+                  </h2>
+                  <div className="courses-list">
+                    {courses.map(course => {
+                      const embed = course._embedded || {}
+                      const media = embed['wp:featuredmedia'] || []
+                      const imgUrl = media.length > 0 ? media[0].source_url : null
+                      return (
+                        <Link key={course.id} to={`/${lang}/courses/${course.slug}`} className="course-card-link">
+                          <article className="course-card">
+                            {imgUrl && (
+                              <div className="course-card-img">
+                                <img src={imgUrl} alt={course.title?.rendered || ''} loading="lazy" />
+                              </div>
+                            )}
+                            <div className="course-card-body">
+                              <h3 className="course-card-title" dangerouslySetInnerHTML={{ __html: course.title?.rendered || '' }} />
+                              {course.excerpt?.rendered && (
+                                <p className="course-card-excerpt" dangerouslySetInnerHTML={{ __html: course.excerpt.rendered }} />
+                              )}
+                            </div>
+                          </article>
+                        </Link>
+                      )
+                    })}
+                  </div>
+                </div>
+              )}
+              {coursesLoading && (
+                <div className="courses-loading" style={{ marginTop: '50px', textAlign: 'center', padding: '40px' }}>
+                  <div className="loading-spinner"></div>
+                  <p style={{ marginTop: '16px', color: 'var(--muted)' }}>
+                    {lang === 'ml' ? 'കോഴ്സുകൾ ലോഡ് ചെയ്യുന്നു...' : 'Loading courses...'}
+                  </p>
+                </div>
+              )}
             </div>
           </div>
         </div>

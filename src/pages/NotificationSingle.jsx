@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useParams, Link, useLocation, useSearchParams } from 'react-router-dom'
-import { fetchNotification, getLanguageContext, extractTranslationSlugs } from '../services/wordpressApi'
+import { fetchNotification, fetchNotifications, getLanguageContext, extractTranslationSlugs } from '../services/wordpressApi'
 import { usePageInfo } from '../services/PageInfoContext'
 
 
@@ -17,6 +17,7 @@ function NotificationSingle() {
   const [notification, setNotification] = useState(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
+  const [sidebarNotifications, setSidebarNotifications] = useState([])
 
   useEffect(() => {
     const load = async () => {
@@ -24,13 +25,17 @@ function NotificationSingle() {
       setError(null)
       try {
         const decodedSlug = decodeURIComponent(slug);
-        const data = await fetchNotification(decodedSlug, { lang, _t: Date.now() })
+        const [data, recent] = await Promise.all([
+          fetchNotification(decodedSlug, { lang, _t: Date.now() }),
+          fetchNotifications({ lang, per_page: 10, _t: Date.now() })
+        ])
         if (data) {
           setPageInfo({ id: data.id, postType: 'notification', translationSlugs: await extractTranslationSlugs(data, 'notification') })
           setNotification(data)
         } else {
           setError(lang === 'ml' ? 'അറിയിപ്പ് കണ്ടെത്തിയില്ല.' : 'Notification not found.')
         }
+        setSidebarNotifications(recent || [])
       } catch (err) {
         setError(lang === 'ml' ? 'അറിയിപ്പ് ലോഡ് ചെയ്യുന്നതിൽ പരാജയപ്പെട്ടു.' : 'Failed to load notification.')
       } finally {
@@ -93,7 +98,7 @@ function NotificationSingle() {
         </div>
       </section>
 
-      <div className="container" style={{ padding: '60px 0 100px' }}>
+      <div className="container">
         <div className="notification-single-layout">
           <div className="notification-single-main">
             {notification.featuredImage && (
@@ -109,9 +114,23 @@ function NotificationSingle() {
 
           <aside className="notification-single-sidebar">
             <div className="sidebar-widget">
-              <h3>{lang === 'ml' ? 'എല്ലാ അറിയിപ്പുകളും' : 'All Notifications'}</h3>
-              <Link to={lang === 'ml' ? '/notifications' : `/${lang}/notifications`} className="btn outline full">
-                {lang === 'ml' ? 'എല്ലാ അറിയിപ്പുകളും കാണുക' : 'View All Notifications'}
+              <h3>{lang === 'ml' ? 'ഏറ്റവും പുതിയ അറിയിപ്പുകൾ' : 'Latest Notifications'}</h3>
+              {sidebarNotifications.length > 0 ? (
+                <ul className="sidebar-notification-list">
+                  {sidebarNotifications.map(item => (
+                    <li key={item.id}>
+                      <Link to={lang === 'ml' ? `/notifications/${item.slug}` : `/${lang}/notifications/${item.slug}`} className="sidebar-notification-link">
+                        <span className="sidebar-notification-title">{item.title}</span>
+                        <span className="sidebar-notification-date">{new Date(item.date).toLocaleDateString(lang === 'ml' ? 'ml-IN' : 'en-US')}</span>
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <p style={{ fontSize: '14px', color: 'var(--muted)' }}>{lang === 'ml' ? 'അറിയിപ്പുകളൊന്നുമില്ല.' : 'No notifications.'}</p>
+              )}
+              <Link to={lang === 'ml' ? '/notifications' : `/${lang}/notifications`} className="btn outline full" style={{ marginTop: '12px' }}>
+                {lang === 'ml' ? 'എല്ലാം കാണുക' : 'View All'}
               </Link>
             </div>
           </aside>

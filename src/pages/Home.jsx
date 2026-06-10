@@ -1,51 +1,20 @@
 import { useState, useEffect } from 'react'
 import { Link, useLocation, useSearchParams } from 'react-router-dom'
 import About from '../components/About'
-import { fetchGallery, getLanguageContext, fetchPosts, fetchPageBySlug } from '../services/wordpressApi'
+import { fetchGallery, getLanguageContext, fetchPosts, fetchPageBySlug, fetchMenuByLocation } from '../services/wordpressApi'
 import { WP_CONFIG } from '../config/wpConfig'
 
-const slides = [
-	{
-		id: 1,
-		title: 'മലയാള ഭാഷയുടെ പൈതൃകത്തെ പരിപാലിക്കുകയും പ്രോത്സാഹിപ്പിക്കുകയും',
-		sub: 'മലയാള സർവകലാശാല മലയാള ഭാഷ, സാഹിത്യം, സംസ്കാരം എന്നിവയുടെ സംരക്ഷണത്തിനും പ്രചാരണത്തിനും വികസനത്തിനും സമർപ്പിച്ചിരിക്കുന്നു.',
-		image: '/images/slider.jpg'
-	},
-	{
-		id: 2,
-		title: 'ഉന്നത നിലവാരത്തിലുള്ള അക്കാദമിക് പ്രോഗ്രാമുകളും ഗവേഷണ സംരംഭങ്ങളും',
-		sub: 'ഞങ്ങൾ UG, PG, PhD ലെവലുകളിൽ വൈവിധ്യമാർന്ന അക്കാദമിക് പ്രോഗ്രാമുകൾ വാഗ്ദാനം ചെയ്യുന്നു.',
-		image: '/images/slider2.jpg'
-	},
-	{
-		id: 3,
-		title: 'ഹരിത കാമ്പസ്: പുകയിലവിരുദ്ധ, ലഹരിവിരുദ്ധ, റാഗിങ്ങ് രഹിത',
-		sub: 'മലയാള സർവകലാശാല വിദ്യാർത്ഥികൾക്കും സ്റ്റാഫിനും സുരക്ഷിതവും സൗഹൃദപരവുമായ ഒരു പഠന-ജോലി അന്തരീക്ഷം നൽകുന്നു.',
-		image: '/images/slider.jpg'
-	},
-	{
-		id: 4,
-		title: 'അന്തർദേശീയ കോളബറേഷനുകളും ഗവേഷണ പങ്കാളിത്തങ്ങളും',
-		sub: 'ലോകമെമ്പാടുമുള്ള പ്രമുഖ സർവകലാശാലകളുമായുള്ള കോളബറേഷനിലൂടെ ഞങ്ങൾ ഗ്ലോബൽ ആകുന്നു.',
-		image: '/images/slider2.jpg'
-	}
-]
-
-const notifications = [
-	{ id: 1, type: 'urgent', title: 'പ്രവേശന റജിസ്ട്രേഷൻ അവസാന തീയതി', description: 'PG പ്രോഗ്രാമുകൾക്കുള്ള അപേക്ഷാ അവസാന തീയതി: 2024-06-30', date: '2024-06-20', link: '#admissions' },
-	{ id: 2, type: 'warning', title: 'പരീക്ഷാ സമയക്രമം പുറത്തുവിട്ടു', description: 'മേയ്-ജൂൺ 2024 സെമസ്റ്റർ പരീക്ഷാ സമയക്രമം ഡൗൺലോഡ് ചെയ്യുക', date: '2024-06-18', link: '#exams' },
-	{ id: 3, type: 'info', title: 'ലൈബ്രറി അവധി അറിയിപ്പ്', description: '15.06.2024 ന് ലൈബ്രറി ദിവസം മുഴുവൻ അടച്ചിരിക്കും', date: '2024-06-15', link: '#library' }
-]
 
 
 
-
-function Home() {
+	function Home() {
 	const location = useLocation()
 	const [searchParams] = useSearchParams()
 	const lang = getLanguageContext(location.pathname, searchParams)
 
+	const [slides, setSlides] = useState([])
 	const [currentSlide, setCurrentSlide] = useState(0)
+	const [loadingSlides, setLoadingSlides] = useState(true)
 	const [newsIndex, setNewsIndex] = useState(0)
 	const [isPaused, setIsPaused] = useState(false)
 	const [galleryItems, setGalleryItems] = useState([])
@@ -54,6 +23,7 @@ function Home() {
 	const [homePageData, setHomePageData] = useState(null)
 	const [loadingHomePage, setLoadingHomePage] = useState(true)
 	const [cardsToShow, setCardsToShow] = useState(3)
+	const [topMenuItems, setTopMenuItems] = useState([])
 
 	useEffect(() => {
 		const handleResize = () => {
@@ -70,15 +40,27 @@ function Home() {
 		const loadData = async () => {
 			setLoadingNews(true)
 			setLoadingHomePage(true)
+			setLoadingSlides(true)
 			setNewsIndex(0)
 			try {
-				const [gallery, news, homePage] = await Promise.all([
+				const [slidesData, gallery, news, homePage, topMenu] = await Promise.all([
+					fetch(`${WP_CONFIG.API_URL}/slider?per_page=5&_embed&lang=${lang}&_t=${Date.now()}`).then(r => r.ok ? r.json() : []),
 					fetchGallery({ lang, per_page: 8 }),
 					fetchPosts({ lang, per_page: 6 }),
-					fetchPageBySlug('home-page-ml')
+					fetchPageBySlug('home-page-ml'),
+					fetchMenuByLocation('top_menu_1', lang)
 				])
+				const formattedSlides = (slidesData || []).map(s => ({
+					id: s.id,
+					title: s.title?.rendered || '',
+					sub: s.content?.rendered?.replace(/<[^>]+>/g, '').trim() || '',
+					image: s._embedded?.['wp:featuredmedia']?.[0]?.source_url || '/images/slider.jpg',
+					buttons: s.acf?.slider_buttons || []
+				}))
+				setSlides(formattedSlides)
 				setGalleryItems(gallery || [])
 				setNewsItems(news || [])
+				setTopMenuItems(topMenu || [])
 
 				if (homePage?.acf?.buttons_2) {
 					const resolveMedia = async (id) => {
@@ -116,6 +98,25 @@ function Home() {
 						}
 					}
 				}
+				if (homePage?.acf?.buttons) {
+					const resolveMedia = async (id) => {
+						try {
+							const res = await fetch(`${WP_CONFIG.API_URL}/media/${id}`)
+							if (res.ok) {
+								const media = await res.json()
+								return media.source_url
+							}
+						} catch (e) {
+							console.warn('Failed to resolve media:', e)
+						}
+						return null
+					}
+					for (const item of homePage.acf.buttons) {
+						if (item.icon && typeof item.icon === 'number') {
+							item.icon = await resolveMedia(item.icon)
+						}
+					}
+				}
 				setHomePageData(homePage || null)
 			} catch (error) {
 				console.error("Home data fetch failed", error)
@@ -128,11 +129,12 @@ function Home() {
 	}, [lang])
 
 	useEffect(() => {
+		if (slides.length === 0) return
 		const timer = setInterval(() => {
 			setCurrentSlide(prev => (prev + 1) % slides.length)
 		}, 5000)
 		return () => clearInterval(timer)
-	}, [])
+	}, [slides.length])
 
 	useEffect(() => {
 		if (!isPaused && newsItems.length > cardsToShow) {
@@ -173,6 +175,7 @@ function Home() {
 	return (
 		<main id="home">
 			{/* Hero Slider */}
+			{slides.length > 0 && (
 			<div className="hero-slider">
 				<div className="slider-container">
 					{slides.map((slide, index) => (
@@ -182,11 +185,16 @@ function Home() {
 								<div className="slide-content-wrapper">
 									<div className="slide-content">
 										<h2 className="slide-title">{slide.title}</h2>
-										<p className="slide-sub">{slide.sub}</p>
+										{slide.sub && <p className="slide-sub">{slide.sub}</p>}
+										{slide.buttons.length > 0 && (
 										<div className="slide-cta">
-											<button className="btn primary" onClick={() => scrollToId('initiatives')}>About University</button>
-											<button className="btn" onClick={() => scrollToId('academics')}>Academic Programs</button>
+											{slide.buttons.map((btn, i) => (
+												<a key={i} href={btn.button_link?.url || '#'} className={`btn ${i === 0 ? 'primary' : ''}`} target={btn.button_link?.target || '_self'} rel={btn.button_link?.target === '_blank' ? 'noopener' : ''}>
+													{btn.button_text}
+												</a>
+											))}
 										</div>
+										)}
 									</div>
 									<div className="slide-image-preview">
 										<div className="preview-frame">
@@ -217,9 +225,10 @@ function Home() {
 					<span className="current">{String(currentSlide + 1).padStart(2, '0')}</span> / <span className="total">{String(slides.length).padStart(2, '0')}</span>
 				</div>
 			</div>
+			)}
 
 			{/* About Section */}
-			<About />
+			<About homePageData={homePageData} />
 
 			{/* News Section */}
 			<section className="news-slider-section" id="news" style={{ minHeight: '400px' }}>
@@ -398,8 +407,6 @@ function Home() {
 									ശില്പകലാസംഗ്രഹങ്ങൾ, പൈതൃക മ്യൂസിയം തുടങ്ങിയവയും അതിന്റെ ഭാഗമാണ്. സഹജമായ പഠനവാതവരണവും
 									സൗഹൃദപരമായ ക്ലാസുകൾ, വിദ്യാർത്ഥികളിൽ പ്രചോദനവും ഉന്നമനവും ഉണ്ടാക്കുന്നു.
 								</p>
-								<a href="#" className="btn2 primary" style={{ marginLeft: '15px' }}>
-									കൂടുതല്‍ വായിക്കുക →</a>
 							</div>
 							<div className="story-image" style={{ backgroundImage: "url('images/campus.jpg')", backgroundSize: 'cover' }}>
 							</div>
@@ -434,29 +441,48 @@ function Home() {
 
 				
 					<div className="facility-grid">
-						<span className="facility-item">പൈതൃക മ്യൂസിയം</span>
-						<span className="facility-item">ഐ.ടി സൗകര്യങ്ങൾ</span>
-						<span className="facility-item">ഗ്രന്ഥാലയം</span>                
-						<span className="facility-item">തിയേറ്റർ</span>
-						<span className="facility-item">യാത്രാസൗകര്യങ്ങൾ</span>
-						<span className="facility-item">സ്പോർട്സ്</span>
-						<span className="facility-item">ഭാഷാ ലാബ്</span>
-						<span className="facility-item">ശാസ്ത്ര ലാബ്</span>
-						<span className="facility-item">മീഡിയ ലാബ്</span>
-						<span className="facility-item">ഇ-ലേണിംഗ് സൗകര്യങ്ങൾ</span>
-						<span className="facility-item">കയ്യെഴുത്തു ഗ്രന്ഥാലയം</span>
-						<span className="facility-item">ഫീൽഡ് ട്രിപ്പുകൾ</span>
-						<span className="facility-item">ഇന്റേൺഷിപ്പ്</span>
-						<span className="facility-item">ആരോഗ്യവും ക്ഷേമവും കേന്ദ്രം</span>
+						{topMenuItems.length > 0 ? topMenuItems.map((item, index) => {
+							const url = item.url || '#'
+							const isExternal = url.startsWith('http') && !url.startsWith(WP_CONFIG.SITE_URL)
+							const internalPath = !isExternal && url.startsWith(WP_CONFIG.SITE_URL)
+								? url.replace(WP_CONFIG.SITE_URL, '') || '/'
+								: url
+							return isExternal ? (
+								<a key={item.id || index} href={url} className="facility-item" target={item.target || '_self'} rel={item.target === '_blank' ? 'noopener noreferrer' : undefined}>
+									{item.title?.rendered || item.title}
+								</a>
+							) : (
+								<Link key={item.id || index} to={internalPath} className="facility-item">
+									{item.title?.rendered || item.title}
+								</Link>
+							)
+						}) : (
+							<>
+								<span className="facility-item">പൈതൃക മ്യൂസിയം</span>
+								<span className="facility-item">ഐ.ടി സൗകര്യങ്ങൾ</span>
+								<span className="facility-item">ഗ്രന്ഥാലയം</span>                
+								<span className="facility-item">തിയേറ്റർ</span>
+								<span className="facility-item">യാത്രാസൗകര്യങ്ങൾ</span>
+								<span className="facility-item">സ്പോർട്സ്</span>
+								<span className="facility-item">ഭാഷാ ലാബ്</span>
+								<span className="facility-item">ശാസ്ത്ര ലാബ്</span>
+								<span className="facility-item">മീഡിയ ലാബ്</span>
+								<span className="facility-item">ഇ-ലേണിംഗ് സൗകര്യങ്ങൾ</span>
+								<span className="facility-item">കയ്യെഴുത്തു ഗ്രന്ഥാലയം</span>
+								<span className="facility-item">ഫീൽഡ് ട്രിപ്പുകൾ</span>
+								<span className="facility-item">ഇന്റേൺഷിപ്പ്</span>
+								<span className="facility-item">ആരോഗ്യവും ക്ഷേമവും കേന്ദ്രം</span>
+							</>
+						)}
 					</div>
 
 					
-					<div className="campus-cta">
+					{/* <div className="campus-cta">
 						<h3>കാമ്പസ് നേരിൽ കാണൂ ·</h3>
 						<p>മലയാളസർവകലാശാലയുടെ വിവിധ കാമ്പസ് സൗകര്യങ്ങൾ, അങ്കണങ്ങൾ, ക്ലാസുകൾ, ഗാർഡൻ, ലൈബ്രറി, മ്യൂസിയം എന്നിവ
 							ദൂരവീക്ഷണത്തിലൂടെ അനുഭവപ്പെടുന്നതിനുള്ള ഒരു ഓൺലൈൻ സവാരി ആണ്.</p>
 						<a href="#" className="btn2 primary" style={{ marginLeft: '15px' }}>Virtual tour →</a>
-					</div>
+					</div> */}
 				</div>
 			</section>
 

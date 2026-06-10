@@ -64,14 +64,16 @@ export async function fetchMenus() {
   }
 }
 
-export async function fetchMenuByLocation(location) {
+export async function fetchMenuByLocation(location, lang = '') {
   try {
-    const locRes = await fetch(`${WORDPRESS_API_URL}/menu-locations/${location}`)
+    const locUrl = lang ? `${WORDPRESS_API_URL}/menu-locations/${location}?lang=${lang}` : `${WORDPRESS_API_URL}/menu-locations/${location}`
+    const locRes = await fetch(locUrl, { cache: 'no-cache' })
     if (locRes.ok) {
       const locData = await locRes.json()
       const menuId = locData.menu
       if (menuId) {
-        const itemsRes = await fetch(`${WORDPRESS_API_URL}/menu-items?menus=${menuId}`)
+        const itemsUrl = lang ? `${WORDPRESS_API_URL}/menu-items?menus=${menuId}&lang=${lang}` : `${WORDPRESS_API_URL}/menu-items?menus=${menuId}`
+        const itemsRes = await fetch(itemsUrl, { cache: 'no-cache' })
         if (itemsRes.ok) {
           return await itemsRes.json()
         }
@@ -177,6 +179,56 @@ export async function fetchDepartments(params = {}) {
   } catch (error) {
     console.error('Error fetching departments:', error)
     return []
+  }
+}
+
+export async function fetchActivities(params = {}) {
+  try {
+    const defaultParams = {
+      per_page: 20,
+      status: 'publish',
+      _embed: true,
+      lang: 'ml',
+      ...params
+    }
+    const qs = new URLSearchParams(defaultParams)
+    const res = await fetch(`${WORDPRESS_API_URL}/activity?${qs}`)
+    if (!res.ok) throw new Error('Failed to fetch activities')
+    return await res.json()
+  } catch (error) {
+    console.error('Error fetching activities:', error)
+    return []
+  }
+}
+
+export async function fetchCourses(params = {}) {
+  try {
+    const defaultParams = {
+      per_page: 20,
+      status: 'publish',
+      _embed: true,
+      lang: 'ml',
+      ...params
+    }
+    const qs = new URLSearchParams(defaultParams)
+    const res = await fetch(`${WORDPRESS_API_URL}/courses?${qs}`)
+    if (!res.ok) throw new Error('Failed to fetch courses')
+    return await res.json()
+  } catch (error) {
+    console.error('Error fetching courses:', error)
+    return []
+  }
+}
+
+export async function fetchFacultyDepartment(id, params = {}) {
+  try {
+    const qs = new URLSearchParams(params)
+    const res = await fetch(`${WORDPRESS_API_URL}/faculty_department/${id}?${qs}`)
+    if (!res.ok) throw new Error('Faculty department not found')
+    return await res.json()
+  } catch (error) {
+    console.error('Error fetching faculty department:', error)
+    return null
   }
 }
 
@@ -321,6 +373,73 @@ export async function fetchPostBySlug(slug, params = {}) {
   }
 }
 
+export async function fetchCourseBySlug(slug, params = {}) {
+  try {
+    const defaultParams = {
+      slug,
+      _embed: true,
+      _t: Date.now(),
+      lang: 'ml',
+      ...params
+    }
+    const queryString = new URLSearchParams(defaultParams).toString()
+    const response = await fetch(`${WORDPRESS_API_URL}/courses?${queryString}`)
+    if (!response.ok) throw new Error('Course not found')
+    const data = await response.json()
+
+    if (data.length > 0) {
+      const post = data[0]
+      return {
+        id: post.id,
+        title: stripHtml(post.title?.rendered || ''),
+        content: post.content?.rendered || '',
+        excerpt: post.excerpt?.rendered || '',
+        date: post.date,
+        link: post.link,
+        slug: post.slug,
+        featuredImage: getFeaturedImage(post)
+      }
+    }
+    return null
+  } catch (error) {
+    console.error('Error fetching course by slug:', error)
+    return null
+  }
+}
+
+export async function fetchActivityBySlug(slug, params = {}) {
+  try {
+    const defaultParams = {
+      slug,
+      _embed: true,
+      _t: Date.now(),
+      lang: 'ml',
+      ...params
+    }
+    const queryString = new URLSearchParams(defaultParams).toString()
+    const response = await fetch(`${WORDPRESS_API_URL}/activity?${queryString}`)
+    if (!response.ok) throw new Error('Activity not found')
+    const data = await response.json()
+    if (data.length > 0) {
+      const post = data[0]
+      return {
+        id: post.id,
+        title: stripHtml(post.title?.rendered || ''),
+        content: post.content?.rendered || '',
+        date: post.date,
+        link: post.link,
+        slug: post.slug,
+        featuredImage: getFeaturedImage(post),
+        excerpt: stripHtml(post.excerpt?.rendered || '')
+      }
+    }
+    return null
+  } catch (error) {
+    console.error('Error fetching activity:', error)
+    return null
+  }
+}
+
 export async function fetchGallery(params = {}) {
   try {
     const defaultParams = {
@@ -341,14 +460,23 @@ export async function fetchGallery(params = {}) {
     }
 
     const data = await response.json()
-    return data.map(item => ({
-      id: item.id,
-      title: stripHtml(item.title?.rendered || ''),
-      desc: stripHtml(item.excerpt?.rendered || ''),
-      image: getFeaturedImage(item) || '/images/placeholder.jpg',
-      link: item.link,
-      slug: item.slug
-    }))
+    return data.map(item => {
+      const acfImages = item.acf?.photo_gallery?.gallery_images?.[0]
+      const firstImage = Array.isArray(acfImages) ? acfImages[0]?.full_image_url : acfImages?.full_image_url
+      const video = item.acf?.video || ''
+      const videoId = video.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([a-zA-Z0-9_-]+)/)?.[1]
+      const thumb = getFeaturedImage(item) || firstImage
+      return {
+        id: item.id,
+        title: stripHtml(item.title?.rendered || ''),
+        desc: stripHtml(item.excerpt?.rendered || ''),
+        image: thumb || (videoId ? `https://img.youtube.com/vi/${videoId}/hqdefault.jpg` : '/images/placeholder.jpg'),
+        link: item.link,
+        slug: item.slug,
+        galleryCategory: item.gallery_category,
+        video
+      }
+    })
   } catch (error) {
     console.error('Error fetching gallery:', error)
     return []
@@ -472,6 +600,8 @@ export async function fetchNaacPosts(params = {}) {
         date: post.date,
         slug: post.slug,
         featuredImage: getFeaturedImage(post),
+        _links: post._links,
+        translations: post.translations,
         categories: parseTerms(post, 'naac_category'),
         primaryCategory
       }
@@ -599,6 +729,252 @@ export async function fetchPublicationCategoryBySlug(slug, params = {}) {
   }
 }
 
+export async function fetchIqacPosts(params = {}) {
+  try {
+    const defaultParams = {
+      per_page: 100,
+      status: 'publish',
+      _embed: true,
+      ...params
+    }
+    const queryString = new URLSearchParams(defaultParams).toString()
+    const response = await fetch(`${WORDPRESS_API_URL}/iqac?${queryString}`, { cache: 'no-cache' })
+    if (!response.ok) {
+      console.warn('IQAC endpoint not found (404) — check that post_type=iqac is registered with show_in_rest=true')
+      return []
+    }
+    const data = await response.json()
+    return data.map(post => {
+      const embeddedTerms = post._embedded?.['wp:term'] || []
+      let iqacCategoryTerms = embeddedTerms.flat().filter(term => term.taxonomy === 'iqac_category')
+      let primaryCategory = iqacCategoryTerms[0] || null
+      if (!primaryCategory) {
+        const rawIds = post.iqac_category || []
+        if (rawIds.length > 0 && post._embedded?.['wp:term']) {
+          const allTerms = post._embedded['wp:term'].flat()
+          const matched = allTerms.find(t => rawIds.includes(t.id))
+          if (matched) primaryCategory = { id: matched.id, name: matched.name, slug: matched.slug }
+        }
+      }
+      if (!primaryCategory && iqacCategoryTerms.length === 0 && post._embedded?.['wp:term']) {
+        iqacCategoryTerms = embeddedTerms.flat().filter(term => term.taxonomy === 'iqac_category')
+      }
+      return {
+        id: post.id,
+        title: stripHtml(post.title?.rendered || ''),
+        content: fixWordPressUrls(post.content?.rendered || ''),
+        excerpt: fixWordPressUrls(post.excerpt?.rendered || ''),
+        date: post.date,
+        slug: post.slug,
+        featuredImage: getFeaturedImage(post),
+        _links: post._links,
+        translations: post.translations,
+        categories: iqacCategoryTerms.map(t => ({ id: t.id, name: stripHtml(t.name || ''), slug: t.slug })),
+        primaryCategory: primaryCategory ? { ...primaryCategory, name: stripHtml(primaryCategory.name || '') } : null
+      }
+    })
+  } catch (error) {
+    console.error('Error fetching IQAC posts:', error)
+    return []
+  }
+}
+
+export async function fetchIqacPostBySlug(slug, params = {}) {
+  try {
+    const defaultParams = {
+      slug,
+      _embed: true,
+      ...params
+    }
+    const queryString = new URLSearchParams(defaultParams).toString()
+    const response = await fetch(`${WORDPRESS_API_URL}/iqac?${queryString}`, { cache: 'no-cache' })
+    if (!response.ok) throw new Error('IQAC post not found')
+    const data = await response.json()
+    if (data.length > 0) {
+      const post = data[0]
+      const embeddedTerms = post._embedded?.['wp:term'] || []
+      let iqacCategoryTerms = embeddedTerms.flat().filter(term => term.taxonomy === 'iqac_category')
+      let primaryCategory = iqacCategoryTerms[0] || null
+      if (!primaryCategory) {
+        const rawIds = post.iqac_category || []
+        if (rawIds.length > 0 && post._embedded?.['wp:term']) {
+          const allTerms = post._embedded['wp:term'].flat()
+          const matched = allTerms.find(t => rawIds.includes(t.id))
+          if (matched) primaryCategory = { id: matched.id, name: matched.name, slug: matched.slug }
+        }
+      }
+      return {
+        id: post.id,
+        title: stripHtml(post.title?.rendered || ''),
+        content: fixWordPressUrls(post.content?.rendered || ''),
+        excerpt: fixWordPressUrls(post.excerpt?.rendered || ''),
+        date: post.date,
+        slug: post.slug,
+        featuredImage: getFeaturedImage(post),
+        _links: post._links,
+        translations: post.translations,
+        categories: iqacCategoryTerms.map(t => ({ id: t.id, name: stripHtml(t.name || ''), slug: t.slug })),
+        primaryCategory: primaryCategory ? { ...primaryCategory, name: stripHtml(primaryCategory.name || '') } : null
+      }
+    }
+    return null
+  } catch (error) {
+    console.error('Error fetching IQAC post by slug:', error)
+    return null
+  }
+}
+
+export async function fetchIqacCategories(params = {}) {
+  try {
+    const queryString = new URLSearchParams(params).toString()
+    const response = await fetch(`${WORDPRESS_API_URL}/iqac_category?${queryString}`, { cache: 'no-cache' })
+    if (!response.ok) throw new Error('IQAC categories not found')
+    const data = await response.json()
+    return data.map(cat => ({ ...cat, name: stripHtml(cat.name || '') }))
+  } catch (error) {
+    console.error('Error fetching IQAC categories:', error)
+    return []
+  }
+}
+
+export async function fetchIqacCategoryBySlug(slug, params = {}) {
+  try {
+    const queryString = new URLSearchParams({ slug, ...params }).toString()
+    const response = await fetch(`${WORDPRESS_API_URL}/iqac_category?${queryString}`, { cache: 'no-cache' })
+    if (!response.ok) throw new Error('IQAC category not found')
+    const data = await response.json()
+    return data.length > 0 ? data[0] : null
+  } catch (error) {
+    console.error('Error fetching IQAC category by slug:', error)
+    return null
+  }
+}
+
+export async function fetchNssPosts(params = {}) {
+  try {
+    const defaultParams = {
+      per_page: 100,
+      status: 'publish',
+      _embed: true,
+      acf_format: 'standard',
+      ...params
+    }
+    const queryString = new URLSearchParams(defaultParams).toString()
+    const response = await fetch(`${WORDPRESS_API_URL}/nss?${queryString}`, { cache: 'no-cache' })
+    if (!response.ok) {
+      console.warn('NSS endpoint not found (404) — check that post_type=nss is registered with show_in_rest=true')
+      return []
+    }
+    const data = await response.json()
+    return data.map(post => {
+      const embeddedTerms = post._embedded?.['wp:term'] || []
+      let nssCategoryTerms = embeddedTerms.flat().filter(term => term.taxonomy === 'nss_category')
+      let primaryCategory = nssCategoryTerms[0] || null
+      if (!primaryCategory) {
+        const rawIds = post.nss_category || []
+        if (rawIds.length > 0 && post._embedded?.['wp:term']) {
+          const allTerms = post._embedded['wp:term'].flat()
+          const matched = allTerms.find(t => rawIds.includes(t.id))
+          if (matched) primaryCategory = { id: matched.id, name: matched.name, slug: matched.slug }
+        }
+      }
+      if (!primaryCategory && nssCategoryTerms.length === 0 && post._embedded?.['wp:term']) {
+        nssCategoryTerms = embeddedTerms.flat().filter(term => term.taxonomy === 'nss_category')
+      }
+      return {
+        id: post.id,
+        title: stripHtml(post.title?.rendered || ''),
+        content: fixWordPressUrls(post.content?.rendered || ''),
+        excerpt: fixWordPressUrls(post.excerpt?.rendered || ''),
+        date: post.date,
+        slug: post.slug,
+        featuredImage: getFeaturedImage(post),
+        acf: post.acf || {},
+        _links: post._links,
+        translations: post.translations,
+        categories: nssCategoryTerms.map(t => ({ id: t.id, name: stripHtml(t.name || ''), slug: t.slug })),
+        primaryCategory: primaryCategory ? { ...primaryCategory, name: stripHtml(primaryCategory.name || '') } : null
+      }
+    })
+  } catch (error) {
+    console.error('Error fetching NSS posts:', error)
+    return []
+  }
+}
+
+export async function fetchNssPostBySlug(slug, params = {}) {
+  try {
+    const defaultParams = {
+      slug,
+      _embed: true,
+      acf_format: 'standard',
+      ...params
+    }
+    const queryString = new URLSearchParams(defaultParams).toString()
+    const response = await fetch(`${WORDPRESS_API_URL}/nss?${queryString}`, { cache: 'no-cache' })
+    if (!response.ok) throw new Error('NSS post not found')
+    const data = await response.json()
+    if (data.length > 0) {
+      const post = data[0]
+      const embeddedTerms = post._embedded?.['wp:term'] || []
+      let nssCategoryTerms = embeddedTerms.flat().filter(term => term.taxonomy === 'nss_category')
+      let primaryCategory = nssCategoryTerms[0] || null
+      if (!primaryCategory) {
+        const rawIds = post.nss_category || []
+        if (rawIds.length > 0 && post._embedded?.['wp:term']) {
+          const allTerms = post._embedded['wp:term'].flat()
+          const matched = allTerms.find(t => rawIds.includes(t.id))
+          if (matched) primaryCategory = { id: matched.id, name: matched.name, slug: matched.slug }
+        }
+      }
+      return {
+        id: post.id,
+        title: stripHtml(post.title?.rendered || ''),
+        content: fixWordPressUrls(post.content?.rendered || ''),
+        excerpt: fixWordPressUrls(post.excerpt?.rendered || ''),
+        date: post.date,
+        slug: post.slug,
+        featuredImage: getFeaturedImage(post),
+        acf: post.acf || {},
+        _links: post._links,
+        translations: post.translations,
+        categories: nssCategoryTerms.map(t => ({ id: t.id, name: stripHtml(t.name || ''), slug: t.slug })),
+        primaryCategory: primaryCategory ? { ...primaryCategory, name: stripHtml(primaryCategory.name || '') } : null
+      }
+    }
+    return null
+  } catch (error) {
+    console.error('Error fetching NSS post by slug:', error)
+    return null
+  }
+}
+
+export async function fetchNssCategories(params = {}) {
+  try {
+    const queryString = new URLSearchParams(params).toString()
+    const response = await fetch(`${WORDPRESS_API_URL}/nss_category?${queryString}`, { cache: 'no-cache' })
+    if (!response.ok) throw new Error('NSS categories not found')
+    const data = await response.json()
+    return data.map(cat => ({ ...cat, name: stripHtml(cat.name || '') }))
+  } catch (error) {
+    console.error('Error fetching NSS categories:', error)
+    return []
+  }
+}
+
+export async function fetchNssCategoryBySlug(slug, params = {}) {
+  try {
+    const queryString = new URLSearchParams({ slug, ...params }).toString()
+    const response = await fetch(`${WORDPRESS_API_URL}/nss_category?${queryString}`, { cache: 'no-cache' })
+    if (!response.ok) throw new Error('NSS category not found')
+    const data = await response.json()
+    return data.length > 0 ? data[0] : null
+  } catch (error) {
+    console.error('Error fetching NSS category by slug:', error)
+    return null
+  }
+}
+
 export function getLanguageContext(pathname, searchParams) {
   // 1. Check path prefix (e.g., /en/notifications)
   const pathParts = pathname.split('/').filter(Boolean)
@@ -654,10 +1030,13 @@ function pluralizePostType(postType) {
     gallery: 'galleries',
     notification: 'notifications',
     department: 'departments',
+    activity: 'activity',
     faculty: 'faculties',
     naac: 'naac',
     publication: 'publications',
     faculty_department: 'faculty_department',
+    iqac: 'iqac',
+    nss: 'nss',
   }
   return map[postType] || `${postType}s`
 }
