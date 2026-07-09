@@ -220,6 +220,25 @@ export async function fetchCourses(params = {}) {
   }
 }
 
+export async function fetchStudents(params = {}) {
+  try {
+    const defaultParams = {
+      per_page: 20,
+      status: 'publish',
+      _embed: true,
+      lang: 'ml',
+      ...params
+    }
+    const qs = new URLSearchParams(defaultParams)
+    const res = await fetch(`${WORDPRESS_API_URL}/student?${qs}`)
+    if (!res.ok) throw new Error('Failed to fetch students')
+    return await res.json()
+  } catch (error) {
+    console.error('Error fetching students:', error)
+    return []
+  }
+}
+
 export async function fetchFacultyDepartment(id, params = {}) {
   try {
     const qs = new URLSearchParams(params)
@@ -436,6 +455,39 @@ export async function fetchActivityBySlug(slug, params = {}) {
     return null
   } catch (error) {
     console.error('Error fetching activity:', error)
+    return null
+  }
+}
+
+export async function fetchFacultyBySlug(slug, params = {}) {
+  try {
+    const defaultParams = {
+      slug,
+      _embed: true,
+      _t: Date.now(),
+      lang: 'ml',
+      ...params
+    }
+    const queryString = new URLSearchParams(defaultParams).toString()
+    const response = await fetch(`${WORDPRESS_API_URL}/faculties?${queryString}`)
+    if (!response.ok) throw new Error('Faculty not found')
+    const data = await response.json()
+    if (data.length > 0) {
+      const post = data[0]
+      return {
+        id: post.id,
+        title: stripHtml(post.title?.rendered || ''),
+        content: post.content?.rendered || '',
+        date: post.date,
+        link: post.link,
+        slug: post.slug,
+        featuredImage: getFeaturedImage(post),
+        excerpt: stripHtml(post.excerpt?.rendered || '')
+      }
+    }
+    return null
+  } catch (error) {
+    console.error('Error fetching faculty:', error)
     return null
   }
 }

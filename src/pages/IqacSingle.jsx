@@ -179,6 +179,9 @@ function IqacSingle() {
                 </Link>
               )
             })}
+            <Link to={`/${lang}/naac`} className="iqac-category-link">
+              {lang === 'ml' ? 'എൻ.എ.എ.സി' : 'NAAC'}
+            </Link>
           </nav>
         )}
 

@@ -1,40 +1,17 @@
 import { useState, useEffect } from 'react'
 import { Link, useSearchParams, useLocation } from 'react-router-dom'
-import { fetchDepartments, fetchFaculties, stripHtml, getLanguageContext } from '../services/wordpressApi'
+import { fetchFacultyDepartments, stripHtml, getLanguageContext } from '../services/wordpressApi'
 
-function truncate(str, max = 80) {
-  if (!str) return ''
-  return str.length > max ? str.slice(0, max).trim() + '…' : str
-}
-
-function getFacultyDeptSlugs(faculty) {
-  const embedded = faculty._embedded?.['wp:term'] || []
-  const terms = embedded.flat().filter(t => t.taxonomy === 'faculty_department')
-  if (terms.length > 0) return terms.map(t => t.slug)
-  if (faculty.faculty_department && Array.isArray(faculty.faculty_department)) {
-    return faculty.faculty_department.map(String)
-  }
-  return []
-}
-
-function getFacultyInfo(f) {
-  const name = stripHtml(f.title?.rendered || f.title || '')
-  const initials = name.split(' ').filter(Boolean).map(w => w[0]).join('').slice(0, 2).toUpperCase()
-  const role = f.meta?.designation || f.acf?.designation || (f.excerpt?.rendered ? stripHtml(f.excerpt.rendered).slice(0, 50) : '')
-  const img = f._embedded?.['wp:featuredmedia']?.[0]?.source_url
-  return { name, initials, role, img }
-}
-
-const fallbackDepts = {
+const fallbackTerms = {
   ml: [
-    { id: 1, title: { rendered: 'എഴുത്തച്ഛൻ പഠന സ്കൂൾ' }, slug: 'എഴുത്തച്ഛൻ-പഠന-സ്കൂൾ', excerpt: { rendered: 'ഭാഷാശാസ്ത്രം, സാഹിത്യം, സൃഷ്ടിപരമായ എഴുത്ത്' } },
-    { id: 2, title: { rendered: 'സാംസ്കാരിക പഠന വിഭാഗം' }, slug: 'സാംസ്കാരിക-പഠന-വിഭാഗം', excerpt: { rendered: 'നാടോടി വിദ്യ, മാനവശാസ്ത്രം' } },
-    { id: 3, title: { rendered: 'പത്രപ്രവർത്തന വിഭാഗം' }, slug: 'പത്രപ്രവർത്തന-വിഭാഗം', excerpt: { rendered: 'പ്രിന്റ്, ഡിജിറ്റൽ, ബ്രോഡ്കാസ്റ്റ്' } }
+    { id: 1, name: 'എഴുത്തച്ഛൻ പഠന സ്കൂൾ', slug: 'ezhuthachan-school-of-studies', count: 1, description: 'ഭാഷാശാസ്ത്രം, സാഹിത്യം, സൃഷ്ടിപരമായ എഴുത്ത്', parent: 0 },
+    { id: 2, name: 'സാംസ്കാരിക പഠന വിഭാഗം', slug: 'department-of-cultural-studies', count: 1, description: 'നാടോടി വിദ്യ, മാനവശാസ്ത്രം', parent: 0 },
+    { id: 3, name: 'പത്രപ്രവർത്തന വിഭാഗം', slug: 'department-of-journalism', count: 1, description: 'പ്രിന്റ്, ഡിജിറ്റൽ, ബ്രോഡ്കാസ്റ്റ്', parent: 0 }
   ],
   en: [
-    { id: 1, title: { rendered: 'Thunchath Ezhuthachan School of Studies' }, slug: 'ezhuthachan-school-of-studies', excerpt: { rendered: 'Linguistics, Literature, Creative Writing' } },
-    { id: 2, title: { rendered: 'Department of Cultural Studies' }, slug: 'department-of-cultural-studies', excerpt: { rendered: 'Folklore, Anthropology' } },
-    { id: 3, title: { rendered: 'Department of Journalism' }, slug: 'department-of-journalism', excerpt: { rendered: 'Print, Digital, Broadcast' } }
+    { id: 1, name: 'Thunchath Ezhuthachan School of Studies', slug: 'ezhuthachan-school-of-studies', count: 1, description: 'Linguistics, Literature, Creative Writing', parent: 0 },
+    { id: 2, name: 'Department of Cultural Studies', slug: 'department-of-cultural-studies', count: 1, description: 'Folklore, Anthropology', parent: 0 },
+    { id: 3, name: 'Department of Journalism', slug: 'department-of-journalism', count: 1, description: 'Print, Digital, Broadcast', parent: 0 }
   ]
 }
 
@@ -43,38 +20,28 @@ function Departments() {
   const location = useLocation()
   const lang = getLanguageContext(location.pathname, searchParams)
 
-  const [depts, setDepts] = useState([])
-  const [facultiesByDept, setFacultiesByDept] = useState({})
+  const [terms, setTerms] = useState([])
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
     let cancelled = false
     setLoading(true)
-    Promise.all([
-      fetchDepartments({ lang }),
-      fetchFaculties({ lang })
-    ]).then(([deptData, facData]) => {
-      if (cancelled) return
-      const depts = deptData.length > 0 ? deptData : fallbackDepts[lang] || fallbackDepts.ml
-
-      const grouped = {}
-      facData.forEach(f => {
-        const slugs = getFacultyDeptSlugs(f)
-        slugs.forEach(slug => {
-          if (!grouped[slug]) grouped[slug] = []
-          grouped[slug].push(getFacultyInfo(f))
-        })
-      })
-
-      setDepts(depts)
-      setFacultiesByDept(grouped)
-      setLoading(false)
-    }).catch(() => {
-      if (!cancelled) {
-        setDepts(fallbackDepts[lang] || fallbackDepts.ml)
+    fetchFacultyDepartments({ lang, per_page: 100 })
+      .then(data => {
+        if (cancelled) return
+        if (data.length > 0) {
+          setTerms(data.filter(t => t.parent === 0))
+        } else {
+          setTerms(fallbackTerms[lang] || fallbackTerms.ml)
+        }
         setLoading(false)
-      }
-    })
+      })
+      .catch(() => {
+        if (!cancelled) {
+          setTerms(fallbackTerms[lang] || fallbackTerms.ml)
+          setLoading(false)
+        }
+      })
     return () => { cancelled = true }
   }, [lang])
 
@@ -99,45 +66,29 @@ function Departments() {
               <div key={i} className="department-skeleton" />
             ))
           ) : (
-            depts.map(dept => {
-              const deptFaculties = facultiesByDept[dept.slug] || []
-              return (
-                <div key={dept.id} className="department-card-wrapper">
+            terms.map(term => (
+              <div key={term.id} className="department-card-wrapper">
                   <Link
                     className="department-card"
-                    to={`/${lang}/department/${dept.slug}`}
+                    to={`/${lang}/department/term-${term.id}`}
                   >
-                    <div className="department-card-accent" />
-                    <h3 className="department-card-title">
-                      {stripHtml(dept.title?.rendered || dept.title || '')}
-                    </h3>
-                    {dept.excerpt?.rendered && (
-                      <p className="department-card-excerpt">
-                        {truncate(stripHtml(dept.excerpt.rendered))}
-                      </p>
-                    )}
-                    <span className="department-card-link">{cta}</span>
-                  </Link>
-                  {deptFaculties.length > 0 && (
-                    <div className="department-faculties">
-                      {deptFaculties.map((fac, i) => (
-                        <div key={i} className="dept-faculty-mini">
-                          {fac.img ? (
-                            <img src={fac.img} alt={fac.name} className="dept-faculty-mini-avatar" />
-                          ) : (
-                            <span className="dept-faculty-mini-avatar dept-faculty-mini-initials">{fac.initials}</span>
-                          )}
-                          <div>
-                            <span className="dept-faculty-mini-name">{fac.name}</span>
-                            {fac.role && <span className="dept-faculty-mini-role">{fac.role}</span>}
-                          </div>
-                        </div>
-                      ))}
-                    </div>
+                  <div className="department-card-accent" />
+                  <h3 className="department-card-title">
+                    {stripHtml(term.name || '')}
+                  </h3>
+                  {term.description && (
+                    <p className="department-card-excerpt">
+                      {stripHtml(term.description)}
+                    </p>
                   )}
-                </div>
-              )
-            })
+                  <span className="department-card-link">
+                    {term.count > 0
+                      ? cta
+                      : (lang === 'en' ? 'Coming Soon' : 'ഉടൻ ലഭ്യമാകും')}
+                  </span>
+                </Link>
+              </div>
+            ))
           )}
         </div>
       </div>

@@ -147,19 +147,19 @@ function About({ homePageData }) {
               <div className="hero-stats" aria-label="Highlights">
                 <div className="stat">
                     <a href="#">
-                        <strong>വിദ്യാർത്ഥികൾക്കുള്ള സേവനങ്ങൾ</strong>
-                    <span>Scholarships/NSS/Insurance etc. </span>
+                        <strong>{lang === 'ml' ? 'വിദ്യാർത്ഥികൾക്കുള്ള സേവനങ്ങൾ' : 'Student Services'}</strong>
+                    <span>{lang === 'ml' ? 'സ്കോളർഷിപ്പുകൾ/എൻഎസ്എസ്/ഇൻഷുറൻസ് മുതലായവ' : 'Scholarships/NSS/Insurance etc.'}</span>
                     </a>
                 </div>
                 <div className="stat">
                     <a href="#">
-                        <strong>ഭരണം</strong>
-                    <span>ചാൻസലർ/പ്രോ-ചാൻസലർ/വൈസ് ചാന്‍സലര്‍</span>
+                        <strong>{lang === 'ml' ? 'ഭരണം' : 'Administration'}</strong>
+                    <span>{lang === 'ml' ? 'ചാൻസലർ/പ്രോ-ചാൻസലർ/വൈസ് ചാന്‍സലര്‍' : 'Chancellor/Pro-Chancellor/Vice Chancellor'}</span>
                     </a>
                 </div>
                 <div className="stat">
-                    <a href="http://malayalamuniversity.edu.in/360-virtual-tour/" target="_blank"><strong>വിർച്വൽ ടൂർ </strong>
-                    <span>Explore the university</span></a>
+                    <a href="http://malayalamuniversity.edu.in/360-virtual-tour/" target="_blank"><strong>{lang === 'ml' ? 'വിർച്വൽ ടൂർ' : 'Virtual Tour'}</strong>
+                    <span>{lang === 'ml' ? 'സർവകലാശാല ചുറ്റിക്കാണാം' : 'Explore the university'}</span></a>
                 </div>
             </div>
 

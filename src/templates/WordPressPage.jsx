@@ -190,6 +190,26 @@ function WordPressPage() {
     return () => window.removeEventListener('scroll', revealOnScroll)
   }, [loading])
 
+  useEffect(() => {
+    if (loading) return
+    const toggles = document.querySelectorAll('.wp-block-accordion-heading__toggle')
+    toggles.forEach(btn => {
+      btn.onclick = (e) => {
+        e.preventDefault()
+        const item = btn.closest('.wp-block-accordion-item')
+        if (!item) return
+        const panel = item.querySelector('.wp-block-accordion-panel')
+        const isOpen = item.classList.contains('is-open')
+        item.classList.toggle('is-open')
+        btn.setAttribute('aria-expanded', !isOpen)
+        if (panel) panel.toggleAttribute('inert')
+        const icon = btn.querySelector('.wp-block-accordion-heading__toggle-icon')
+        if (icon) icon.textContent = isOpen ? '+' : '−'
+      }
+    })
+    return () => { toggles.forEach(btn => { btn.onclick = null }) }
+  }, [loading])
+
   if (loading) {
     return (
       <div className="page-loading">

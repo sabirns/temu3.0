@@ -16,6 +16,7 @@ function NssSingle() {
   const [currentPost, setCurrentPost] = useState(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
+  const [zoomedImage, setZoomedImage] = useState(null)
 
   useEffect(() => {
     let cancelled = false
@@ -121,6 +122,7 @@ function NssSingle() {
   }
 
   return (
+    <>
     <main className="nss-page">
       <section className="inner-hero">
         <div className="container">
@@ -188,15 +190,15 @@ function NssSingle() {
                 <img src={currentPost.featuredImage} alt={currentPost.title} />
               </div>
             )}
-            {currentPost.acf?.gallery && currentPost.acf.gallery.length > 0 && (
+            {currentPost.acf?.photo_gallery?.gallery_images?.[0]?.length > 0 && (
               <div className="nss-gallery">
                 <h3 className="nss-gallery-title">{lang === 'ml' ? 'ഗാലറി' : 'Gallery'}</h3>
                 <div className="nss-gallery-grid">
-                  {currentPost.acf.gallery.map((img, i) => {
-                    const src = typeof img === 'object' ? (img.url || img.sizes?.large || img.full_image_url) : img
-                    const alt = typeof img === 'object' ? (img.alt || img.title || '') : ''
+                  {currentPost.acf.photo_gallery.gallery_images[0].map((img, i) => {
+                    const src = img.full_image_url || img.url
+                    const alt = img.alt_text || img.title || ''
                     return (
-                      <div key={i} className="nss-gallery-item">
+                      <div key={i} className="nss-gallery-item" onClick={() => setZoomedImage(src)}>
                         <img src={src} alt={alt} loading="lazy" />
                       </div>
                     )
@@ -212,6 +214,14 @@ function NssSingle() {
         </div>
       </div>
     </main>
+
+      {zoomedImage && (
+        <div className="nss-zoom-overlay" onClick={() => setZoomedImage(null)}>
+          <button className="nss-zoom-close" onClick={() => setZoomedImage(null)}>&times;</button>
+          <img className="nss-zoom-image" src={zoomedImage} alt="" />
+        </div>
+      )}
+    </>
   )
 }
 

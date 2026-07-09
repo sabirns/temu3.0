@@ -1,12 +1,15 @@
-import { BrowserRouter as Router, Routes, Route, Navigate, useParams } from 'react-router-dom'
+import { BrowserRouter as Router, Routes, Route, Navigate, useParams, useLocation } from 'react-router-dom'
+import { useEffect } from 'react'
 import Header from './components/Header'
 import Footer from './components/Footer'
 import Home from './pages/Home'
 import Departments from './pages/Departments'
+import Faculties from './pages/Faculties'
 import DepartmentSingle from './pages/DepartmentSingle'
 import Notifications from './pages/Notifications'
 import NotificationSingle from './pages/NotificationSingle'
 import WordPressPage from './templates/WordPressPage'
+import ContactUs from './templates/ContactUs'
 import ChildPagesGrid from './templates/ChildPagesGrid'
 
 import GallerySingle from './pages/GallerySingle'
@@ -25,6 +28,7 @@ import PublicationCategory from './pages/PublicationCategory'
 import CourseSingle from './pages/CourseSingle'
 import Activities from './pages/Activities'
 import ActivitySingle from './pages/ActivitySingle'
+import FacultySingle from './pages/FacultySingle'
 import InitiativesPage from './pages/InitiativesPage'
 import ScrollToTop from './components/ScrollToTop'
 import DocumentTitle from './components/DocumentTitle'
@@ -37,10 +41,20 @@ function TaxonomyRedirect({ base }) {
   return <Navigate to={to} replace />
 }
 
+function LangFont() {
+  const location = useLocation()
+  useEffect(() => {
+    const lang = location.pathname.split('/').filter(Boolean)[0]
+    document.body.className = lang === 'en' ? 'lang-en' : ''
+  }, [location])
+  return null
+}
+
 function App() {
   return (
     <Router>
       <ScrollToTop />
+      <LangFont />
       <DocumentTitle />
       <PageInfoProvider>
       <div className="grid-bg" aria-hidden="true"></div>
@@ -56,7 +70,10 @@ function App() {
         
         <Route path="/departments" element={<Departments />} />
         <Route path="/:lang/departments" element={<Departments />} />
-        <Route path="/:lang/ഫാക്കൽറ്റികൾ" element={<Departments />} />
+
+        <Route path="/faculties" element={<Faculties />} />
+        <Route path="/:lang/faculties" element={<Faculties />} />
+        <Route path="/:lang/ഫാക്കൽറ്റികൾ" element={<Faculties />} />
         
         <Route path="/department/:id" element={<DepartmentSingle />} />
         <Route path="/:lang/department/:id" element={<DepartmentSingle />} />
@@ -117,6 +134,8 @@ function App() {
         <Route path="/:lang/activities/department/:termSlug" element={<Activities />} />
         <Route path="/activity/:slug" element={<ActivitySingle />} />
         <Route path="/:lang/activity/:slug" element={<ActivitySingle />} />
+        <Route path="/faculty/:slug" element={<FacultySingle />} />
+        <Route path="/:lang/faculty/:slug" element={<FacultySingle />} />
         <Route path="/initiatives" element={<InitiativesPage />} />
         <Route path="/:lang/initiatives" element={<InitiativesPage />} />
         <Route path="/പദ്ധതികളും-സംരംഭങ്ങളും" element={<InitiativesPage />} />
@@ -124,6 +143,10 @@ function App() {
 
         <Route path="/എൻ-എസ്-എസ്" element={<Navigate to="/nss" replace />} />
         <Route path="/ml/എൻ-എസ്-എസ്" element={<Navigate to="/ml/nss" replace />} />
+        <Route path="/contact-us" element={<ContactUs />} />
+        <Route path="/contact-us-ml" element={<ContactUs />} />
+        <Route path="/:lang/contact-us" element={<ContactUs />} />
+        <Route path="/:lang/contact-us-ml" element={<ContactUs />} />
         <Route path="/:slug/*" element={<WordPressPage />} />
         <Route path="/:lang/:slug/*" element={<WordPressPage />} />
       </Routes>

@@ -429,21 +429,21 @@ function Header() {
 
               <div className="nav-item has-dropdown" data-dd>
                 <button className="btn btn-small" aria-haspopup="true" aria-expanded="false">
-                  Student Support <span className="dropdown-arrow">▼</span>
+                  {siteLanguage === 'ml' ? 'വിദ്യാർത്ഥി പിന്തുണ' : 'Student Support'} <span className="dropdown-arrow">▼</span>
                 </button>
                 <div className="dropdown-menu">
                   <div className="dropdown-grid">
-                    <Link to="#" className="dropdown-item"><div><strong>Scholarship</strong></div></Link>
-                    <Link to="#" className="dropdown-item"><div><strong>NSS</strong></div></Link>
-                    <Link to="#" className="dropdown-item"><div><strong>PTA</strong></div></Link>
-                    <Link to="#" className="dropdown-item"><div><strong>Student Union</strong></div></Link>
-                    <Link to="#" className="dropdown-item"><div><strong>Student Zone</strong></div></Link>
-                    <Link to="#" className="dropdown-item"><div><strong>Internship</strong></div></Link>
-                    <Link to="#" className="dropdown-item"><div><strong>Field Trips</strong></div></Link>
-                    <Link to="#" className="dropdown-item"><div><strong>Placement</strong></div></Link>
-                    <Link to="#" className="dropdown-item"><div><strong>Career Guidance</strong></div></Link>
-                    <Link to="#" className="dropdown-item"><div><strong>Civil Services Academy</strong></div></Link>
-                    <Link to="#" className="dropdown-item"><div><strong>Grievance & Redressal</strong></div></Link>
+                    <Link to="#" className="dropdown-item"><div><strong>{siteLanguage === 'ml' ? 'സ്കോളർഷിപ്പ്' : 'Scholarship'}</strong></div></Link>
+                    <Link to="#" className="dropdown-item"><div><strong>{siteLanguage === 'ml' ? 'എൻഎസ്എസ്' : 'NSS'}</strong></div></Link>
+                    <Link to="#" className="dropdown-item"><div><strong>{siteLanguage === 'ml' ? 'പിടിഎ' : 'PTA'}</strong></div></Link>
+                    <Link to="#" className="dropdown-item"><div><strong>{siteLanguage === 'ml' ? 'വിദ്യാർത്ഥി യൂണിയൻ' : 'Student Union'}</strong></div></Link>
+                    <Link to="#" className="dropdown-item"><div><strong>{siteLanguage === 'ml' ? 'സ്റ്റുഡന്റ് സോൺ' : 'Student Zone'}</strong></div></Link>
+                    <Link to="#" className="dropdown-item"><div><strong>{siteLanguage === 'ml' ? 'ഇന്റേൺഷിപ്പ്' : 'Internship'}</strong></div></Link>
+                    <Link to="#" className="dropdown-item"><div><strong>{siteLanguage === 'ml' ? 'ഫീൽഡ് ട്രിപ്പുകൾ' : 'Field Trips'}</strong></div></Link>
+                    <Link to="#" className="dropdown-item"><div><strong>{siteLanguage === 'ml' ? 'പ്ലേസ്മെന്റ്' : 'Placement'}</strong></div></Link>
+                    <Link to="#" className="dropdown-item"><div><strong>{siteLanguage === 'ml' ? 'കരിയർ ഗൈഡൻസ്' : 'Career Guidance'}</strong></div></Link>
+                    <Link to="#" className="dropdown-item"><div><strong>{siteLanguage === 'ml' ? 'സിവിൽ സർവീസസ് അക്കാദമി' : 'Civil Services Academy'}</strong></div></Link>
+                    <Link to="#" className="dropdown-item"><div><strong>{siteLanguage === 'ml' ? 'പരാതി പരിഹാര സെൽ' : 'Grievance & Redressal'}</strong></div></Link>
                   </div>
                 </div>
               </div>
@@ -533,10 +533,24 @@ function Header() {
               </details>
 
               <details style={{ marginTop: 10 }}>
-                <summary>Student Support</summary>
+                <summary>{siteLanguage === 'ml' ? 'വിദ്യാർത്ഥി പിന്തുണ' : 'Student Support'}</summary>
                 <div className="detail-body">
-                  {['Scholarship', 'NSS', 'PTA', 'Student Union', 'Student Zone', 'Internship', 'Field Trips', 'Placement', 'Career Guidance', 'Civil Services Academy', 'Grievance & Redressal'].map((item, i) => (
-                    <Link key={i} to="#" className="mobile-link" onClick={closeMobile}>{item}</Link>
+                  {[
+                    { en: 'Scholarship', ml: 'സ്കോളർഷിപ്പ്' },
+                    { en: 'NSS', ml: 'എൻഎസ്എസ്' },
+                    { en: 'PTA', ml: 'പിടിഎ' },
+                    { en: 'Student Union', ml: 'വിദ്യാർത്ഥി യൂണിയൻ' },
+                    { en: 'Student Zone', ml: 'സ്റ്റുഡന്റ് സോൺ' },
+                    { en: 'Internship', ml: 'ഇന്റേൺഷിപ്പ്' },
+                    { en: 'Field Trips', ml: 'ഫീൽഡ് ട്രിപ്പുകൾ' },
+                    { en: 'Placement', ml: 'പ്ലേസ്മെന്റ്' },
+                    { en: 'Career Guidance', ml: 'കരിയർ ഗൈഡൻസ്' },
+                    { en: 'Civil Services Academy', ml: 'സിവിൽ സർവീസസ് അക്കാദമി' },
+                    { en: 'Grievance & Redressal', ml: 'പരാതി പരിഹാര സെൽ' }
+                  ].map((item, i) => (
+                    <Link key={i} to="#" className="mobile-link" onClick={closeMobile}>
+                      {siteLanguage === 'ml' ? item.ml : item.en}
+                    </Link>
                   ))}
                 </div>
               </details>

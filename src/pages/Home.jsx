@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { Link, useLocation, useSearchParams } from 'react-router-dom'
 import About from '../components/About'
-import { fetchGallery, getLanguageContext, fetchPosts, fetchPageBySlug, fetchMenuByLocation } from '../services/wordpressApi'
+import { fetchGallery, getLanguageContext, fetchPosts, fetchPage, fetchPageBySlug, fetchMenuByLocation } from '../services/wordpressApi'
 import { WP_CONFIG } from '../config/wpConfig'
 
 
@@ -24,6 +24,7 @@ import { WP_CONFIG } from '../config/wpConfig'
 	const [loadingHomePage, setLoadingHomePage] = useState(true)
 	const [cardsToShow, setCardsToShow] = useState(3)
 	const [topMenuItems, setTopMenuItems] = useState([])
+	const [portalTab, setPortalTab] = useState('all')
 
 	useEffect(() => {
 		const handleResize = () => {
@@ -47,10 +48,17 @@ import { WP_CONFIG } from '../config/wpConfig'
 					fetch(`${WP_CONFIG.API_URL}/slider?per_page=5&_embed&lang=${lang}&_t=${Date.now()}`).then(r => r.ok ? r.json() : []),
 					fetchGallery({ lang, per_page: 8 }),
 					fetchPosts({ lang, per_page: 6 }),
-					fetchPageBySlug('home-page-ml'),
+					lang === 'ml' ? fetchPageBySlug('home-page-ml', { lang }) : fetchPage(465, { lang }),
 					fetchMenuByLocation('top_menu_1', lang)
 				])
-				const formattedSlides = (slidesData || []).map(s => ({
+				const slideLang = lang
+				const formattedSlides = (slidesData || [])
+					.filter(s => {
+						if (s.lang) return s.lang === slideLang
+						if (s.translations) return !!s.translations[slideLang === 'ml' ? 'ml_IN' : 'en_US'] || s.translations[slideLang]
+						return true
+					})
+					.map(s => ({
 					id: s.id,
 					title: s.title?.rendered || '',
 					sub: s.content?.rendered?.replace(/<[^>]+>/g, '').trim() || '',
@@ -235,8 +243,8 @@ import { WP_CONFIG } from '../config/wpConfig'
 				<div className="container">
 					<div className="section-head reveal reveal-up">
 						<div>
-							<h2>📰 വാർത്തകൾ / Latest News & Announcements</h2>
-							<p>സർവകലാശാലയിലെ പുതിയ സംഭവവികാസങ്ങളും പരിഷ്‌കാരങ്ങളും.</p>
+							<h2>{lang === 'ml' ? '📰 വാർത്തകൾ' : '📰 Latest News & Announcements'}</h2>
+							<p>{lang === 'ml' ? 'സർവകലാശാലയിലെ പുതിയ സംഭവവികാസങ്ങളും പരിഷ്‌കാരങ്ങളും.' : 'The latest developments and reforms in the university.'}</p>
 						</div>
 						<Link 
 							to={lang === 'ml' ? '/news' : `/${lang}/news`} 
@@ -300,8 +308,8 @@ import { WP_CONFIG } from '../config/wpConfig'
 				<div className="container">
 					<div className="section-head reveal reveal-up">
 						<div>
-							<h2>📸 വിസ്മയ കാഴ്ചകൾ / University Gallery</h2>
-							<p>മലയാളസർവകലാശാലയുടെ വിവിധ പരിപാടികളുടെ ചിത്രങ്ങൾ.</p>
+							<h2>{lang === 'ml' ? '📸 വിസ്മയ കാഴ്ചകൾ' : '📸 University Gallery'}</h2>
+							<p>{lang === 'ml' ? 'മലയാളസർവകലാശാലയുടെ വിവിധ പരിപാടികളുടെ ചിത്രങ്ങൾ.' : 'Photos of various programs at Malayalam University.'}</p>
 						</div>
 						<Link to={lang === 'ml' ? '/gallery' : `/${lang}/gallery`} className="btn">View All Gallery →</Link>
 					</div>
@@ -331,8 +339,8 @@ import { WP_CONFIG } from '../config/wpConfig'
 				<div className="container">
 					<div className="section-head">
 						<div>
-							<h2>പദ്ധതികളും സംരംഭങ്ങളും</h2>
-							<p>മലയാളസർവകലാശാലയുടെ വിവിധ പദ്ധതികളും സംരംഭങ്ങളും.</p>
+							<h2>{lang === 'ml' ? 'പദ്ധതികളും സംരംഭങ്ങളും' : 'Projects & Initiatives'}</h2>
+							<p>{lang === 'ml' ? 'മലയാളസർവകലാശാലയുടെ വിവിധ പദ്ധതികളും സംരംഭങ്ങളും.' : 'Various projects and initiatives of Malayalam University.'}</p>
 						</div>
 						<a className="btn" href="#contact">Directory / Contact</a>
 					</div>
@@ -383,9 +391,8 @@ import { WP_CONFIG } from '../config/wpConfig'
 			<section className="principles-banner" id="principles">
 				<div className="container">
 					<div className="principles-statement reveal reveal-up active">
-						<h2>ഇതൊരു പുകയിലവിരുദ്ധ, ലഹരിവിരുദ്ധ, റാഗിങ്ങ് രഹിത, ഹരിത കാമ്പസ്‌ ആണ്</h2>
-						<p>മലയാള സർവകലാശാലയിൽ, എല്ലാ വിദ്യാർത്ഥികൾക്കും ഉദ്യോഗസ്ഥർക്കും അധ്യാപകർക്കും സുരക്ഷിതവും സൗഹൃദപരവും
-							പരിസ്ഥിതി സൗഹൃദപരവുമായ ഒരു പഠന-ജോലി അന്തരീക്ഷം നൽകുന്നതിന് ഞങ്ങൾ പ്രതിജ്ഞാബദ്ധരാണ്.</p>
+						<h2>{lang === 'ml' ? 'ഇതൊരു പുകയിലവിരുദ്ധ, ലഹരിവിരുദ്ധ, റാഗിങ്ങ് രഹിത, ഹരിത കാമ്പസ്‌ ആണ്' : 'This is a Tobacco-Free, Substance-Free, Ragging-Free, Green Campus'}</h2>
+						<p>{lang === 'ml' ? 'മലയാള സർവകലാശാലയിൽ, എല്ലാ വിദ്യാർത്ഥികൾക്കും ഉദ്യോഗസ്ഥർക്കും അധ്യാപകർക്കും സുരക്ഷിതവും സൗഹൃദപരവും പരിസ്ഥിതി സൗഹൃദപരവുമായ ഒരു പഠന-ജോലി അന്തരീക്ഷം നൽകുന്നതിന് ഞങ്ങൾ പ്രതിജ്ഞാബദ്ധരാണ്.' : 'At Malayalam University, we are committed to providing a safe, friendly, and environmentally sustainable study-work environment for all students, staff, and teachers.'}</p>
 					</div>
 				</div>
 			</section>
@@ -397,15 +404,13 @@ import { WP_CONFIG } from '../config/wpConfig'
 					<div className="campus-story">
 						<div className="story-grid">
 							<div className="story-text">
-								<h3>കാമ്പസും കാമ്പസ് ജീവിതവും</h3>
-								<p><b>അറിവ് പ്രകൃതിയെയും സംസ്കാരത്തെയും ഒന്നിപ്പിക്കുന്നിടം</b></p>
+								<h3>{lang === 'ml' ? 'കാമ്പസും കാമ്പസ് ജീവിതവും' : 'Campus & Campus Life'}</h3>
+								<p><b>{lang === 'ml' ? 'അറിവ് പ്രകൃതിയെയും സംസ്കാരത്തെയും ഒന്നിപ്പിക്കുന്നിടം' : 'Where Knowledge Unites Nature and Culture'}</b></p>
 								<p>
-									മലയാളസർവകലാശാലയുടെ കാമ്പസ് അവിശ്വസനീയമായ സ്വാഭാവിക സൗന്ദര്യവും, സമാധാനപൂർവകമായ പഠനവാതവരണവും
-									വാഗ്ദാനം ചെയ്യുന്നു. ആധുനിക സൗകര്യങ്ങൾ, നീളംകൊണ്ട് വിരലെടുത്ത ശാഖകൾ, വൈവിധ്യമാർന്ന
-									പഠനകേന്ദ്രങ്ങൾ, ഗവേഷണ പ്രോജക്റ്റുകൾ, ശാഖകളുമായി സമന്വയിച്ച കൃത്യമായ സൗകര്യങ്ങൾ എല്ലാം
-									വിദ്യാർഥികൾക്ക് ഉത്തമമായ പഠന അനുഭവം നൽകുന്നു. വിപുലമായ ഗ്രന്ഥാലയം, വിശാലമായ ഗാർഡൻ, വിവിധ
-									ശില്പകലാസംഗ്രഹങ്ങൾ, പൈതൃക മ്യൂസിയം തുടങ്ങിയവയും അതിന്റെ ഭാഗമാണ്. സഹജമായ പഠനവാതവരണവും
-									സൗഹൃദപരമായ ക്ലാസുകൾ, വിദ്യാർത്ഥികളിൽ പ്രചോദനവും ഉന്നമനവും ഉണ്ടാക്കുന്നു.
+									{lang === 'ml' ? 
+									'മലയാളസർവകലാശാലയുടെ കാമ്പസ് അവിശ്വസനീയമായ സ്വാഭാവിക സൗന്ദര്യവും, സമാധാനപൂർവകമായ പഠനവാതവരണവും വാഗ്ദാനം ചെയ്യുന്നു. ആധുനിക സൗകര്യങ്ങൾ, നീളംകൊണ്ട് വിരലെടുത്ത ശാഖകൾ, വൈവിധ്യമാർന്ന പഠനകേന്ദ്രങ്ങൾ, ഗവേഷണ പ്രോജക്റ്റുകൾ, ശാഖകളുമായി സമന്വയിച്ച കൃത്യമായ സൗകര്യങ്ങൾ എല്ലാം വിദ്യാർഥികൾക്ക് ഉത്തമമായ പഠന അനുഭവം നൽകുന്നു. വിപുലമായ ഗ്രന്ഥാലയം, വിശാലമായ ഗാർഡൻ, വിവിധ ശില്പകലാസംഗ്രഹങ്ങൾ, പൈതൃക മ്യൂസിയം തുടങ്ങിയവയും അതിന്റെ ഭാഗമാണ്. സഹജമായ പഠനവാതവരണവും സൗഹൃദപരമായ ക്ലാസുകൾ, വിദ്യാർത്ഥികളിൽ പ്രചോദനവും ഉന്നമനവും ഉണ്ടാക്കുന്നു.' :
+									'The campus of Malayalam University offers incredible natural beauty and a peaceful learning environment. Modern facilities, diverse learning centers, research projects, and well-integrated amenities provide students with an excellent educational experience. A comprehensive library, expansive gardens, various art collections, and a heritage museum are all part of this campus. The natural learning atmosphere and friendly classes inspire and uplift the students.'
+									}
 								</p>
 							</div>
 							<div className="story-image" style={{ backgroundImage: "url('images/campus.jpg')", backgroundSize: 'cover' }}>
@@ -417,25 +422,18 @@ import { WP_CONFIG } from '../config/wpConfig'
 					<div className="campus-highlights">
 						<div className="campus-card">
 							<div className="card-icon">🌳</div>
-							<h3>ഹരിത കാമ്പസ്</h3>
-							<p>മലയാളസർവകലാശാലയുടെ ഹരിത കാമ്പസ് പ്രകൃതിയുമായി പൂർണ്ണമായും ചേർന്നിരിക്കുന്നു. വിശാലമായ തോട്ടങ്ങളും
-								പൂക്കളും ശുദ്ധമായ വായുമാലിന്യവും പഠനത്തിന് അനുയോജ്യമായ പരിസ്ഥിതി സൃഷ്ടിക്കുന്നു. കാലാവസ്ഥയുടെ
-								മികച്ച അനുയോജ്യതയിൽ വിദ്യാർത്ഥികൾക്ക് ഉത്തമമായ പഠനവും വിശ്രമവും നൽകുന്നു.</p>
+							<h3>{lang === 'ml' ? 'ഹരിത കാമ്പസ്' : 'Green Campus'}</h3>
+							<p>{lang === 'ml' ? 'മലയാളസർവകലാശാലയുടെ ഹരിത കാമ്പസ് പ്രകൃതിയുമായി പൂർണ്ണമായും ചേർന്നിരിക്കുന്നു. വിശാലമായ തോട്ടങ്ങളും പൂക്കളും ശുദ്ധമായ വായുമാലിന്യവും പഠനത്തിന് അനുയോജ്യമായ പരിസ്ഥിതി സൃഷ്ടിക്കുന്നു. കാലാവസ്ഥയുടെ മികച്ച അനുയോജ്യതയിൽ വിദ്യാർത്ഥികൾക്ക് ഉത്തമമായ പഠനവും വിശ്രമവും നൽകുന്നു.' : 'The green campus of Malayalam University is perfectly integrated with nature. Expansive gardens, flowers, and pure air create an ideal environment for learning. It provides students with an excellent setting for both studying and relaxing.'}</p>
 						</div>
 						<div className="campus-card">
 							<div className="card-icon">🏛️</div>
-							<h3>ആധുനിക സൗകര്യങ്ങൾ</h3>
-							<p>മലയാളസർവകലാശാലയിൽ ഏറ്റവും പുതിയ സാങ്കേതിക വിദ്യകളും ആധുനിക സൗകര്യങ്ങളും സമഗ്രമായ പഠനത്തിനായി
-								ഒരുക്കിയിട്ടുണ്ട്. സ്മാർട്ട്ബോർഡുകൾ, കമ്പ്യൂട്ടർ ലാബുകൾ, wi-fi സൗകര്യങ്ങൾ, ഗ്രന്ഥാലയം,
-								സപ്പോർട്ട് സേവനങ്ങൾ എന്നിവ വിദ്യാർത്ഥികൾക്ക് മികച്ച പഠന അനുഭവം നൽകുന്നു.</p>
+							<h3>{lang === 'ml' ? 'ആധുനിക സൗകര്യങ്ങൾ' : 'Modern Facilities'}</h3>
+							<p>{lang === 'ml' ? 'മലയാളസർവകലാശാലയിൽ ഏറ്റവും പുതിയ സാങ്കേതിക വിദ്യകളും ആധുനിക സൗകര്യങ്ങളും സമഗ്രമായ പഠനത്തിനായി ഒരുക്കിയിട്ടുണ്ട്. സ്മാർട്ട്ബോർഡുകൾ, കമ്പ്യൂട്ടർ ലാബുകൾ, wi-fi സൗകര്യങ്ങൾ, ഗ്രന്ഥാലയം, സപ്പോർട്ട് സേവനങ്ങൾ എന്നിവ വിദ്യാർത്ഥികൾക്ക് മികച്ച പഠന അനുഭവം നൽകുന്നു.' : 'Malayalam University is equipped with the latest technologies and modern facilities for comprehensive learning. Smartboards, computer labs, Wi-Fi facilities, library, and support services provide students with an outstanding educational experience.'}</p>
 						</div>
 						<div className="campus-card">
 							<div className="card-icon">🎭</div>
-							<h3>കലാ സാംസ്കാരികം</h3>
-							<p>മലയാളസർവകലാശാല പഠനവും കലാസാംസ്കാരിക പ്രവർത്തനങ്ങളും സമന്വയിച്ചുള്ള ഒരു പ്രധാന കേന്ദ്രമാണ്. ഓരോ
-								വർഷവും കലാപരിപാടികൾ, നാടകങ്ങൾ, സംഗീതമേളകൾ, കലാസമ്മേളനങ്ങൾ എന്നിവ വിദ്യാർത്ഥികളുടെ സൃഷ്ടിപരമായ
-								കഴിവുകളെ മികവുറ്റവാക്കുന്നു. സാംസ്കാരിക വൈവിധ്യത്തിന് ഉത്തമ പ്രോത്സാഹനമാണ് ഇവിടെ നൽകപ്പെടുന്നത്.
-							</p>
+							<h3>{lang === 'ml' ? 'കലാ സാംസ്കാരികം' : 'Art & Culture'}</h3>
+							<p>{lang === 'ml' ? 'മലയാളസർവകലാശാല പഠനവും കലാസാംസ്കാരിക പ്രവർത്തനങ്ങളും സമന്വയിച്ചുള്ള ഒരു പ്രധാന കേന്ദ്രമാണ്. ഓരോ വർഷവും കലാപരിപാടികൾ, നാടകങ്ങൾ, സംഗീതമേളകൾ, കലാസമ്മേളനങ്ങൾ എന്നിവ വിദ്യാർത്ഥികളുടെ സൃഷ്ടിപരമായ കഴിവുകളെ മികവുറ്റവാക്കുന്നു. സാംസ്കാരിക വൈവിധ്യത്തിന് ഉത്തമ പ്രോത്സാഹനമാണ് ഇവിടെ നൽകപ്പെടുന്നത്.' : 'Malayalam University is a major center that blends learning with arts and cultural activities. Every year, cultural programs, dramas, music festivals, and art conventions enhance the creative skills of students. Excellent encouragement is given to cultural diversity here.'}</p>
 						</div>
 					</div>
 
@@ -458,20 +456,20 @@ import { WP_CONFIG } from '../config/wpConfig'
 							)
 						}) : (
 							<>
-								<span className="facility-item">പൈതൃക മ്യൂസിയം</span>
-								<span className="facility-item">ഐ.ടി സൗകര്യങ്ങൾ</span>
-								<span className="facility-item">ഗ്രന്ഥാലയം</span>                
-								<span className="facility-item">തിയേറ്റർ</span>
-								<span className="facility-item">യാത്രാസൗകര്യങ്ങൾ</span>
-								<span className="facility-item">സ്പോർട്സ്</span>
-								<span className="facility-item">ഭാഷാ ലാബ്</span>
-								<span className="facility-item">ശാസ്ത്ര ലാബ്</span>
-								<span className="facility-item">മീഡിയ ലാബ്</span>
-								<span className="facility-item">ഇ-ലേണിംഗ് സൗകര്യങ്ങൾ</span>
-								<span className="facility-item">കയ്യെഴുത്തു ഗ്രന്ഥാലയം</span>
-								<span className="facility-item">ഫീൽഡ് ട്രിപ്പുകൾ</span>
-								<span className="facility-item">ഇന്റേൺഷിപ്പ്</span>
-								<span className="facility-item">ആരോഗ്യവും ക്ഷേമവും കേന്ദ്രം</span>
+								<span className="facility-item">{lang === 'ml' ? 'പൈതൃക മ്യൂസിയം' : 'Heritage Museum'}</span>
+								<span className="facility-item">{lang === 'ml' ? 'ഐ.ടി സൗകര്യങ്ങൾ' : 'IT Facilities'}</span>
+								<span className="facility-item">{lang === 'ml' ? 'ഗ്രന്ഥാലയം' : 'Library'}</span>                
+								<span className="facility-item">{lang === 'ml' ? 'തിയേറ്റർ' : 'Theater'}</span>
+								<span className="facility-item">{lang === 'ml' ? 'യാത്രാസൗകര്യങ്ങൾ' : 'Transport Facilities'}</span>
+								<span className="facility-item">{lang === 'ml' ? 'സ്പോർട്സ്' : 'Sports'}</span>
+								<span className="facility-item">{lang === 'ml' ? 'ഭാഷാ ലാബ്' : 'Language Lab'}</span>
+								<span className="facility-item">{lang === 'ml' ? 'ശാസ്ത്ര ലാബ്' : 'Science Lab'}</span>
+								<span className="facility-item">{lang === 'ml' ? 'മീഡിയ ലാബ്' : 'Media Lab'}</span>
+								<span className="facility-item">{lang === 'ml' ? 'ഇ-ലേണിംഗ് സൗകര്യങ്ങൾ' : 'E-Learning Facilities'}</span>
+								<span className="facility-item">{lang === 'ml' ? 'കയ്യെഴുത്തു ഗ്രന്ഥാലയം' : 'Manuscript Library'}</span>
+								<span className="facility-item">{lang === 'ml' ? 'ഫീൽഡ് ട്രിപ്പുകൾ' : 'Field Trips'}</span>
+								<span className="facility-item">{lang === 'ml' ? 'ഇന്റേൺഷിപ്പ്' : 'Internship'}</span>
+								<span className="facility-item">{lang === 'ml' ? 'ആരോഗ്യവും ക്ഷേമവും കേന്ദ്രം' : 'Health & Wellness Center'}</span>
 							</>
 						)}
 					</div>
@@ -490,46 +488,84 @@ import { WP_CONFIG } from '../config/wpConfig'
 			{/* Quick Links / Portals Section */}
 			<section className="portals-section">
 				<div className="container">
-					<div className="portals-grid">
-						{homePageData?.acf?.buttons_2?.length > 0 ? (
-							homePageData.acf.buttons_2.map((item, index) => {
-								const linkField = item.external_link || item.link || '#'
-								const linkUrl = typeof linkField === 'object' && linkField?.url ? linkField.url : linkField
-								const linkTarget = typeof linkField === 'object' && linkField?.target ? linkField.target : (item.external_link ? '_blank' : '_self')
-								const imgSrc = typeof item.image === 'object' && item.image?.url ? item.image.url : item.image
+					{homePageData?.acf?.buttons_2?.length > 0 && (
+						<>
+							{(() => {
+								const catSet = new Set()
+								homePageData.acf.buttons_2.forEach(item => {
+									if (item.category) catSet.add(item.category)
+								})
+								const categories = ['all', ...Array.from(catSet)]
+								const catLabels = {
+									all: lang === 'ml' ? 'എല്ലാം' : 'All',
+									...Object.fromEntries(
+										homePageData.acf.buttons_2
+											.filter(item => item.category)
+											.map(item => [item.category, item.category])
+									)
+								}
+								const filtered = portalTab === 'all'
+									? homePageData.acf.buttons_2
+									: homePageData.acf.buttons_2.filter(item => item.category === portalTab)
 								return (
-									<a key={index} href={linkUrl} className="portal-card"
-										target={linkTarget === '_blank' ? '_blank' : undefined}
-										rel={linkTarget === '_blank' ? 'noopener noreferrer' : undefined}
-									>
-										<div className="portal-icon">
-											{imgSrc ? (
-												<img src={imgSrc} alt={item.title} />
-											) : (
-												<span className={item.icon}></span>
-											)}
+									<>
+										{categories.length > 1 && (
+											<div className="portals-tabs">
+												{categories.map(cat => (
+													<button
+														key={cat}
+														className={`portals-tab ${portalTab === cat ? 'active' : ''}`}
+														onClick={() => setPortalTab(cat)}
+													>
+														{catLabels[cat] || cat}
+													</button>
+												))}
+											</div>
+										)}
+										<div className="portals-grid">
+											{filtered.map((item, index) => {
+												const linkField = item.external_link || item.link || '#'
+												const linkUrl = typeof linkField === 'object' && linkField?.url ? linkField.url : linkField
+												const linkTarget = typeof linkField === 'object' && linkField?.target ? linkField.target : (item.external_link ? '_blank' : '_self')
+												const imgSrc = typeof item.image === 'object' && item.image?.url ? item.image.url : item.image
+												return (
+													<a key={index} href={linkUrl} className="portal-card"
+														target={linkTarget === '_blank' ? '_blank' : undefined}
+														rel={linkTarget === '_blank' ? 'noopener noreferrer' : undefined}
+													>
+														<div className="portal-icon">
+															{imgSrc ? (
+																<img src={imgSrc} alt={item.title} />
+															) : (
+																<span className={item.icon}></span>
+															)}
+														</div>
+														<div className="portal-text">
+															<h3>{item.title}</h3>
+															<p>{item.description}</p>
+														</div>
+													</a>
+												)
+											})}
 										</div>
-										<div className="portal-text">
-											<h3>{item.title}</h3>
-											<p>{item.description}</p>
-										</div>
-									</a>
+									</>
 								)
-							})
-						) : (
-							<>
-								<a href="https://ugc.ac.in" target="_blank" rel="noopener noreferrer" className="portal-card">
-									<div className="portal-icon">
-										<img src="https://upload.wikimedia.org/wikipedia/en/thumb/9/91/University_Grants_Commission_%28India%29_logo.png/220px-University_Grants_Commission_%28India%29_logo.png" alt="UGC" />
-									</div>
-									<div className="portal-text">
-										<h3>UGC</h3>
-										<p>{lang === 'ml' ? 'യൂണിവേഴ്സിറ്റി ഗ്രാന്റ്സ് കമ്മീഷൻ' : 'University Grants Commission'}</p>
-									</div>
-								</a>
-							</>
-						)}
-					</div>
+							})()}
+						</>
+					)}
+					{(!homePageData?.acf?.buttons_2 || homePageData.acf.buttons_2.length === 0) && (
+						<div className="portals-grid">
+							<a href="https://ugc.ac.in" target="_blank" rel="noopener noreferrer" className="portal-card">
+								<div className="portal-icon">
+									<img src="https://upload.wikimedia.org/wikipedia/en/thumb/9/91/University_Grants_Commission_%28India%29_logo.png/220px-University_Grants_Commission_%28India%29_logo.png" alt="UGC" />
+								</div>
+								<div className="portal-text">
+									<h3>UGC</h3>
+									<p>{lang === 'ml' ? 'യൂണിവേഴ്സിറ്റി ഗ്രാന്റ്സ് കമ്മീഷൻ' : 'University Grants Commission'}</p>
+								</div>
+							</a>
+						</div>
+					)}
 				</div>
 			</section>
 		</main>
