@@ -2,7 +2,9 @@ import { useState, useEffect } from 'react'
 import { useParams, Link, useLocation, useSearchParams } from 'react-router-dom'
 import { fetchPublicationBySlug, getLanguageContext, extractTranslationSlugs } from '../services/wordpressApi'
 import { usePageInfo } from '../services/PageInfoContext'
+import GutenbergContent from '../components/GutenbergContent'
 import '../styles/pages.css'
+
 
 function PublicationSingle() {
   const { slug } = useParams()
@@ -107,9 +109,9 @@ function PublicationSingle() {
             </div>
 
             {pub.content && (
-              <div
+              <GutenbergContent
+                html={pub.content}
                 className="publication-content wordpress-content"
-                dangerouslySetInnerHTML={{ __html: pub.content }}
               />
             )}
           </div>

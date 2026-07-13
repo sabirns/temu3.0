@@ -2,7 +2,9 @@ import { useState, useEffect, useRef } from 'react'
 import { useParams, useSearchParams, useLocation, Link } from 'react-router-dom'
 import { fetchDepartment, fetchDepartments, fetchFaculties, fetchActivities, fetchCourses, fetchStudents, fetchFacultyDepartment, fetchFacultyDepartments, fetchGallery, stripHtml, getLanguageContext, extractTranslationSlugs } from '../services/wordpressApi'
 import { usePageInfo } from '../services/PageInfoContext'
+import GutenbergContent from '../components/GutenbergContent'
 import '../styles/pages.css'
+
 
 function DepartmentSingle() {
   const { id } = useParams()
@@ -76,12 +78,13 @@ function DepartmentSingle() {
         ? rawGallery.map(g => (typeof g === 'object' ? g.ID || g.id : g)).filter(Boolean)
         : []
 
-      const [facData, actData, courseData, termData, galleryData, studentData, slugs] = await Promise.all([
+      const [facData, actData, courseData, termData, galleryData, termGalleryData, studentData, slugs] = await Promise.all([
         fetchFaculties({ lang }),
         deptTermIds.length > 0 ? fetchActivities({ faculty_department: deptTermIds[0], lang }) : Promise.resolve([]),
         deptTermIds.length > 0 ? fetchCourses({ faculty_department: deptTermIds[0], lang }) : Promise.resolve([]),
         deptTermIds.length > 0 ? fetchFacultyDepartment(deptTermIds[0]) : Promise.resolve(null),
         galleryIds.length > 0 ? fetchGallery({ include: galleryIds.join(','), per_page: 50, lang }) : Promise.resolve([]),
+        deptTermIds.length > 0 ? fetchGallery({ faculty_department: deptTermIds[0], per_page: 50, lang }) : Promise.resolve([]),
         deptTermIds.length > 0 ? fetchStudents({ faculty_department: deptTermIds[0], lang }) : Promise.resolve([]),
         extractTranslationSlugs(deptData, 'department')
       ])
@@ -103,7 +106,10 @@ function DepartmentSingle() {
       setCourses(courseData)
       setStudents(studentData)
       if (termData?.slug) setDeptTermSlug(termData.slug)
-      if (galleryData.length > 0) setGalleryItems(galleryData)
+      
+      const mergedGallery = [...galleryData, ...termGalleryData]
+      const uniqueGallery = Array.from(new Map(mergedGallery.map(item => [item.id, item])).values())
+      if (uniqueGallery.length > 0) setGalleryItems(uniqueGallery)
       setPageInfo({ id: deptData.id, postType: 'department', translationSlugs: slugs })
     }
 
@@ -224,12 +230,22 @@ function DepartmentSingle() {
                     {lang === 'ml' ? 'വിദ്യാർത്ഥികൾ' : 'Students'}
                   </button>
                 )}
+                {wpDept?.acf?.syllabus?.length > 0 && (
+                  <button className={`dept-tab ${activeTab === 'syllabus' ? 'active' : ''}`} onClick={() => setActiveTab('syllabus')}>
+                    {lang === 'ml' ? 'സിലബസ്' : 'Syllabus'}
+                  </button>
+                )}
+                {wpDept?.acf?.student_achievement && (
+                  <button className={`dept-tab ${activeTab === 'achievements' ? 'active' : ''}`} onClick={() => setActiveTab('achievements')}>
+                    {lang === 'ml' ? 'വിദ്യാർത്ഥികളുടെ നേട്ടങ്ങൾ' : 'Student Achievement'}
+                  </button>
+                )}
               </div>
 
               {activeTab === 'overview' && (
                 <section id="overview" ref={overviewRef} className="dept-section">
                   <div ref={contentRef} className="dept-content-body" style={{ maxHeight: showFullContent ? 'none' : '500px', overflow: 'hidden', position: 'relative' }}>
-                    <div dangerouslySetInnerHTML={{ __html: content }} />
+                    <GutenbergContent html={content} />
                     {!showFullContent && contentOverflows && (
                       <div className="dept-content-fade" />
                     )}
@@ -284,6 +300,57 @@ function DepartmentSingle() {
                 </section>
               )}
 
+              {activeTab === 'syllabus' && wpDept?.acf?.syllabus?.length > 0 && (
+                <section className="dept-section">
+                  <div className="dept-projects-table-wrap">
+                    <table className="dept-projects-table">
+                      <thead>
+                        <tr>
+                          <th>{lang === 'ml' ? 'ക്ര.നം.' : 'Sl. No'}</th>
+                          <th>{lang === 'ml' ? 'ശീർഷകം' : 'Title'}</th>
+                          <th>{lang === 'ml' ? 'ഫയൽ' : 'File'}</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {wpDept.acf.syllabus.map((item, idx) => {
+                          const fileUrl = typeof item.file === 'object' ? item.file?.url : item.file;
+                          return (
+                            <tr key={idx}>
+                              <td>{idx + 1}</td>
+                              <td>{item.title}</td>
+                              <td>
+                                {fileUrl && (
+                                  <a href={fileUrl} target="_blank" rel="noopener noreferrer" className="btn btn-small" style={{ display: 'inline-block' }}>
+                                    {lang === 'ml' ? 'ഡൗൺലോഡ് ചെയ്യുക' : 'Download'}
+                                  </a>
+                                )}
+                              </td>
+                            </tr>
+                          );
+                        })}
+                      </tbody>
+                    </table>
+                  </div>
+                </section>
+              )}
+
+              {activeTab === 'achievements' && wpDept?.acf?.student_achievement && (
+                <section className="dept-section">
+                  <div className="dept-content-body">
+                    <GutenbergContent html={wpDept.acf.student_achievement} />
+                  </div>
+                </section>
+              )}
+
+              {wpDept?.acf?.facilities?.length > 0 && (
+                <section className="dept-gallery-section" style={{ marginTop: '40px' }}>
+                  <div className="dept-gallery-header">
+                    <h2>{lang === 'ml' ? 'സൗകര്യങ്ങൾ' : 'Facilities'}</h2>
+                  </div>
+                  <FacilitiesAccordion items={wpDept.acf.facilities} lang={lang} />
+                </section>
+              )}
+
               {imageGalleries.length > 0 && (
                 <section className="dept-gallery-section">
                   <div className="dept-gallery-header">
@@ -306,8 +373,8 @@ function DepartmentSingle() {
             </div>
 
             <aside className="dept-sidebar">
-              <div className="side-card" style={{ padding: '24px', borderRadius: 'var(--radius)', boxShadow: 'var(--shadow2)', border: '1px solid var(--stroke)', background: 'var(--card)', marginBottom: '30px' }}>
-                <h3 style={{ marginTop: 0, color: 'var(--secondary)', fontSize: '20px', borderBottom: '1px solid var(--stroke)', paddingBottom: '12px', marginBottom: '20px' }}>
+              <div className="side-card">
+                <h3>
                   {stripHtml(title)} {lang === 'ml' ? 'ഫാക്കൽറ്റി അംഗങ്ങൾ' : 'Faculty Members'}
                 </h3>
                 {faculties.length === 0 && (
@@ -316,7 +383,7 @@ function DepartmentSingle() {
                 {faculties.map(f => {
                   const name = stripHtml(f.title?.rendered || f.title || '')
                   const initials = name.split(' ').filter(Boolean).map(w => w[0]).join('').slice(0, 2).toUpperCase()
-                  const role = f.meta?.designation || f.acf?.designation || (f.excerpt?.rendered ? stripHtml(f.excerpt.rendered).slice(0, 50) : 'Faculty Member')
+                  const role = f.acf?.designation || ''
                   const img = f._embedded?.['wp:featuredmedia']?.[0]?.source_url
                   return (
                     <Link key={f.id} to={`/${lang}/faculty/${f.slug}`} className="faculty-item" style={{ display: 'flex', gap: '12px', alignItems: 'center', marginBottom: '16px', textDecoration: 'none', color: 'inherit' }}>
@@ -329,15 +396,15 @@ function DepartmentSingle() {
                       )}
                       <div className="faculty-info">
                         <h5 style={{ margin: 0, fontSize: '14px', fontWeight: 600 }}>{name}</h5>
-                        <p style={{ margin: '2px 0 0', fontSize: '13px', color: 'var(--muted)' }}>{role}</p>
+                        {role && <p style={{ margin: '2px 0 0', fontSize: '13px', color: 'var(--muted)' }}>{role}</p>}
                       </div>
                     </Link>
                   )
                 })}
               </div>
 
-              <div className="side-card" style={{ padding: '24px', borderRadius: 'var(--radius)', boxShadow: 'var(--shadow2)', border: '1px solid var(--stroke)', background: 'var(--card)', marginBottom: '30px' }}>
-                <h3 style={{ marginTop: 0, color: 'var(--secondary)', fontSize: '20px', borderBottom: '1px solid var(--stroke)', paddingBottom: '12px', marginBottom: '20px' }}>
+              <div className="side-card">
+                <h3>
                   {lang === 'ml' ? 'പ്രവർത്തനങ്ങൾ' : 'Activities'}
                 </h3>
                 {activities.length === 0 && (
@@ -366,8 +433,8 @@ function DepartmentSingle() {
                 <Link to={`/${lang}/activities/department/${deptTermSlug}`} className="btn btn-small" style={{ width: '100%', justifyContent: 'center', marginTop: '15px' }}>{lang === 'ml' ? 'എല്ലാ പ്രവർത്തനങ്ങളും കാണുക' : 'View All Activities'}</Link>
               </div>
 
-              <div className="side-card" style={{ padding: '24px', borderRadius: 'var(--radius)', boxShadow: 'var(--shadow2)', border: '1px solid var(--stroke)', background: 'var(--card)', marginBottom: '30px' }}>
-                <h3 style={{ marginTop: 0, color: 'var(--secondary)', fontSize: '20px', borderBottom: '1px solid var(--stroke)', paddingBottom: '12px', marginBottom: '20px' }}>
+              <div className="side-card">
+                <h3>
                   {lang === 'ml' ? 'പ്രോഗ്രാമുകൾ' : 'Programs'}
                 </h3>
                 {courses.length === 0 && (
@@ -420,7 +487,34 @@ function StudentAccordion({ items, lang }) {
           </button>
           <div className="student-accordion-body" style={{ maxHeight: openIndex === idx ? '2000px' : '0' }}>
             <div className="student-accordion-body-inner">
-              <div className="page-content-body" dangerouslySetInnerHTML={{ __html: s.content?.rendered || '' }} />
+              <GutenbergContent html={s.content?.rendered || ''} className="page-content-body" />
+            </div>
+          </div>
+        </div>
+      ))}
+    </div>
+  )
+}
+
+function FacilitiesAccordion({ items, lang }) {
+  const [openIndex, setOpenIndex] = useState(null)
+
+  const toggle = idx => setOpenIndex(openIndex === idx ? null : idx)
+
+  return (
+    <div className="student-accordion">
+      {items.map((fac, idx) => (
+        <div key={idx} className="student-accordion-item">
+          <button
+            onClick={() => toggle(idx)}
+            className={`student-accordion-header${openIndex === idx ? ' is-open' : ''}`}
+          >
+            <span>{fac.facilities_title || 'Facility'}</span>
+            <span className="student-accordion-arrow">&#9660;</span>
+          </button>
+          <div className="student-accordion-body" style={{ maxHeight: openIndex === idx ? '2000px' : '0' }}>
+            <div className="student-accordion-body-inner">
+              <GutenbergContent html={fac.facilities_description || ''} className="page-content-body" />
             </div>
           </div>
         </div>

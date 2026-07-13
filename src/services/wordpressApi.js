@@ -474,6 +474,13 @@ export async function fetchFacultyBySlug(slug, params = {}) {
     const data = await response.json()
     if (data.length > 0) {
       const post = data[0]
+      
+      const embeddedTerms = post._embedded?.['wp:term'] || []
+      const departments = embeddedTerms.flat().filter(term => term.taxonomy === 'faculty_department')
+      const childDepartments = departments.filter(term => term.parent !== 0)
+      const displayDepartments = childDepartments.length > 0 ? childDepartments : departments
+      const departmentNames = displayDepartments.map(d => d.name).join(', ')
+
       return {
         id: post.id,
         title: stripHtml(post.title?.rendered || ''),
@@ -482,7 +489,9 @@ export async function fetchFacultyBySlug(slug, params = {}) {
         link: post.link,
         slug: post.slug,
         featuredImage: getFeaturedImage(post),
-        excerpt: stripHtml(post.excerpt?.rendered || '')
+        excerpt: stripHtml(post.excerpt?.rendered || ''),
+        acf: post.acf || {},
+        department: departmentNames
       }
     }
     return null

@@ -63,12 +63,12 @@
     display: flex;
     align-items: center;
     gap: 6px;
-    padding: 13px 15px;
+    padding: 13px 9px;
     font-weight: 600;
-    font-size: 14px;
+    font-size: 13px;
     transition: all .2s ease;
     white-space: nowrap;
-    color: var(--text);
+    color: #000;
     text-decoration: none;
     border-radius: 10px;
 }
@@ -287,6 +287,7 @@
    Responsive
    =========================================== */
 @media (max-width: 992px) {
+    /* Desktop version hidden/shown conditionally */
     #mega-menu-custom {
         flex-direction: column;
         display: none;
@@ -297,44 +298,126 @@
         display: flex;
     }
     
-    #mega-menu-custom > li.mega-menu-item {
+    /* Mobile Panel Accordion Styles */
+    #mega-menu-mobile,
+    #mobile-custom-menus {
+        flex-direction: column;
+        display: flex !important;
+        width: 100%;
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        gap: 0;
+    }
+    
+    #mega-menu-custom > li.mega-menu-item,
+    #mega-menu-mobile > li.mega-menu-item,
+    #mobile-custom-menus > li.mega-menu-item {
         width: 100%;
     }
     
-    #mega-menu-custom > li.mega-menu-item > a.mega-menu-link {
-        padding: 12px 15px;
-        border-bottom: 1px solid rgba(51, 51, 51, .08);
+    #mega-menu-mobile > li.mega-menu-item,
+    #mobile-custom-menus > li.mega-menu-item {
+        width: 100%;
+        margin-bottom: 10px;
     }
     
-    #mega-menu-custom > li.mega-menu-item > ul.mega-sub-menu,
-    .mega-menu-flyout > ul.mega-sub-menu {
-        position: static;
-        min-width: auto;
-        box-shadow: none;
-        border: none;
-        padding: 10px 20px;
-        display: block;
-        background: rgba(248, 249, 250, 0.5);
-        border-radius: 8px;
-        margin: 5px 0;
+    #mega-menu-mobile > li.mega-menu-item > a.mega-menu-link,
+    #mobile-custom-menus > li.mega-menu-item > a.mega-menu-link {
+        padding: 14px 18px;
+        background: rgba(0, 0, 0, 0.03);
+        border-radius: 12px;
+        font-size: 15px;
+        font-weight: 700;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border: 1px solid rgba(0, 0, 0, 0.04);
+        transition: all 0.3s ease;
+        color: var(--secondary);
     }
     
-    .mega-sub-menu > li.mega-menu-row > ul.mega-sub-menu {
-        grid-template-columns: 1fr;
-    }
-    
-    .mega-menu-columns-3-of-12,
-    .mega-menu-columns-2-of-6 {
-        grid-column: span 1;
+    #mega-menu-mobile > li.mega-menu-item.open > a.mega-menu-link,
+    #mobile-custom-menus > li.mega-menu-item.open > a.mega-menu-link {
+        background: var(--primary);
+        color: #fff;
+        border-color: var(--primary);
+        box-shadow: 0 4px 15px rgba(172, 38, 41, 0.2);
     }
 
-    /* Hide hover-triggered submenu on mobile, only show via .open class */
-    #mega-menu-custom > li.mega-menu-item > ul.mega-sub-menu,
-    .mega-menu-flyout > ul.mega-sub-menu {
-        display: none;
+    #mega-menu-mobile > li.mega-menu-item.open > a.mega-menu-link .mega-indicator,
+    #mobile-custom-menus > li.mega-menu-item.open > a.mega-menu-link .mega-indicator {
+        filter: brightness(0) invert(1);
     }
 
+    /* Target deeply nested sub-menus and flatten them */
+    #mega-menu-mobile ul.mega-sub-menu,
+    #mobile-custom-menus ul.mega-sub-menu {
+        position: static !important;
+        width: auto !important;
+        max-height: none !important;
+        box-shadow: none !important;
+        border: none !important;
+        border-left: 2px solid rgba(172, 38, 41, 0.15) !important;
+        padding: 4px 0 4px 15px !important;
+        background: transparent !important;
+        backdrop-filter: none !important;
+        margin: 8px 0 8px 12px !important;
+        display: none; /* Hidden by default */
+    }
+
+    /* Only show when parent has .open class */
     .mega-menu-item-has-children.open > ul.mega-sub-menu {
         display: block !important;
+    }
+
+    /* Kill the grid completely inside mobile */
+    #mega-menu-mobile .mega-menu-row > ul.mega-sub-menu,
+    #mobile-custom-menus .mega-menu-row > ul.mega-sub-menu {
+        display: flex !important;
+        flex-direction: column;
+        gap: 0;
+    }
+
+    #mega-menu-mobile .mega-menu-column,
+    #mobile-custom-menus .mega-menu-column {
+        width: 100% !important;
+        padding: 0 !important;
+    }
+
+    #mega-menu-mobile .mega-menu-item a,
+    #mobile-custom-menus .mega-menu-item a {
+        font-size: 14px;
+        font-weight: 600;
+        padding: 10px 12px;
+        border-radius: 8px;
+        display: block;
+        color: var(--text);
+        text-decoration: none;
+        margin-bottom: 4px;
+    }
+    
+    #mega-menu-mobile .mega-menu-item a:hover,
+    #mobile-custom-menus .mega-menu-item a:hover {
+        background: rgba(172, 38, 41, .05);
+        color: var(--primary);
+        padding-left: 16px;
+        transition: all 0.2s ease;
+    }
+
+    #mobile-custom-menus {
+        margin-top: 10px;
+        border-top: 1px solid rgba(0,0,0,0.05);
+        padding-top: 10px;
+    }
+
+    /* Hide block titles if they are cluttering */
+    #mega-menu-mobile .mega-block-title {
+        font-size: 12px;
+        margin-top: 15px;
+        margin-bottom: 5px;
+        opacity: 0.5;
+        text-transform: uppercase;
+        font-weight: 700;
     }
 }

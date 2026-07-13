@@ -3,6 +3,8 @@ import { Link, useSearchParams, useLocation } from 'react-router-dom'
 import { getLanguageContext, extractTranslationSlugs } from '../services/wordpressApi'
 import { WP_CONFIG } from '../config/wpConfig'
 import { usePageInfo } from '../services/PageInfoContext'
+import GutenbergContent from '../components/GutenbergContent'
+
 
 function ContactUs() {
   const [searchParams] = useSearchParams()
@@ -122,7 +124,7 @@ function ContactUs() {
         <div className="container">
           {page.content && (
             <div className="contact-wysiwyg">
-              <div className="wordpress-content" dangerouslySetInnerHTML={{ __html: page.content }} />
+              <GutenbergContent html={page.content} className="wordpress-content" />
             </div>
           )}
 

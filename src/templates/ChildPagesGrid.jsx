@@ -2,7 +2,9 @@ import { useState, useEffect } from 'react'
 import { Link, useSearchParams, useLocation } from 'react-router-dom'
 import { getLanguageContext } from '../services/wordpressApi'
 import { WP_CONFIG } from '../config/wpConfig'
+import GutenbergContent from '../components/GutenbergContent'
 import '../styles/pages.css'
+
 
 function ChildPagesGrid() {
   const [searchParams] = useSearchParams()
@@ -76,7 +78,7 @@ function ChildPagesGrid() {
           </nav>
           <h1 className="inner-hero-title" dangerouslySetInnerHTML={{ __html: page.title?.rendered || page.title }} />
           {page.content?.rendered && (
-            <div className="page-subtitle" dangerouslySetInnerHTML={{ __html: page.content.rendered }} />
+            <GutenbergContent html={page.content.rendered} className="page-subtitle" />
           )}
         </div>
       </section>

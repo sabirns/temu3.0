@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react'
 import { useParams, Link, useLocation, useSearchParams } from 'react-router-dom'
 import { fetchFacultyBySlug, getLanguageContext } from '../services/wordpressApi'
+import GutenbergContent from '../components/GutenbergContent'
+
 
 function FacultySingle() {
   const { slug } = useParams()
@@ -67,21 +69,32 @@ function FacultySingle() {
             <span>{faculty.title}</span>
           </nav>
           <h1 className="inner-hero-title">{faculty.title}</h1>
-          {faculty.excerpt && (
-            <p className="inner-hero-desc" style={{ fontSize: '14px', opacity: 0.7 }}>
-              {faculty.excerpt}
+          {faculty.acf?.designation && (
+            <p className="inner-hero-desc" style={{ fontSize: '18px', opacity: 0.8, marginTop: '10px', marginBottom: '5px' }}>
+              {faculty.acf.designation}
+            </p>
+          )}
+          {faculty.department && (
+            <p className="inner-hero-desc" style={{ fontSize: '15px', opacity: 0.6, marginTop: 0 }}>
+              {faculty.department}
             </p>
           )}
         </div>
       </section>
 
       <div className="container" style={{ paddingTop: '40px', paddingBottom: '60px' }}>
-        {faculty.featuredImage && (
-          <div style={{ width: '100%', maxHeight: '400px', overflow: 'hidden', borderRadius: 'var(--radius)', marginBottom: '30px' }}>
-            <img src={faculty.featuredImage} alt={faculty.title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+        <div className="faculty-profile-layout">
+          <aside className="faculty-profile-sidebar">
+            {faculty.featuredImage && (
+              <div className="faculty-profile-card">
+                <img src={faculty.featuredImage} alt={faculty.title} />
+              </div>
+            )}
+          </aside>
+          <div className="faculty-profile-content">
+            <GutenbergContent html={faculty.content} className="page-content-body" />
           </div>
-        )}
-        <div className="page-content-body" dangerouslySetInnerHTML={{ __html: faculty.content }} />
+        </div>
       </div>
     </main>
   )

@@ -2,7 +2,9 @@ import { useState, useEffect } from 'react'
 import { useParams, Link, useLocation, useSearchParams, Navigate } from 'react-router-dom'
 import { fetchIqacPosts, getLanguageContext, extractTranslationSlugs } from '../services/wordpressApi'
 import { usePageInfo } from '../services/PageInfoContext'
+import GutenbergContent from '../components/GutenbergContent'
 import '../styles/pages.css'
+
 
 function IqacSingle() {
   const { categorySlug, slug } = useParams()
@@ -230,9 +232,9 @@ function IqacSingle() {
                 </div>
               </div>
             )}
-            <div
+            <GutenbergContent
+              html={currentPost.content}
               className="iqac-content wordpress-content"
-              dangerouslySetInnerHTML={{ __html: currentPost.content }}
             />
           </div>
         </div>

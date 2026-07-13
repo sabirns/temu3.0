@@ -9,6 +9,8 @@ import '../styles/pages.css'
 
 import { fetchPostBySlug, extractTranslationSlugs } from '../services/wordpressApi'
 import { usePageInfo } from '../services/PageInfoContext'
+import GutenbergContent from '../components/GutenbergContent'
+
 
 function NewsSingle() {
   const { slug } = useParams()
@@ -97,9 +99,9 @@ function NewsSingle() {
       <div className="container" style={{ padding: '60px 0 100px' }}>
         <div className="news-single-layout no-image">
           <div className="news-single-main-full">
-            <div 
+            <GutenbergContent 
+              html={post.content} 
               className="news-content wordpress-content" 
-              dangerouslySetInnerHTML={{ __html: post.content }} 
             />
           </div>
 

@@ -1,7 +1,9 @@
 import { useState, useEffect } from 'react'
 import { useParams, Link, useLocation, useSearchParams } from 'react-router-dom'
 import { fetchCourseBySlug, getLanguageContext } from '../services/wordpressApi'
+import GutenbergContent from '../components/GutenbergContent'
 import '../styles/pages.css'
+
 
 function CourseSingle() {
   const { slug } = useParams()
@@ -77,9 +79,9 @@ function CourseSingle() {
                 <img src={course.featuredImage} alt={course.title} style={{ width: '100%', display: 'block' }} />
               </div>
             )}
-            <div
+            <GutenbergContent
+              html={course.content}
               className="page-content wordpress-content"
-              dangerouslySetInnerHTML={{ __html: course.content }}
               style={{ fontSize: '18px', lineHeight: '1.8', color: 'var(--text)' }}
             />
           </div>

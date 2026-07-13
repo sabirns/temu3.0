@@ -2,9 +2,9 @@ import { useState, useEffect } from 'react'
 import { useParams, Link, useLocation, useSearchParams } from 'react-router-dom'
 import { fetchNotification, fetchNotifications, getLanguageContext, extractTranslationSlugs } from '../services/wordpressApi'
 import { usePageInfo } from '../services/PageInfoContext'
-
-
+import GutenbergContent from '../components/GutenbergContent'
 import '../styles/pages.css'
+
 
 function NotificationSingle() {
   const { slug } = useParams()
@@ -106,9 +106,9 @@ function NotificationSingle() {
                 <img src={notification.featuredImage} alt={notification.title} />
               </div>
             )}
-            <div
+            <GutenbergContent
+              html={notification.content}
               className="notification-content wordpress-content"
-              dangerouslySetInnerHTML={{ __html: notification.content }}
             />
           </div>
 

@@ -1,5 +1,6 @@
-import { BrowserRouter as Router, Routes, Route, Navigate, useParams, useLocation } from 'react-router-dom'
+import { BrowserRouter as Router, Routes, Route, Navigate, useParams, useLocation, useNavigate } from 'react-router-dom'
 import { useEffect } from 'react'
+import { WP_CONFIG } from './config/wpConfig'
 import Header from './components/Header'
 import Footer from './components/Footer'
 import Home from './pages/Home'
@@ -50,9 +51,41 @@ function LangFont() {
   return null
 }
 
+function LinkInterceptor() {
+  const navigate = useNavigate()
+  
+  useEffect(() => {
+    const handleGlobalClick = (e) => {
+      const anchor = e.target.closest('a')
+      if (!anchor) return
+      
+      const href = anchor.getAttribute('href')
+      if (!href) return
+
+      if (anchor.target === '_blank' || anchor.hasAttribute('download')) return
+      
+      if (e.ctrlKey || e.metaKey || e.shiftKey || e.altKey) return
+
+      const siteUrl = WP_CONFIG.SITE_URL
+      
+      if (href.startsWith(siteUrl)) {
+        e.preventDefault()
+        const relativePath = href.replace(siteUrl, '') || '/'
+        navigate(relativePath)
+      }
+    }
+
+    document.addEventListener('click', handleGlobalClick)
+    return () => document.removeEventListener('click', handleGlobalClick)
+  }, [navigate])
+
+  return null
+}
+
 function App() {
   return (
     <Router>
+      <LinkInterceptor />
       <ScrollToTop />
       <LangFont />
       <DocumentTitle />

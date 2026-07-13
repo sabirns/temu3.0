@@ -2,7 +2,9 @@ import { useState, useEffect } from 'react'
 import { useParams, Link, useLocation, useSearchParams, useNavigate } from 'react-router-dom'
 import { fetchNssPosts, fetchNssPostBySlug, getLanguageContext, extractTranslationSlugs } from '../services/wordpressApi'
 import { usePageInfo } from '../services/PageInfoContext'
+import GutenbergContent from '../components/GutenbergContent'
 import '../styles/pages.css'
+
 
 function NssSingle() {
   const { slug } = useParams()
@@ -206,9 +208,9 @@ function NssSingle() {
                 </div>
               </div>
             )}
-            <div
+            <GutenbergContent
+              html={currentPost.content}
               className="nss-content wordpress-content"
-              dangerouslySetInnerHTML={{ __html: currentPost.content }}
             />
           </div>
         </div>

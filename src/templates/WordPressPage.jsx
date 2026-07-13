@@ -3,6 +3,8 @@ import { useParams, Link, useSearchParams, useLocation } from 'react-router-dom'
 import { fetchPage, fetchPageBySlug, getPageContent, getLanguageContext, extractTranslationSlugs } from '../services/wordpressApi'
 import { WP_CONFIG } from '../config/wpConfig'
 import { usePageInfo } from '../services/PageInfoContext'
+import GutenbergContent from '../components/GutenbergContent'
+
 
 function WordPressPage() {
   const { pageId, slug, '*': splat } = useParams()
@@ -22,6 +24,7 @@ function WordPressPage() {
   const [error, setError] = useState(null)
   const [courses, setCourses] = useState([])
   const [coursesLoading, setCoursesLoading] = useState(false)
+  const [subLinks, setSubLinks] = useState([])
 
   useEffect(() => {
     async function loadPage() {
@@ -176,6 +179,57 @@ function WordPressPage() {
   }, [pageId, slug, splat, lang])
 
   useEffect(() => {
+    if (!page || loading) return
+    const tmp = document.createElement('div')
+    tmp.innerHTML = page.content || ''
+    const textContent = (tmp.textContent || tmp.innerText || '').trim()
+    
+    // Check if content is effectively empty
+    if (textContent === '') {
+      let attempts = 0
+      const currentPath = decodeURIComponent(window.location.pathname).replace(/\/$/, '') || '/'
+      
+      const checkMenu = () => {
+        const links = Array.from(document.querySelectorAll('#mega-menu-custom a'))
+        if (links.length === 0) {
+          if (attempts < 20) {
+            attempts++
+            setTimeout(checkMenu, 100)
+          }
+          return
+        }
+        
+        const currentLink = links.find(a => {
+          const href = a.getAttribute('href')
+          if (!href || href === '#') return false
+          try {
+            const url = new URL(href, window.location.origin)
+            return (decodeURIComponent(url.pathname).replace(/\/$/, '') || '/') === currentPath
+          } catch { return false }
+        })
+        
+        if (currentLink) {
+          const parentLi = currentLink.closest('li')
+          if (parentLi) {
+            const subMenu = parentLi.querySelector('ul.sub-menu, ul.mega-sub-menu')
+            if (subMenu) {
+              const extractedLinks = Array.from(subMenu.querySelectorAll(':scope > li > a')).map(a => ({
+                title: a.textContent.trim(),
+                url: a.getAttribute('href')
+              }))
+              setSubLinks(extractedLinks)
+            }
+          }
+        }
+      }
+      
+      checkMenu()
+    } else {
+      setSubLinks([])
+    }
+  }, [page, loading, location.pathname])
+
+  useEffect(() => {
     const revealElements = document.querySelectorAll('.page-reveal')
     const revealOnScroll = () => {
       revealElements.forEach(el => {
@@ -257,9 +311,9 @@ function WordPressPage() {
                 </div>
               )}
               
-              <div 
+              <GutenbergContent 
+                html={page.content}
                 className="page-content wordpress-content"
-                dangerouslySetInnerHTML={{ __html: page.content }} 
                 style={{ 
                   fontSize: '18px', 
                   lineHeight: '1.8', 
@@ -279,6 +333,33 @@ function WordPressPage() {
                   </div>
                 )
               })()}
+
+              {/* Sub-menu Cards for empty pages */}
+              {subLinks.length > 0 && (
+                <div className="submenu-cards-section" style={{ marginTop: '40px' }}>
+                  <div className="portals-grid" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))' }}>
+                    {subLinks.map((link, idx) => {
+                      const isInternal = link.url.startsWith('/') || link.url.startsWith(window.location.origin)
+                      const path = isInternal && link.url.startsWith('http') ? new URL(link.url).pathname : link.url
+                      
+                      return (
+                        <div key={idx} className="portal-card" style={{ padding: '24px', textAlign: 'center' }}>
+                          <h3 style={{ fontSize: '20px', color: 'var(--primary)', marginBottom: '16px' }}>{link.title}</h3>
+                          {isInternal ? (
+                            <Link to={path} className="btn primary" style={{ width: '100%', justifyContent: 'center' }}>
+                              {lang === 'ml' ? 'കൂടുതൽ അറിയുക' : 'Explore'}
+                            </Link>
+                          ) : (
+                            <a href={link.url} target="_blank" rel="noopener noreferrer" className="btn primary" style={{ width: '100%', justifyContent: 'center' }}>
+                              {lang === 'ml' ? 'കൂടുതൽ അറിയുക' : 'Explore'}
+                            </a>
+                          )}
+                        </div>
+                      )
+                    })}
+                  </div>
+                </div>
+              )}
 
               {/* Courses section */}
               {courses.length > 0 && (

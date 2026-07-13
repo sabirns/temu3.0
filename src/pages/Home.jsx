@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { Link, useLocation, useSearchParams } from 'react-router-dom'
-import About from '../components/About'
+import About, { ParallaxLetters } from '../components/About'
 import { fetchGallery, getLanguageContext, fetchPosts, fetchPage, fetchPageBySlug, fetchMenuByLocation } from '../services/wordpressApi'
 import { WP_CONFIG } from '../config/wpConfig'
 
@@ -17,6 +17,7 @@ import { WP_CONFIG } from '../config/wpConfig'
 	const [loadingSlides, setLoadingSlides] = useState(true)
 	const [newsIndex, setNewsIndex] = useState(0)
 	const [isPaused, setIsPaused] = useState(false)
+	const [isHeroPaused, setIsHeroPaused] = useState(false)
 	const [galleryItems, setGalleryItems] = useState([])
 	const [newsItems, setNewsItems] = useState([])
 	const [loadingNews, setLoadingNews] = useState(true)
@@ -137,12 +138,12 @@ import { WP_CONFIG } from '../config/wpConfig'
 	}, [lang])
 
 	useEffect(() => {
-		if (slides.length === 0) return
+		if (slides.length === 0 || isHeroPaused) return
 		const timer = setInterval(() => {
 			setCurrentSlide(prev => (prev + 1) % slides.length)
 		}, 5000)
 		return () => clearInterval(timer)
-	}, [slides.length])
+	}, [slides.length, isHeroPaused])
 
 	useEffect(() => {
 		if (!isPaused && newsItems.length > cardsToShow) {
@@ -182,61 +183,61 @@ import { WP_CONFIG } from '../config/wpConfig'
 
 	return (
 		<main id="home">
-			{/* Hero Slider */}
-			{slides.length > 0 && (
-			<div className="hero-slider">
-				<div className="slider-container">
-					{slides.map((slide, index) => (
-						<div key={slide.id} className={`slide ${index === currentSlide ? 'active' : ''}`}>
-							<div className="slide-bg" style={{ backgroundImage: `url('${slide.image}')` }}></div>
-							<div className="container">
-								<div className="slide-content-wrapper">
-									<div className="slide-content">
-										<h2 className="slide-title">{slide.title}</h2>
-										{slide.sub && <p className="slide-sub">{slide.sub}</p>}
-										{slide.buttons.length > 0 && (
-										<div className="slide-cta">
-											{slide.buttons.map((btn, i) => (
-												<a key={i} href={btn.button_link?.url || '#'} className={`btn ${i === 0 ? 'primary' : ''}`} target={btn.button_link?.target || '_self'} rel={btn.button_link?.target === '_blank' ? 'noopener' : ''}>
-													{btn.button_text}
-												</a>
-											))}
-										</div>
-										)}
-									</div>
-									<div className="slide-image-preview">
-										<div className="preview-frame">
-											<div className="preview-image" style={{ backgroundImage: `url('${slide.image}')` }}></div>
-										</div>
-									</div>
-								</div>
-							</div>
-						</div>
-					))}
-				</div>
+			<section className="hero-and-about-wrapper" style={{ position: 'relative', overflow: 'hidden' }}>
+				<ParallaxLetters />
+				{/* Hero Slider */}
+				{slides.length > 0 && (
+				<div className="container slider_wrapper" style={{ position: 'relative', zIndex: 2 }}>
+					<div className="hero-slider" onMouseEnter={() => setIsHeroPaused(true)} onMouseLeave={() => setIsHeroPaused(false)}>
+                    <div className="slider-container">
+                        {slides.map((slide, index) => (
+                            <div key={slide.id} className={`slide ${index === currentSlide ? 'active' : ''}`}>
+                                <div className="slide-bg" style={{ backgroundImage: `url('${slide.image}')` }}></div>
+                                <div className="container">
+                                    <div className="slide-content-wrapper">
+                                        <div className="slide-content">
+                                            <h2 className="slide-title">{slide.title}</h2>
+                                            {slide.sub && <p className="slide-sub">{slide.sub}</p>}
+                                            {slide.buttons.length > 0 && (
+                                            <div className="slide-cta">
+                                                {slide.buttons.map((btn, i) => (
+                                                    <a key={i} href={btn.button_link?.url || '#'} className={`btn ${i === 0 ? 'primary' : ''}`} target={btn.button_link?.target || '_self'} rel={btn.button_link?.target === '_blank' ? 'noopener' : ''}>
+                                                        {btn.button_text}
+                                                    </a>
+                                                ))}
+                                            </div>
+                                            )}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
 
-				<div className="slider-dots">
-					{slides.map((_, index) => (
-						<button
-							key={index}
-							className={`dot ${index === currentSlide ? 'active' : ''}`}
-							onClick={() => setCurrentSlide(index)}
-							aria-label={`Go to slide ${index + 1}`}
-						></button>
-					))}
-				</div>
+                    <div className="slider-dots">
+                        {slides.map((_, index) => (
+                            <button
+                                key={index}
+                                className={`dot ${index === currentSlide ? 'active' : ''}`}
+                                onClick={() => setCurrentSlide(index)}
+                                aria-label={`Go to slide ${index + 1}`}
+                            ></button>
+                        ))}
+                    </div>
 
-				<button className="slider-arrow prev" onClick={() => setCurrentSlide((currentSlide - 1 + slides.length) % slides.length)} aria-label="Previous slide"></button>
-				<button className="slider-arrow next" onClick={() => setCurrentSlide((currentSlide + 1) % slides.length)} aria-label="Next slide"></button>
+                    <button className="slider-arrow prev" onClick={() => setCurrentSlide((currentSlide - 1 + slides.length) % slides.length)} aria-label="Previous slide"></button>
+                    <button className="slider-arrow next" onClick={() => setCurrentSlide((currentSlide + 1) % slides.length)} aria-label="Next slide"></button>
 
-				<div className="slide-counter">
-					<span className="current">{String(currentSlide + 1).padStart(2, '0')}</span> / <span className="total">{String(slides.length).padStart(2, '0')}</span>
-				</div>
-			</div>
+                    <div className="slide-counter">
+                        <span className="current">{String(currentSlide + 1).padStart(2, '0')}</span> / <span className="total">{String(slides.length).padStart(2, '0')}</span>
+                    </div>
+                </div>
+            </div>
 			)}
 
 			{/* About Section */}
 			<About homePageData={homePageData} />
+			</section>
 
 			{/* News Section */}
 			<section className="news-slider-section" id="news" style={{ minHeight: '400px' }}>
@@ -248,7 +249,7 @@ import { WP_CONFIG } from '../config/wpConfig'
 						</div>
 						<Link 
 							to={lang === 'ml' ? '/news' : `/${lang}/news`} 
-							className="btn"
+							className="btn primary"
 						>
 							{lang === 'ml' ? 'എല്ലാ വാർത്തകളും കാണുക →' : 'View All News →'}
 						</Link>
@@ -311,7 +312,7 @@ import { WP_CONFIG } from '../config/wpConfig'
 							<h2>{lang === 'ml' ? '📸 വിസ്മയ കാഴ്ചകൾ' : '📸 University Gallery'}</h2>
 							<p>{lang === 'ml' ? 'മലയാളസർവകലാശാലയുടെ വിവിധ പരിപാടികളുടെ ചിത്രങ്ങൾ.' : 'Photos of various programs at Malayalam University.'}</p>
 						</div>
-						<Link to={lang === 'ml' ? '/gallery' : `/${lang}/gallery`} className="btn">View All Gallery →</Link>
+						<Link to={lang === 'ml' ? '/gallery' : `/${lang}/gallery`} className="btn primary">{lang === 'ml' ? 'ഗാലറി കാണുക →' : 'View All Gallery →'}</Link>
 					</div>
 
 					<div className="gallery-slider-container">
@@ -337,12 +338,17 @@ import { WP_CONFIG } from '../config/wpConfig'
 			{/* About/Projects Section */}
 			<section id="initiatives" className="section">
 				<div className="container">
-					<div className="section-head">
+					<div className="section-head reveal reveal-up">
 						<div>
 							<h2>{lang === 'ml' ? 'പദ്ധതികളും സംരംഭങ്ങളും' : 'Projects & Initiatives'}</h2>
 							<p>{lang === 'ml' ? 'മലയാളസർവകലാശാലയുടെ വിവിധ പദ്ധതികളും സംരംഭങ്ങളും.' : 'Various projects and initiatives of Malayalam University.'}</p>
 						</div>
-						<a className="btn" href="#contact">Directory / Contact</a>
+						<Link 
+							to={lang === 'ml' ? '/initiatives' : `/${lang}/initiatives`} 
+							className="btn primary"
+						>
+							{lang === 'ml' ? 'കൂടുതൽ കാണുക →' : 'View All Initiatives →'}
+						</Link>
 					</div>
 
 					<div className="grid">
@@ -355,7 +361,13 @@ import { WP_CONFIG } from '../config/wpConfig'
 							homePageData.acf.buttons.map((btn, index) => {
 								const btnLinkField = btn.external_link || btn.link || '#'
 								const linkUrl = typeof btnLinkField === 'object' && btnLinkField?.url ? btnLinkField.url : btnLinkField
-								const linkText = typeof btnLinkField === 'object' && btnLinkField?.title ? btnLinkField.title : 'Explore →'
+								
+								const isExternal = linkUrl.startsWith('http') && !linkUrl.startsWith(WP_CONFIG.SITE_URL)
+								const internalPath = !isExternal && linkUrl.startsWith(WP_CONFIG.SITE_URL)
+									? linkUrl.replace(WP_CONFIG.SITE_URL, '') || '/'
+									: linkUrl
+
+								const linkText = typeof btnLinkField === 'object' && btnLinkField?.title ? btnLinkField.title : (lang === 'ml' ? 'കൂടുതൽ അറിയുക →' : 'Explore →')
 								const iconUrl = typeof btn.icon === 'object' && btn.icon?.url ? btn.icon.url : btn.icon
 								return (
 									<article className="card" key={index}>
@@ -367,7 +379,11 @@ import { WP_CONFIG } from '../config/wpConfig'
 										<h3>{btn.title}</h3>
 										<p dangerouslySetInnerHTML={{ __html: btn.description }}></p>
 										<div className="meta">
-											<a className="link" href={linkUrl}>{linkText}</a>
+											{isExternal ? (
+												<a className="link" href={linkUrl} target="_blank" rel="noopener noreferrer">{linkText}</a>
+											) : (
+												<Link className="link" to={internalPath}>{linkText}</Link>
+											)}
 										</div>
 									</article>
 								)
@@ -379,7 +395,7 @@ import { WP_CONFIG } from '../config/wpConfig'
 									<h3></h3>
 									<p>.</p>
 									<div className="meta">
-										<a className="link" href="#vision">Explore →</a>
+										<a className="link" href="#vision">{lang === 'ml' ? 'കൂടുതൽ അറിയുക →' : 'Explore →'}</a>
 									</div>
 								</article>
 							</>
@@ -404,7 +420,7 @@ import { WP_CONFIG } from '../config/wpConfig'
 					<div className="campus-story">
 						<div className="story-grid">
 							<div className="story-text">
-								<h3>{lang === 'ml' ? 'കാമ്പസും കാമ്പസ് ജീവിതവും' : 'Campus & Campus Life'}</h3>
+								<h3>{lang === 'ml' ? 'ക്യാമ്പസും സൗകര്യങ്ങളും' : 'Campus & Facilities'}</h3>
 								<p><b>{lang === 'ml' ? 'അറിവ് പ്രകൃതിയെയും സംസ്കാരത്തെയും ഒന്നിപ്പിക്കുന്നിടം' : 'Where Knowledge Unites Nature and Culture'}</b></p>
 								<p>
 									{lang === 'ml' ? 
@@ -420,20 +436,32 @@ import { WP_CONFIG } from '../config/wpConfig'
 
 				
 					<div className="campus-highlights">
-						<div className="campus-card">
-							<div className="card-icon">🌳</div>
-							<h3>{lang === 'ml' ? 'ഹരിത കാമ്പസ്' : 'Green Campus'}</h3>
-							<p>{lang === 'ml' ? 'മലയാളസർവകലാശാലയുടെ ഹരിത കാമ്പസ് പ്രകൃതിയുമായി പൂർണ്ണമായും ചേർന്നിരിക്കുന്നു. വിശാലമായ തോട്ടങ്ങളും പൂക്കളും ശുദ്ധമായ വായുമാലിന്യവും പഠനത്തിന് അനുയോജ്യമായ പരിസ്ഥിതി സൃഷ്ടിക്കുന്നു. കാലാവസ്ഥയുടെ മികച്ച അനുയോജ്യതയിൽ വിദ്യാർത്ഥികൾക്ക് ഉത്തമമായ പഠനവും വിശ്രമവും നൽകുന്നു.' : 'The green campus of Malayalam University is perfectly integrated with nature. Expansive gardens, flowers, and pure air create an ideal environment for learning. It provides students with an excellent setting for both studying and relaxing.'}</p>
+						<div className="campus-card has-image">
+							<div className="card-bg" style={{ backgroundImage: "url('/images/gallery1.jpg')" }}></div>
+							<div className="card-overlay"></div>
+							<div className="card-content">
+								<div className="card-icon">🌳</div>
+								<h3>{lang === 'ml' ? 'ഹരിത കാമ്പസ്' : 'Green Campus'}</h3>
+								<p>{lang === 'ml' ? 'പ്രകൃതിയുമായി പൂർണ്ണമായും ചേർന്നിരിക്കുന്ന കാമ്പസ്. വിദ്യാർത്ഥികൾക്ക് ശാന്തവും സുന്ദരവുമായ ഒരു അന്തരീക്ഷം.' : 'Perfectly integrated with nature for an ideal environment. The campus provides a serene and beautiful atmosphere for students.'}</p>
+							</div>
 						</div>
-						<div className="campus-card">
-							<div className="card-icon">🏛️</div>
-							<h3>{lang === 'ml' ? 'ആധുനിക സൗകര്യങ്ങൾ' : 'Modern Facilities'}</h3>
-							<p>{lang === 'ml' ? 'മലയാളസർവകലാശാലയിൽ ഏറ്റവും പുതിയ സാങ്കേതിക വിദ്യകളും ആധുനിക സൗകര്യങ്ങളും സമഗ്രമായ പഠനത്തിനായി ഒരുക്കിയിട്ടുണ്ട്. സ്മാർട്ട്ബോർഡുകൾ, കമ്പ്യൂട്ടർ ലാബുകൾ, wi-fi സൗകര്യങ്ങൾ, ഗ്രന്ഥാലയം, സപ്പോർട്ട് സേവനങ്ങൾ എന്നിവ വിദ്യാർത്ഥികൾക്ക് മികച്ച പഠന അനുഭവം നൽകുന്നു.' : 'Malayalam University is equipped with the latest technologies and modern facilities for comprehensive learning. Smartboards, computer labs, Wi-Fi facilities, library, and support services provide students with an outstanding educational experience.'}</p>
+						<div className="campus-card has-image">
+							<div className="card-bg" style={{ backgroundImage: "url('/images/gallery2.jpg')" }}></div>
+							<div className="card-overlay"></div>
+							<div className="card-content">
+								<div className="card-icon">🏛️</div>
+								<h3>{lang === 'ml' ? 'ആധുനിക സൗകര്യങ്ങൾ' : 'Modern Facilities'}</h3>
+								<p>{lang === 'ml' ? 'ആധുനിക സൗകര്യങ്ങളും സമഗ്രമായ പഠനവും ഉറപ്പാക്കുന്നു. ഡിജിറ്റൽ ലൈബ്രറികളും മികച്ച ക്ലാസ് മുറികളും ലഭ്യമാണ്.' : 'Equipped with modern facilities for comprehensive learning. We provide digital libraries and smart classrooms.'}</p>
+							</div>
 						</div>
-						<div className="campus-card">
-							<div className="card-icon">🎭</div>
-							<h3>{lang === 'ml' ? 'കലാ സാംസ്കാരികം' : 'Art & Culture'}</h3>
-							<p>{lang === 'ml' ? 'മലയാളസർവകലാശാല പഠനവും കലാസാംസ്കാരിക പ്രവർത്തനങ്ങളും സമന്വയിച്ചുള്ള ഒരു പ്രധാന കേന്ദ്രമാണ്. ഓരോ വർഷവും കലാപരിപാടികൾ, നാടകങ്ങൾ, സംഗീതമേളകൾ, കലാസമ്മേളനങ്ങൾ എന്നിവ വിദ്യാർത്ഥികളുടെ സൃഷ്ടിപരമായ കഴിവുകളെ മികവുറ്റവാക്കുന്നു. സാംസ്കാരിക വൈവിധ്യത്തിന് ഉത്തമ പ്രോത്സാഹനമാണ് ഇവിടെ നൽകപ്പെടുന്നത്.' : 'Malayalam University is a major center that blends learning with arts and cultural activities. Every year, cultural programs, dramas, music festivals, and art conventions enhance the creative skills of students. Excellent encouragement is given to cultural diversity here.'}</p>
+						<div className="campus-card has-image">
+							<div className="card-bg" style={{ backgroundImage: "url('/images/gallery3.jpg')" }}></div>
+							<div className="card-overlay"></div>
+							<div className="card-content">
+								<div className="card-icon">🎭</div>
+								<h3>{lang === 'ml' ? 'കലാ സാംസ്കാരികം' : 'Art & Culture'}</h3>
+								<p>{lang === 'ml' ? 'പഠനവും കലാസാംസ്കാരിക പ്രവർത്തനങ്ങളും ഒരുമിച്ചു കൊണ്ടുപോകുന്നു. പൈതൃകവും കലയും പ്രോത്സാഹിപ്പിക്കുന്നു.' : 'Blending learning with vibrant arts and cultural activities. We encourage heritage and artistic talents among students.'}</p>
+							</div>
 						</div>
 					</div>
 

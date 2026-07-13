@@ -12,20 +12,33 @@ const malayalamLetters = [
 
 
 
-function ParallaxLetters() {
+export function ParallaxLetters() {
   const [letters, setLetters] = useState([])
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 })
 
   useEffect(() => {
-    const generatedLetters = malayalamLetters.map((letter, index) => ({
-      id: index,
-      letter,
-      size: 40 + (index % 5) * 20,
-      opacity: 0.03 + (index % 3) * 0.02,
-      top: (index * 7) % 100,
-      left: (index * 13) % 100,
-      zIndex: index % 3
-    }))
+    const generatedLetters = malayalamLetters.map((letter, index) => {
+      const isLeft = index % 2 === 0
+      const sideIndex = Math.floor(index / 2) // 0 to 23
+      const col = sideIndex % 4 // 0 to 3
+      const row = Math.floor(sideIndex / 4) // 0 to 5
+
+      // Base left is 0-24% for left, 75-99% for right
+      const baseLeft = isLeft ? 0 : 75
+      const leftOffset = (col * 6) + (row % 2 === 0 ? 0 : 3)
+      
+      const topOffset = (row * 16) + (col % 2 === 0 ? 2 : 8)
+
+      return {
+        id: index,
+        letter,
+        size: 30 + (index % 3) * 15,
+        opacity: 0.08 + (index % 3) * 0.04,
+        top: topOffset,
+        left: baseLeft + leftOffset,
+        zIndex: index % 3
+      }
+    })
     setLetters(generatedLetters)
   }, [])
 
@@ -125,8 +138,6 @@ function About({ homePageData }) {
 
   return (
     <section className="about hero">
-      <ParallaxLetters />
-
       <div className="container">
         <div className="hero-wrap">
           <div className="hero-card">
@@ -136,30 +147,62 @@ function About({ homePageData }) {
 
               {acf.welcome_buttons && acf.welcome_buttons.length > 0 && (
               <div className="hero-cta">
-                {acf.welcome_buttons.map((btn, i) => (
-                  <a key={i} href={btn.welcome_button_link?.url || '#'} className={`btn ${i === 0 ? 'primary' : ''}`} target={btn.welcome_button_link?.target || '_self'} rel={btn.welcome_button_link?.target === '_blank' ? 'noopener' : ''}>
-                    {btn.welcome_button_text}
-                  </a>
-                ))}
+                {acf.welcome_buttons.map((btn, i) => {
+                  const originalText = btn.welcome_button_text || ''
+                  let text = originalText
+                  let url = btn.welcome_button_link?.url || '#'
+                  let isExternal = true
+
+                  // Override for Faculties
+                  if (originalText.includes('പദ്ധതികളും സംരംഭങ്ങളും') || originalText.includes('Projects & Initiatives') || originalText.includes('Initiatives')) {
+                    text = lang === 'ml' ? 'ഫാക്കൽറ്റികൾ' : 'Faculties'
+                    url = lang === 'ml' ? '/faculties' : `/${lang}/faculties`
+                    isExternal = false
+                  } else if (url.startsWith('http') && !url.startsWith(window.location.origin)) {
+                     // Keep external
+                  } else {
+                     // Check if it's internal WP link (if WP_CONFIG was imported, but let's just make it relative if possible)
+                     try {
+                        if (url.startsWith('http')) {
+                            const u = new URL(url)
+                            url = u.pathname
+                            isExternal = false
+                        }
+                     } catch(e) {}
+                  }
+
+                  if (!isExternal || url.startsWith('/')) {
+                    return (
+                      <Link key={i} to={url} className={`btn ${i === 0 ? 'primary' : ''}`}>
+                        {text}
+                      </Link>
+                    )
+                  }
+                  return (
+                    <a key={i} href={url} className={`btn ${i === 0 ? 'primary' : ''}`} target={btn.welcome_button_link?.target || '_self'} rel={btn.welcome_button_link?.target === '_blank' ? 'noopener' : ''}>
+                      {text}
+                    </a>
+                  )
+                })}
               </div>
               )}
 
               <div className="hero-stats" aria-label="Highlights">
                 <div className="stat">
-                    <a href="#">
-                        <strong>{lang === 'ml' ? 'വിദ്യാർത്ഥികൾക്കുള്ള സേവനങ്ങൾ' : 'Student Services'}</strong>
-                    <span>{lang === 'ml' ? 'സ്കോളർഷിപ്പുകൾ/എൻഎസ്എസ്/ഇൻഷുറൻസ് മുതലായവ' : 'Scholarships/NSS/Insurance etc.'}</span>
-                    </a>
+                    <Link to={lang === 'ml' ? '/ml/പ്രവേശനം' : '/en/admission'}>
+                        <strong>{lang === 'ml' ? 'പ്രവേശനം' : 'Admission'}</strong>
+                    <span>{lang === 'ml' ? 'സർവകലാശാലയിൽ ചേരുക' : 'Join our university'}</span>
+                    </Link>
                 </div>
                 <div className="stat">
-                    <a href="#">
-                        <strong>{lang === 'ml' ? 'ഭരണം' : 'Administration'}</strong>
-                    <span>{lang === 'ml' ? 'ചാൻസലർ/പ്രോ-ചാൻസലർ/വൈസ് ചാന്‍സലര്‍' : 'Chancellor/Pro-Chancellor/Vice Chancellor'}</span>
-                    </a>
+                    <Link to={lang === 'ml' ? '/ml/പരീക്ഷ' : '/en/exam'}>
+                        <strong>{lang === 'ml' ? 'പരീക്ഷ' : 'Exam'}</strong>
+                    <span>{lang === 'ml' ? 'പരീക്ഷാ വിവരങ്ങൾ' : 'Examination details'}</span>
+                    </Link>
                 </div>
                 <div className="stat">
-                    <a href="http://malayalamuniversity.edu.in/360-virtual-tour/" target="_blank"><strong>{lang === 'ml' ? 'വിർച്വൽ ടൂർ' : 'Virtual Tour'}</strong>
-                    <span>{lang === 'ml' ? 'സർവകലാശാല ചുറ്റിക്കാണാം' : 'Explore the university'}</span></a>
+                    <Link to={lang === 'ml' ? '/ml/പരീക്ഷാഫലം' : '/en/exam-result'}><strong>{lang === 'ml' ? 'പരീക്ഷാ ഫലം' : 'Exam Result'}</strong>
+                    <span>{lang === 'ml' ? 'നിങ്ങളുടെ ഫലങ്ങൾ പരിശോധിക്കുക' : 'Check your results'}</span></Link>
                 </div>
             </div>
 
@@ -170,8 +213,7 @@ function About({ homePageData }) {
           {/* Notifications Panel */}
           <div className="notifications-panel">
             <div className="notifications-header">
-              <h3>📢 {lang === 'ml' ? 'അറിയിപ്പുകൾ' : 'Notifications'}</h3>
-              <span className="live-badge">LIVE</span>
+              <h3> {lang === 'ml' ? 'അറിയിപ്പുകൾ' : 'Notifications'}</h3>
             </div>
 
             <div className="notifications-tabs">

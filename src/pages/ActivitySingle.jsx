@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react'
 import { useParams, Link, useLocation, useSearchParams } from 'react-router-dom'
 import { fetchActivityBySlug, getLanguageContext } from '../services/wordpressApi'
+import GutenbergContent from '../components/GutenbergContent'
+
 
 function ActivitySingle() {
   const { slug } = useParams()
@@ -81,7 +83,7 @@ function ActivitySingle() {
             <img src={activity.featuredImage} alt={activity.title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
           </div>
         )}
-        <div className="page-content-body" dangerouslySetInnerHTML={{ __html: activity.content }} />
+        <GutenbergContent html={activity.content} className="page-content-body" />
       </div>
     </main>
   )

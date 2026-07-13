@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useLocation, useSearchParams, Link } from 'react-router-dom'
 import { getLanguageContext, fetchPageBySlug } from '../services/wordpressApi'
+import { WP_CONFIG } from '../config/wpConfig'
 
 function InitiativesPage() {
   const location = useLocation()
@@ -46,7 +47,13 @@ function InitiativesPage() {
             {buttons.map((btn, index) => {
               const btnLinkField = btn.external_link || btn.link || '#'
               const linkUrl = typeof btnLinkField === 'object' && btnLinkField?.url ? btnLinkField.url : btnLinkField
-              const linkText = typeof btnLinkField === 'object' && btnLinkField?.title ? btnLinkField.title : 'Explore →'
+              
+              const isExternal = linkUrl.startsWith('http') && !linkUrl.startsWith(WP_CONFIG.SITE_URL)
+              const internalPath = !isExternal && linkUrl.startsWith(WP_CONFIG.SITE_URL)
+                ? linkUrl.replace(WP_CONFIG.SITE_URL, '') || '/'
+                : linkUrl
+
+              const linkText = typeof btnLinkField === 'object' && btnLinkField?.title ? btnLinkField.title : (lang === 'ml' ? 'കൂടുതൽ അറിയുക →' : 'Explore →')
               const iconUrl = typeof btn.icon === 'object' && btn.icon?.url ? btn.icon.url : btn.icon
               return (
                 <article key={index} className="initiative-card" style={{ background: 'var(--card)', borderRadius: 'var(--radius)', border: '1px solid var(--stroke)', padding: '28px', boxShadow: 'var(--shadow2)' }}>
@@ -58,7 +65,11 @@ function InitiativesPage() {
                   <h3 style={{ margin: '0 0 10px', fontSize: '18px' }}>{btn.title}</h3>
                   <p style={{ margin: '0 0 16px', fontSize: '14px', color: 'var(--muted)', lineHeight: 1.6 }} dangerouslySetInnerHTML={{ __html: btn.description }} />
                   <div className="meta">
-                    <a className="link" href={linkUrl} style={{ color: 'var(--primary)', fontWeight: 600, fontSize: '14px', textDecoration: 'none' }}>{linkText}</a>
+                    {isExternal ? (
+                      <a className="link" href={linkUrl} target="_blank" rel="noopener noreferrer" style={{ color: 'var(--primary)', fontWeight: 600, fontSize: '14px', textDecoration: 'none' }}>{linkText}</a>
+                    ) : (
+                      <Link className="link" to={internalPath} style={{ color: 'var(--primary)', fontWeight: 600, fontSize: '14px', textDecoration: 'none' }}>{linkText}</Link>
+                    )}
                   </div>
                 </article>
               )
