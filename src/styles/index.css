@@ -1733,7 +1733,7 @@ img {
     content: "";
     position: absolute;
     inset: 0;
-    background: rgba(58, 117, 73, 0.5); /* Deep green overlay */
+    background: linear-gradient(115deg, rgba(27, 91, 54, .84), rgba(58, 117, 73, .68));
     z-index: 1;
 }
 
@@ -1743,7 +1743,7 @@ img {
 }
 
 .principles-banner h2, .principles-banner p, .principles-banner h3 {
-    color: #000 !important;
+    color: #fff !important;
 }
 
 .principles-grid {
@@ -1897,7 +1897,8 @@ img {
     margin: 0 auto;
     padding: 40px;
     border-radius: 24px;
-    background: linear-gradient(135deg, rgba(255, 255, 255, .30), rgba(255, 255, 255, .30));
+    background: linear-gradient(135deg, rgba(255, 255, 255, .20), rgba(255, 255, 255, .10));
+    border: 1px solid rgba(255, 255, 255, .32);
     box-shadow: var(--shadow);
     backdrop-filter: blur(5px);
 }
@@ -2177,7 +2178,7 @@ img {
 ========================= */
 .news-slider-section {
     padding: 40px 0;
-    background: #f5f7f9; /* Light grey */
+    background: linear-gradient(135deg, #edf7f0 0%, #f7fbf4 52%, #fff7e8 100%);
     position: relative;
     overflow: hidden;
 }
@@ -2473,7 +2474,7 @@ img {
 ========================= */
 .gallery-slider-section {
     padding: 40px 0;
-    background: linear-gradient(135deg, #fff0f0 0%, #fdf5e6 50%, #f0fdf4 100%);
+    background: linear-gradient(135deg, #ffe9e7 0%, #fff2d4 48%, #e1f5e8 100%);
     position: relative;
     overflow: hidden;
 }
@@ -2541,6 +2542,7 @@ img {
     position: relative;
     transition: .4s cubic-bezier(.4, 0, .2, 1);
     cursor: pointer;
+    box-shadow: 0 10px 24px rgba(91, 47, 28, .12);
 }
 
 .gallery-card:hover {
@@ -2561,7 +2563,7 @@ img {
 .gallery-overlay {
     position: absolute;
     inset: 0;
-    background: linear-gradient(to top, rgba(172, 38, 41, 0.95), transparent 80%);
+    background: linear-gradient(to top, rgba(143, 29, 33, .96), rgba(172, 38, 41, .42) 50%, transparent 82%);
     display: flex;
     flex-direction: column;
     justify-content: flex-end;
@@ -2755,7 +2757,7 @@ img {
 .campus-section {
     padding: 40px 0;
     position: relative;
-    background: linear-gradient(135deg, rgba(238, 250, 243, 0.6), rgba(255, 241, 236, 0.6), rgba(238, 247, 252, 0.6));
+    background: linear-gradient(135deg, #e4f5e9 0%, #fff0e8 52%, #e6f1fb 100%);
 }
 
 .campus-highlights {
@@ -2946,14 +2948,14 @@ img {
     align-items: center;
     justify-content: center;
     padding: 12px 24px;
-    background: rgba(255, 255, 255, 0.7);
+    background: rgba(255, 255, 255, .88);
     backdrop-filter: blur(8px);
     color: var(--text);
     font-size: 14px;
     font-weight: 600;
-    border: 1px solid rgba(172, 38, 41, 0.1);
+    border: 1px solid rgba(172, 38, 41, .18);
     border-radius: 50px;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.03);
+    box-shadow: 0 5px 16px rgba(72, 57, 40, .08);
     transition: all 0.3s ease;
     text-decoration: none;
     white-space: nowrap;
@@ -2973,8 +2975,8 @@ img {
     border-radius: 40px;
     padding: 30px;
     margin: 20px 0;
-    box-shadow: 0 15px 40px rgba(0,0,0,0.04);
-    background: rgba(255, 255, 255, 0.8);
+    box-shadow: 0 18px 42px rgba(72, 57, 40, .10);
+    background: rgba(255, 255, 255, .90);
 }
 
 .story-grid {
@@ -4640,13 +4642,13 @@ footer {
 
 /* Text-Only Home News Cards */
 .news-text-card-home {
-    background: #fff;
+    background: linear-gradient(145deg, #ffffff, #f7fcf8);
     border-radius: 20px;
     padding: 30px;
     text-decoration: none;
     transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
-    border: 1px solid rgba(0, 0, 0, 0.04);
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.02);
+    border: 1px solid rgba(58, 117, 73, .14);
+    box-shadow: 0 8px 22px rgba(32, 87, 53, .08);
     position: relative;
     overflow: hidden;
     display: flex;
@@ -4657,8 +4659,8 @@ footer {
 
 .news-text-card-home:hover {
     transform: translateY(-5px);
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.06);
-    border-color: rgba(172, 38, 41, 0.1);
+    box-shadow: 0 14px 32px rgba(32, 87, 53, .15);
+    border-color: rgba(172, 38, 41, .28);
 }
 
 .news-meta-home {
@@ -4675,9 +4677,9 @@ footer {
     letter-spacing: 1px;
     padding: 3px 10px;
     border-radius: 30px;
-    background: rgba(172, 38, 41, 0.05);
+    background: rgba(172, 38, 41, .10);
     color: var(--primary);
-    border: 1px solid rgba(172, 38, 41, 0.1);
+    border: 1px solid rgba(172, 38, 41, .22);
 }
 
 .news-date-home {
@@ -4722,7 +4724,7 @@ footer {
 /* Portals Section */
 .portals-section {
     padding: 70px 0;
-    background: linear-gradient(135deg, #f8f9ff 0%, #f0f2f5 100%);
+    background: linear-gradient(135deg, #f2edff 0%, #eef6ff 48%, #edf9f1 100%);
     position: relative;
 }
 
@@ -4784,9 +4786,9 @@ footer {
     padding: 10px;
     border-radius: 14px;
     text-decoration: none;
-    border: 1px solid rgba(0, 0, 0, 0.06);
+    border: 1px solid rgba(70, 71, 117, .13);
     transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04), 0 8px 24px rgba(0, 0, 0, 0.02);
+    box-shadow: 0 4px 12px rgba(45, 58, 102, .07), 0 10px 26px rgba(45, 58, 102, .05);
     position: relative;
     overflow: hidden;
 }
@@ -4798,14 +4800,14 @@ footer {
     border-radius: 18px;
     opacity: 0;
     transition: opacity 0.35s ease;
-    background: linear-gradient(135deg, rgba(37, 99, 235, 0.03), rgba(99, 102, 241, 0.05));
+    background: linear-gradient(135deg, rgba(172, 38, 41, .08), rgba(58, 117, 73, .10));
     pointer-events: none;
 }
 
 .portal-card:hover {
     transform: translateY(-4px);
     box-shadow: 0 12px 40px rgba(0, 0, 0, 0.08), 0 4px 12px rgba(0, 0, 0, 0.04);
-    border-color: rgba(37, 99, 235, 0.25);
+    border-color: rgba(172, 38, 41, .30);
 }
 
 .portal-card:hover::after {
@@ -4819,7 +4821,7 @@ footer {
     display: flex;
     align-items: center;
     justify-content: center;
-    background: linear-gradient(135deg, #f0f4ff, #e8ecf8);
+    background: linear-gradient(135deg, #fbe4e2, #f4f0cf);
     border-radius: 16px;
     overflow: hidden;
     padding: 5px;
@@ -4829,7 +4831,7 @@ footer {
 }
 
 .portal-card:hover .portal-icon {
-    background: linear-gradient(135deg, #e8eeff, #dce4f8);
+    background: linear-gradient(135deg, #f8d8d5, #e0f1e4);
     transform: scale(1.05);
 }
 
