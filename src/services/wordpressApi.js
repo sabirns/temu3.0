@@ -53,6 +53,30 @@ export async function fetchPages(params = {}) {
   }
 }
 
+export async function searchContent(query, lang = 'ml') {
+  try {
+    const params = new URLSearchParams({
+      search: query,
+      lang: lang,
+      _embed: true,
+      per_page: 20
+    })
+    
+    // Search posts
+    const postsRes = await fetch(`${WORDPRESS_API_URL}/posts?${params.toString()}`)
+    const posts = postsRes.ok ? await postsRes.json() : []
+    
+    // Search pages
+    const pagesRes = await fetch(`${WORDPRESS_API_URL}/pages?${params.toString()}`)
+    const pages = pagesRes.ok ? await pagesRes.json() : []
+    
+    return { posts, pages }
+  } catch (error) {
+    console.error('Error searching content:', error)
+    return { posts: [], pages: [] }
+  }
+}
+
 export async function fetchMenus() {
   try {
     const response = await fetch(`${WORDPRESS_API_URL}/menus`)
@@ -267,12 +291,28 @@ export async function fetchFacultyDepartments(params = {}) {
   }
 }
 
+export function getFacultyProfileUrl(f) {
+  if (!f) return null
+  if (f.profilePdf) return f.profilePdf
+  const profile = f.acf?.profile
+  if (typeof profile === 'string' && (profile.startsWith('http') || profile.startsWith('/'))) return profile
+  if (typeof profile === 'object' && profile !== null) {
+    if (profile.url) return profile.url
+    if (profile.source_url) return profile.source_url
+    if (profile.link) return profile.link
+  }
+  const attachments = (f._embedded?.['wp:attachment'] || []).flat()
+  const pdf = attachments.find(att => att.mime_type === 'application/pdf' || (att.source_url && att.source_url.endsWith('.pdf')))
+  return pdf?.source_url || null
+}
+
 export async function fetchFaculties(params = {}) {
   try {
     const defaultParams = {
       per_page: 100,
       status: 'publish',
       _embed: true,
+      acf_format: 'standard',
       lang: 'ml',
       ...params
     }
@@ -461,18 +501,29 @@ export async function fetchActivityBySlug(slug, params = {}) {
 
 export async function fetchFacultyBySlug(slug, params = {}) {
   try {
+    const decodedSlug = decodeURIComponent(slug)
     const defaultParams = {
-      slug,
+      slug: decodedSlug,
       _embed: true,
       _t: Date.now(),
       lang: 'ml',
       ...params
     }
     const queryString = new URLSearchParams(defaultParams).toString()
-    const response = await fetch(`${WORDPRESS_API_URL}/faculties?${queryString}`)
+    let response = await fetch(`${WORDPRESS_API_URL}/faculties?${queryString}`)
     if (!response.ok) throw new Error('Faculty not found')
-    const data = await response.json()
-    if (data.length > 0) {
+    let data = await response.json()
+    
+    // Fallback try raw slug if decoded didn't return matches
+    if ((!data || data.length === 0) && slug !== decodedSlug) {
+      const rawParams = new URLSearchParams({ ...defaultParams, slug }).toString()
+      const rawResponse = await fetch(`${WORDPRESS_API_URL}/faculties?${rawParams}`)
+      if (rawResponse.ok) {
+        data = await rawResponse.json()
+      }
+    }
+
+    if (data && data.length > 0) {
       const post = data[0]
       
       const embeddedTerms = post._embedded?.['wp:term'] || []
@@ -480,6 +531,12 @@ export async function fetchFacultyBySlug(slug, params = {}) {
       const childDepartments = departments.filter(term => term.parent !== 0)
       const displayDepartments = childDepartments.length > 0 ? childDepartments : departments
       const departmentNames = displayDepartments.map(d => d.name).join(', ')
+
+      // Extract attachments/PDF profiles if available
+      const attachments = post._embedded?.['wp:attachment'] || []
+      const pdfAttachment = attachments.find(att => att.mime_type === 'application/pdf' || att.source_url?.endsWith('.pdf'))
+      
+      let profileUrl = getFacultyProfileUrl(post)
 
       return {
         id: post.id,
@@ -491,7 +548,9 @@ export async function fetchFacultyBySlug(slug, params = {}) {
         featuredImage: getFeaturedImage(post),
         excerpt: stripHtml(post.excerpt?.rendered || ''),
         acf: post.acf || {},
-        department: departmentNames
+        department: departmentNames,
+        profilePdf: profileUrl,
+        attachments: attachments.map(att => ({ id: att.id, title: stripHtml(att.title?.rendered || ''), url: att.source_url }))
       }
     }
     return null
@@ -535,7 +594,9 @@ export async function fetchGallery(params = {}) {
         link: item.link,
         slug: item.slug,
         galleryCategory: item.gallery_category,
-        video
+        video,
+        acf: item.acf,
+        _embedded: item._embedded
       }
     })
   } catch (error) {

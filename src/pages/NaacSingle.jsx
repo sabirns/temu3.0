@@ -60,7 +60,7 @@ function NaacSingle() {
         <section className="inner-hero">
           <div className="container">
             <nav className="breadcrumb">
-              <Link to={lang === 'ml' ? '/' : `/${lang}`}>{lang === 'ml' ? 'ഹോം' : 'Home'}</Link>
+              <Link to={lang === 'ml' ? '/' : `/${lang}`}>{lang === 'ml' ? 'പൂമുഖം' : 'Home'}</Link>
               <span>/</span>
               <span>NAAC</span>
             </nav>
@@ -71,7 +71,7 @@ function NaacSingle() {
           <h2 className="naac-error-title">Oops!</h2>
           <p className="naac-error-text">{error}</p>
           <Link to={lang === 'ml' ? '/' : `/${lang}`} className="btn primary">
-            {lang === 'ml' ? 'ഹോം പേജിലേക്ക്' : 'Go Home'}
+            {lang === 'ml' ? 'പൂമുഖം പേജിലേക്ക്' : 'Go Home'}
           </Link>
         </div>
       </main>
@@ -115,7 +115,7 @@ function sortByRomanName(a, b) {
         <section className="inner-hero">
           <div className="container">
             <nav className="breadcrumb">
-              <Link to={lang === 'ml' ? '/' : `/${lang}`}>{lang === 'ml' ? 'ഹോം' : 'Home'}</Link>
+              <Link to={lang === 'ml' ? '/' : `/${lang}`}>{lang === 'ml' ? 'പൂമുഖം' : 'Home'}</Link>
               <span>/</span>
               <span>NAAC</span>
             </nav>
@@ -159,7 +159,7 @@ function sortByRomanName(a, b) {
       <section className="inner-hero">
         <div className="container">
           <nav className="breadcrumb">
-            <Link to={lang === 'ml' ? '/' : `/${lang}`}>{lang === 'ml' ? 'ഹോം' : 'Home'}</Link>
+            <Link to={lang === 'ml' ? '/' : `/${lang}`}>{lang === 'ml' ? 'പൂമുഖം' : 'Home'}</Link>
             <span>/</span>
             <Link to={lang === 'ml' ? '/naac' : `/${lang}/naac`}>NAAC</Link>
             {currentCategory && (

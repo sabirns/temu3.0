@@ -39,7 +39,7 @@ function IqacDashboard() {
       <section className="inner-hero">
         <div className="container">
           <nav className="breadcrumb">
-            <Link to={lang === 'ml' ? '/' : `/${lang}`}>{lang === 'ml' ? 'ഹോം' : 'Home'}</Link>
+            <Link to={lang === 'ml' ? '/' : `/${lang}`}>{lang === 'ml' ? 'പൂമുഖം' : 'Home'}</Link>
             <span>/</span>
             <span>IQAC</span>
           </nav>

@@ -68,7 +68,7 @@ function News() {
       <section className="inner-hero">
         <div className="container">
           <nav className="breadcrumb">
-            <Link to={lang === 'ml' ? '/' : `/${lang}`}>{lang === 'ml' ? 'ഹോം' : 'Home'}</Link>
+            <Link to={lang === 'ml' ? '/' : `/${lang}`}>{lang === 'ml' ? 'പൂമുഖം' : 'Home'}</Link>
             <span>/</span>
             <span>{lang === 'ml' ? 'വാർത്തകൾ' : 'News'}</span>
           </nav>
@@ -100,7 +100,7 @@ function News() {
                         </span>
                       )}
                       <span className="news-card-date">
-                        {new Date(item.date).toLocaleDateString(lang === 'ml' ? 'ml-IN' : 'en-US')}
+                        {new Date(item.date).toLocaleDateString(lang === 'ml' ? 'ml-IN' : 'en-US', { day: 'numeric', month: 'long', year: 'numeric' })}
                       </span>
                     </div>
                     <h3 className="news-card-title-bold">{item.title}</h3>

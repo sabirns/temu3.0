@@ -145,7 +145,7 @@ function GallerySingle() {
         {gallery.image && <div className="inner-hero-overlay" style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', background: 'rgba(0,0,0,0.5)', zIndex: 1 }}></div>}
         <div className="container" style={{ position: 'relative', zIndex: 2 }}>
           <nav className="breadcrumb">
-            <Link to={`/?lang=${lang}`}>{lang === 'ml' ? 'ഹോം' : 'Home'}</Link>
+            <Link to={`/?lang=${lang}`}>{lang === 'ml' ? 'പൂമുഖം' : 'Home'}</Link>
             <span>/</span>
             <span>{lang === 'ml' ? 'ചിത്രശാല' : 'Gallery'}</span>
             <span>/</span>

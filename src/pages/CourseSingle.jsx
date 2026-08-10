@@ -53,7 +53,7 @@ function CourseSingle() {
       <div className="page-error" style={{ padding: '100px 20px', textAlign: 'center' }}>
         <h2 style={{ fontSize: '42px', color: 'var(--primary)', marginBottom: '20px' }}>Oops!</h2>
         <p style={{ color: 'var(--muted)', marginBottom: '30px' }}>{error}</p>
-        <Link to={`/${lang}`} className="btn primary">{lang === 'ml' ? 'ഹോം' : 'Home'}</Link>
+        <Link to={`/${lang}`} className="btn primary">{lang === 'ml' ? 'പൂമുഖം' : 'Home'}</Link>
       </div>
     )
   }
@@ -63,7 +63,7 @@ function CourseSingle() {
       <section className="inner-hero">
         <div className="container">
           <nav className="breadcrumb">
-            <Link to={`/${lang}`}>{lang === 'ml' ? 'ഹോം' : 'Home'}</Link>
+            <Link to={`/${lang}`}>{lang === 'ml' ? 'പൂമുഖം' : 'Home'}</Link>
             <span>/</span>
             <span dangerouslySetInnerHTML={{ __html: course.title }} />
           </nav>

@@ -158,6 +158,9 @@ function About({ homePageData }) {
                     text = lang === 'ml' ? 'ഫാക്കൽറ്റികൾ' : 'Faculties'
                     url = lang === 'ml' ? '/faculties' : `/${lang}/faculties`
                     isExternal = false
+                  } else if (originalText.toLowerCase().includes('read more') || originalText.includes('കൂടുതൽ വായിക്കുക') || originalText.includes('readmore')) {
+                    url = 'https://tessst.com/temu_cms/ml/%e0%b4%b8%e0%b5%bc%e0%b4%b5%e0%b4%95%e0%b4%b2%e0%b4%be%e0%b4%b6%e0%b4%be%e0%b4%b2/'
+                    isExternal = true
                   } else if (url.startsWith('http') && !url.startsWith(window.location.origin)) {
                      // Keep external
                   } else {
@@ -236,11 +239,13 @@ function About({ homePageData }) {
               ) : filteredNotifications.length > 0 ? (
                 filteredNotifications.slice(0, 5).map((item) => (
                   <a key={item.id} href={item.link} className="notification-card">
-                    <span className="notification-card-badge">{tabLabels[activeTab]}</span>
-                    <h4 className="notification-title">{item.title}</h4>
-                    <span className="notification-date">
-                      {new Date(item.date).toLocaleDateString(lang === 'ml' ? 'ml-IN' : 'en-US')}
-                    </span>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
+                      <span className="notification-card-badge" style={{ marginBottom: 0 }}>{tabLabels[activeTab]}</span>
+                      <span className="notification-date" style={{ marginTop: 0 }}>
+                        {new Date(item.date).toLocaleDateString(lang === 'ml' ? 'ml-IN' : 'en-GB', { day: '2-digit', month: 'long', year: 'numeric' })}
+                      </span>
+                    </div>
+                    <h4 className="notification-title" style={{ marginBottom: 0 }}>{item.title}</h4>
                   </a>
                 ))
               ) : (

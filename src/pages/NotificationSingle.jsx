@@ -74,7 +74,7 @@ function NotificationSingle() {
       <section className="inner-hero">
         <div className="container">
           <nav className="breadcrumb">
-            <Link to={lang === 'ml' ? '/' : `/${lang}`}>{lang === 'ml' ? 'ഹോം' : 'Home'}</Link>
+            <Link to={lang === 'ml' ? '/' : `/${lang}`}>{lang === 'ml' ? 'പൂമുഖം' : 'Home'}</Link>
             <span>/</span>
             <Link to={lang === 'ml' ? '/notifications' : `/${lang}/notifications`}>
               {lang === 'ml' ? 'അറിയിപ്പുകൾ' : 'Notifications'}

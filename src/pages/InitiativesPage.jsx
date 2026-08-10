@@ -28,7 +28,7 @@ function InitiativesPage() {
       <section className="inner-hero">
         <div className="container">
           <nav className="breadcrumb">
-            <Link to={`/${lang}`}>{lang === 'ml' ? 'ഹോം' : 'Home'}</Link>
+            <Link to={`/${lang}`}>{lang === 'ml' ? 'പൂമുഖം' : 'Home'}</Link>
             <span>/</span>
             <span>{lang === 'ml' ? 'പദ്ധതികളും സംരംഭങ്ങളും' : 'Initiatives & Projects'}</span>
           </nav>

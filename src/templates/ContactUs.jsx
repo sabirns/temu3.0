@@ -112,7 +112,7 @@ function ContactUs() {
       <section className="inner-hero">
         <div className="container">
           <nav className="breadcrumb">
-            <Link to={`/?lang=${lang}`}>{lang === 'ml' ? 'ഹോം' : 'Home'}</Link>
+            <Link to={`/?lang=${lang}`}>{lang === 'ml' ? 'പൂമുഖം' : 'Home'}</Link>
             <span>/</span>
             <span dangerouslySetInnerHTML={{ __html: page.title }} />
           </nav>

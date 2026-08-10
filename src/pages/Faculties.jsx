@@ -82,7 +82,10 @@ function Faculties() {
               return (
                 <div key={faculty.id} className="faculty-section reveal-up active" style={{ transitionDelay: `${0.1 * (idx + 1)}s` }}>
                   <h2 className="faculty-section-title">
-                    {stripHtml(faculty.name || '')}
+                    <Link to={`/${lang}/faculty-department/${faculty.slug}`} style={{ color: 'inherit', textDecoration: 'none' }}>
+                      {stripHtml(faculty.name || '')}
+                      <span style={{ fontSize: '0.6em', marginLeft: '10px', color: 'var(--primary)', opacity: 0.8 }}>🔗</span>
+                    </Link>
                   </h2>
                   
                   {facultyDepts.length > 0 ? (
@@ -93,7 +96,6 @@ function Faculties() {
                           className="department-card"
                           to={`/${lang}/department/${dept.slug}`}
                         >
-                          <div className="department-card-accent" />
                           <h3 className="department-card-title">
                             {stripHtml(dept.title?.rendered || dept.title || '')}
                           </h3>

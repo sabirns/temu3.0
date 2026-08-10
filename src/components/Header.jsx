@@ -53,15 +53,26 @@ function Header() {
     const [megaMenuHtml, setMegaMenuHtml] = useState('')
     const [topMenuItems, setTopMenuItems] = useState([])
     const [mobileOpen, setMobileOpen] = useState(false)
+    const [isSearchOpen, setIsSearchOpen] = useState(false)
+    const [searchQuery, setSearchQuery] = useState('')
     
     useEffect(() => {
-        if (mobileOpen) {
+        if (mobileOpen || isSearchOpen) {
             document.body.style.overflow = 'hidden'
         } else {
             document.body.style.overflow = ''
         }
         return () => { document.body.style.overflow = '' }
-    }, [mobileOpen])
+    }, [mobileOpen, isSearchOpen])
+
+    const handleSearchSubmit = (e) => {
+        e.preventDefault()
+        if (searchQuery.trim()) {
+            setIsSearchOpen(false)
+            navigate(`/${siteLanguage}/search?q=${encodeURIComponent(searchQuery)}`)
+            setSearchQuery('')
+        }
+    }
 
     const tickerRef = useRef(null)
     const tickerAnimRef = useRef(null)
@@ -539,7 +550,13 @@ function Header() {
                         </Link>
 
                         <div className="mobile-top-actions">
-                            <div className="action-buttons">
+                            <div className="action-buttons" style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                                <button className="search-btn-header" aria-label="Search" style={{ background: 'none', border: 'none', padding: '4px', cursor: 'pointer', display: 'flex', alignItems: 'center', color: 'var(--navy-900)' }} onClick={() => setIsSearchOpen(true)}>
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                        <circle cx="11" cy="11" r="8"></circle>
+                                        <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                                    </svg>
+                                </button>
                                 {translationPath ? (
                                     <Link to={translationPath} className="toggle" title="Language toggle">
                                         <span className="dot" aria-hidden="true"></span>
@@ -552,6 +569,7 @@ function Header() {
                                     </div>
                                 )}
                             </div>
+
                             <button className={`mobile-toggle ${mobileOpen ? 'active' : ''}`} id="burger" onClick={toggleMobile} aria-label={mobileOpen ? 'Close menu' : 'Open menu'} aria-expanded={mobileOpen}>
                                 <span className="bar"></span>
                                 <span className="bar"></span>
@@ -589,17 +607,17 @@ function Header() {
                                 </button>
                                 <div className="dropdown-menu">
                                     <div className="dropdown-grid">
-                                        <Link to="#" className="dropdown-item"><div><strong>{siteLanguage === 'ml' ? 'സ്കോളർഷിപ്പ്' : 'Scholarship'}</strong></div></Link>
-                                        <Link to="#" className="dropdown-item"><div><strong>{siteLanguage === 'ml' ? 'എൻഎസ്എസ്' : 'NSS'}</strong></div></Link>
-                                        <Link to="#" className="dropdown-item"><div><strong>{siteLanguage === 'ml' ? 'പിടിഎ' : 'PTA'}</strong></div></Link>
-                                        <Link to="#" className="dropdown-item"><div><strong>{siteLanguage === 'ml' ? 'വിദ്യാർത്ഥി യൂണിയൻ' : 'Student Union'}</strong></div></Link>
-                                        <Link to="#" className="dropdown-item"><div><strong>{siteLanguage === 'ml' ? 'സ്റ്റുഡന്റ് സോൺ' : 'Student Zone'}</strong></div></Link>
-                                        <Link to="#" className="dropdown-item"><div><strong>{siteLanguage === 'ml' ? 'ഇന്റേൺഷിപ്പ്' : 'Internship'}</strong></div></Link>
-                                        <Link to="#" className="dropdown-item"><div><strong>{siteLanguage === 'ml' ? 'ഫീൽഡ് ട്രിപ്പുകൾ' : 'Field Trips'}</strong></div></Link>
-                                        <Link to="#" className="dropdown-item"><div><strong>{siteLanguage === 'ml' ? 'പ്ലേസ്മെന്റ്' : 'Placement'}</strong></div></Link>
-                                        <Link to="#" className="dropdown-item"><div><strong>{siteLanguage === 'ml' ? 'കരിയർ ഗൈഡൻസ്' : 'Career Guidance'}</strong></div></Link>
-                                        <Link to="#" className="dropdown-item"><div><strong>{siteLanguage === 'ml' ? 'സിവിൽ സർവീസസ് അക്കാദമി' : 'Civil Services Academy'}</strong></div></Link>
-                                        <Link to="#" className="dropdown-item"><div><strong>{siteLanguage === 'ml' ? 'പരാതി പരിഹാര സെൽ' : 'Grievance & Redressal'}</strong></div></Link>
+                                        <Link to={`/${siteLanguage}/scholarship`} className="dropdown-item"><div><strong>{siteLanguage === 'ml' ? 'സ്കോളർഷിപ്പ്' : 'Scholarship'}</strong></div></Link>
+                                        <Link to={`/${siteLanguage}/nss`} className="dropdown-item"><div><strong>{siteLanguage === 'ml' ? 'എൻഎസ്എസ്' : 'NSS'}</strong></div></Link>
+                                        <Link to={`/${siteLanguage}/pta`} className="dropdown-item"><div><strong>{siteLanguage === 'ml' ? 'പിടിഎ' : 'PTA'}</strong></div></Link>
+                                        <Link to={`/${siteLanguage}/student-union`} className="dropdown-item"><div><strong>{siteLanguage === 'ml' ? 'വിദ്യാർത്ഥി യൂണിയൻ' : 'Student Union'}</strong></div></Link>
+                                        <Link to={`/${siteLanguage}/student-zone`} className="dropdown-item"><div><strong>{siteLanguage === 'ml' ? 'സ്റ്റുഡന്റ് സോൺ' : 'Student Zone'}</strong></div></Link>
+                                        <Link to={`/${siteLanguage}/internship`} className="dropdown-item"><div><strong>{siteLanguage === 'ml' ? 'ഇന്റേൺഷിപ്പ്' : 'Internship'}</strong></div></Link>
+                                        <Link to={`/${siteLanguage}/field-trips`} className="dropdown-item"><div><strong>{siteLanguage === 'ml' ? 'ഫീൽഡ് ട്രിപ്പുകൾ' : 'Field Trips'}</strong></div></Link>
+                                        <Link to={`/${siteLanguage}/placement-cell`} className="dropdown-item"><div><strong>{siteLanguage === 'ml' ? 'പ്ലേസ്മെന്റ്' : 'Placement'}</strong></div></Link>
+                                        <Link to={`/${siteLanguage}/career-guidance`} className="dropdown-item"><div><strong>{siteLanguage === 'ml' ? 'കരിയർ ഗൈഡൻസ്' : 'Career Guidance'}</strong></div></Link>
+                                        <Link to={`/${siteLanguage}/civil-services-academy`} className="dropdown-item"><div><strong>{siteLanguage === 'ml' ? 'സിവിൽ സർവീസസ് അക്കാദമി' : 'Civil Services Academy'}</strong></div></Link>
+                                        <Link to={`/${siteLanguage}/grievance-redressal-cell`} className="dropdown-item"><div><strong>{siteLanguage === 'ml' ? 'പരാതി പരിഹാര സെൽ' : 'Grievance & Redressal'}</strong></div></Link>
                                     </div>
                                 </div>
                             </div>
@@ -612,7 +630,13 @@ function Header() {
                                     <img src="/images/mail.png" alt="Email" className="icon" style={{ width: '16px', height: '16px', objectFit: 'contain' }} /> {contactInfo.email}
                                 </a>
                             </div>
-                            <div className="action-buttons">
+                            <div className="action-buttons" style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+                                <button className="search-btn-header" aria-label="Search" style={{ background: 'none', border: 'none', padding: '4px', cursor: 'pointer', display: 'flex', alignItems: 'center', color: 'var(--navy-900)' }} onClick={() => setIsSearchOpen(true)}>
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                        <circle cx="11" cy="11" r="8"></circle>
+                                        <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                                    </svg>
+                                </button>
                                 {translationPath ? (
                                     <Link to={translationPath} className="toggle" title="Language toggle">
                                         <span className="dot" aria-hidden="true"></span>
@@ -644,7 +668,7 @@ function Header() {
                             ) : (
                                 <ul className="nav-menu justify-content-center">
                                     <li className="nav-item">
-                                        <Link className="nav-link" to="/">ഹോം</Link>
+                                        <Link className="nav-link" to="/">പൂമുഖം</Link>
                                     </li>
                                 </ul>
                             )}
@@ -697,22 +721,22 @@ function Header() {
                                         </a>
                                         <ul className="mega-sub-menu">
                                             {[
-                                                { en: 'Scholarship', ml: 'സ്കോളർഷിപ്പ്' },
-                                                { en: 'NSS', ml: 'എൻഎസ്എസ്' },
-                                                { en: 'PTA', ml: 'പിടിഎ' },
-                                                { en: 'Student Union', ml: 'വിദ്യാർത്ഥി യൂണിയൻ' },
-                                                { en: 'Student Zone', ml: 'സ്റ്റുഡന്റ് സോൺ' },
-                                                { en: 'Internship', ml: 'ഇന്റേൺഷിപ്പ്' },
-                                                { en: 'Field Trips', ml: 'ഫീൽഡ് ട്രിപ്പുകൾ' },
-                                                { en: 'Placement', ml: 'പ്ലേസ്മെന്റ്' },
-                                                { en: 'Career Guidance', ml: 'കരിയർ ഗൈഡൻസ്' },
-                                                { en: 'Civil Services Academy', ml: 'സിവിൽ സർവീസസ് അക്കാദമി' },
-                                                { en: 'Grievance & Redressal', ml: 'പരാതി പരിഹാര സെൽ' }
+                                                { en: 'Scholarship', ml: 'സ്കോളർഷിപ്പ്', slug: 'scholarship' },
+                                                { en: 'NSS', ml: 'എൻഎസ്എസ്', slug: 'nss' },
+                                                { en: 'PTA', ml: 'പിടിഎ', slug: 'pta' },
+                                                { en: 'Student Union', ml: 'വിദ്യാർത്ഥി യൂണിയൻ', slug: 'student-union' },
+                                                { en: 'Student Zone', ml: 'സ്റ്റുഡന്റ് സോൺ', slug: 'student-zone' },
+                                                { en: 'Internship', ml: 'ഇന്റേൺഷിപ്പ്', slug: 'internship' },
+                                                { en: 'Field Trips', ml: 'ഫീൽഡ് ട്രിപ്പുകൾ', slug: 'field-trips' },
+                                                { en: 'Placement', ml: 'പ്ലേസ്മെന്റ്', slug: 'placement-cell' },
+                                                { en: 'Career Guidance', ml: 'കരിയർ ഗൈഡൻസ്', slug: 'career-guidance' },
+                                                { en: 'Civil Services Academy', ml: 'സിവിൽ സർവീസസ് അക്കാദമി', slug: 'civil-services-academy' },
+                                                { en: 'Grievance & Redressal', ml: 'പരാതി പരിഹാര സെൽ', slug: 'grievance-redressal-cell' }
                                             ].map((item, i) => (
                                                 <li key={i} className="mega-menu-item">
-                                                    <a href="#" className="mega-menu-link">
+                                                    <Link to={`/${siteLanguage}/${item.slug}`} className="mega-menu-link" onClick={closeMobile}>
                                                         {siteLanguage === 'ml' ? item.ml : item.en}
-                                                    </a>
+                                                    </Link>
                                                 </li>
                                             ))}
                                         </ul>
@@ -754,6 +778,31 @@ function Header() {
                             </div>
                         </div>
                     </div>
+                </div>
+            </div>
+            {/* Search Modal */}
+            <div className={`search-modal-overlay ${isSearchOpen ? 'open' : ''}`}>
+                <button className="search-modal-close" onClick={() => setIsSearchOpen(false)} aria-label="Close search">
+                    &times;
+                </button>
+                <div className="search-modal-content">
+                    <form onSubmit={handleSearchSubmit} className="search-modal-form">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="search-modal-icon">
+                            <circle cx="11" cy="11" r="8"></circle>
+                            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                        </svg>
+                        <input 
+                            type="text" 
+                            value={searchQuery}
+                            onChange={(e) => setSearchQuery(e.target.value)}
+                            placeholder={siteLanguage === 'ml' ? "തിരയുക..." : "Search..."} 
+                            autoFocus={isSearchOpen}
+                            className="search-modal-input"
+                        />
+                        <button type="submit" className="btn primary search-modal-btn">
+                            {siteLanguage === 'ml' ? "തിരയുക" : "Search"}
+                        </button>
+                    </form>
                 </div>
             </div>
         </header>

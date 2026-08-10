@@ -34,7 +34,7 @@ function Publications() {
       <section className="inner-hero">
         <div className="container">
           <nav className="breadcrumb">
-            <Link to={lang === 'ml' ? '/' : `/${lang}`}>{lang === 'ml' ? 'ഹോം' : 'Home'}</Link>
+            <Link to={lang === 'ml' ? '/' : `/${lang}`}>{lang === 'ml' ? 'പൂമുഖം' : 'Home'}</Link>
             <span>/</span>
             <span>{lang === 'ml' ? 'പ്രസിദ്ധീകരണങ്ങൾ' : 'Publications'}</span>
           </nav>

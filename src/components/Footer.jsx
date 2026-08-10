@@ -56,42 +56,51 @@ function Footer() {
 
             <div className="container">
                 <div className="footer-content">
-                    <div className="footer-section footer-links">
-                        <h4 className="footer-heading">{lang === 'ml' ? 'പ്രധാന ലിങ്കുകൾ' : 'Quick Links'}</h4>
-                        <ul className="footer-list">
-                            {[
-                                { label: lang === 'ml' ? 'വിദ്യാർത്ഥിക്ഷേമം' : 'Student Welfare', href: '#' },
-                                { label: lang === 'ml' ? 'വിദ്യാർത്ഥി യൂണിയൻ' : 'Student Union', href: '#' },
-                                { label: lang === 'ml' ? 'വീഡിയോ ഗാലറി' : 'Video Gallery', href: '#' },
-                                { label: lang === 'ml' ? 'ക്യാമ്പസ്' : 'Campus', href: '#campus' },
-                                { label: lang === 'ml' ? 'ഫീസ് പേയ്‌മെന്റ്' : 'Fee Payment', href: '#' },
-                                { label: lang === 'ml' ? 'ഒഴിവുകൾ' : 'Vacancies', href: '#' },
-                                { label: 'RTI', href: '#' },
-                                { label: lang === 'ml' ? 'സംശയങ്ങൾ' : 'Queries', href: '#' }
-                            ].map((item, i) => (
-                                <li key={i}>
-                                    <a href={item.href}>{item.label}</a>
-                                </li>
-                            ))}
-                        </ul>
-                    </div>
 
                     <div className="footer-section footer-useful">
                         <h4 className="footer-heading">{lang === 'ml' ? 'ഉപയോഗപ്രദമായ ലിങ്കുകൾ' : 'Useful Links'}</h4>
+
+                        <p className="footer-group-heading">{lang === 'ml' ? 'കേന്ദ്ര / സംസ്ഥാന സർക്കാർ വെബ്സൈറ്റുകൾ' : 'Central / State Govt Websites'}</p>
                         <ul className="footer-list">
                             {[
-                                { label: lang === 'ml' ? 'കേരള സർക്കാർ' : 'Govt of Kerala', href: 'https://kerala.gov.in/' },
-                                { label: lang === 'ml' ? 'ഉന്നത വിദ്യാഭ്യാസം' : 'Higher Education', href: 'http://www.highereducation.kerala.gov.in/' },
+                                { label: lang === 'ml' ? 'കേരള സർക്കാർ ഔദ്യോഗിക വെബ് പോർട്ടൽ' : 'Kerala Govt Official Web Portal', href: 'https://kerala.gov.in/' },
+                                { label: lang === 'ml' ? 'ഐടി മിഷൻ, കേരള' : 'IT Mission, Kerala', href: 'http://www.itmission.kerala.gov.in/' },
+                                { label: lang === 'ml' ? 'ഉന്നത വിദ്യാഭ്യാസ വകുപ്പ്, കേരള' : 'Dept. of Higher Education, Kerala', href: 'http://www.highereducation.kerala.gov.in/' },
                                 { label: lang === 'ml' ? 'ഇ-ഗ്രാന്റ്സ്' : 'E-Grantz', href: 'http://www.e-grantz.kerala.gov.in/' },
-                                { label: lang === 'ml' ? 'എൽ.എം.എസ്' : 'LMS', href: 'https://lms.temu.ac.in/' },
-                                { label: 'NAAC', href: '#' },
-                                { label: 'IQAC', href: '#' }
+                                { label: lang === 'ml' ? 'ഫിഷറീസ് ഇ-ഗ്രാന്റ്സ്' : 'Fisheries E-Grantz', href: 'http://www.egrantzfisheries.kerala.gov.in/' },
+                                { label: lang === 'ml' ? 'ഡിസിഇ സ്കോളർഷിപ്പ്' : 'DCE Scholarship', href: 'http://www.dcescholarship.kerala.gov.in' },
+                                { label: lang === 'ml' ? 'കേരള ന്യൂനപക്ഷ ക്ഷേമ സ്കോളർഷിപ്പ്' : 'Kerala Minority Welfare Scholarship', href: 'http://www.minoritywelfare.kerala.gov.in/' },
+                                { label: lang === 'ml' ? 'മുഖ്യമന്ത്രിയുടെ പൊതുജന പരാതി പരിഹാര സംവിധാനം' : "Chief Minister's Public Grievance Redressal System", href: 'http://www.cmo.kerala.gov.in/' },
+                                { label: lang === 'ml' ? 'നാഷണൽ കരിയർ സർവീസ്' : 'National Career Service', href: 'https://www.ncs.gov.in/' },
                             ].map((item, i) => (
                                 <li key={i}>
                                     <a href={item.href} target="_blank" rel="noopener noreferrer">{item.label}</a>
                                 </li>
                             ))}
                         </ul>
+
+                        <div className="footer-useful-row">
+                            <div>
+                                <p className="footer-group-heading">{lang === 'ml' ? 'യുജിസി ഫെലോഷിപ്പ്' : 'UGC Fellowship'}</p>
+                                <ul className="footer-list">
+                                    <li>
+                                        <a href="https://ugc.ac.in/" target="_blank" rel="noopener noreferrer">
+                                            {lang === 'ml' ? 'യുജിസി ഫെലോഷിപ്പ്' : 'UGC Fellowship'}
+                                        </a>
+                                    </li>
+                                </ul>
+                            </div>
+                            <div>
+                                <p className="footer-group-heading">{lang === 'ml' ? 'നാഷണൽ സ്കോളർഷിപ്പ് പോർട്ടൽ' : 'National Scholarship Portal'}</p>
+                                <ul className="footer-list">
+                                    <li>
+                                        <a href="https://scholarships.gov.in/" target="_blank" rel="noopener noreferrer">
+                                            {lang === 'ml' ? 'നാഷണൽ സ്കോളർഷിപ്പ് പോർട്ടൽ' : 'National Scholarship Portal'}
+                                        </a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
                     </div>
 
                     <div className="footer-section footer-contact">
@@ -107,7 +116,10 @@ function Footer() {
                                     <span className="contact-icon">{item.icon}</span>
                                     <div>
                                         <span className="contact-label">{item.label}</span>
-                                        <span className="contact-value">{item.value}</span>
+                                        <span
+                                            className="contact-value"
+                                            dangerouslySetInnerHTML={{ __html: item.value || '' }}
+                                        />
                                     </div>
                                 </div>
                             ))}
@@ -130,6 +142,7 @@ function Footer() {
                             </div>
                         </div>
                     </div>
+
                 </div>
 
                 <div className="footer-map-section">

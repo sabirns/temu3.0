@@ -3,6 +3,7 @@ import { useEffect } from 'react'
 import { WP_CONFIG } from './config/wpConfig'
 import Header from './components/Header'
 import Footer from './components/Footer'
+import FloatingSocial from './components/FloatingSocial'
 import Home from './pages/Home'
 import Departments from './pages/Departments'
 import Faculties from './pages/Faculties'
@@ -12,6 +13,7 @@ import NotificationSingle from './pages/NotificationSingle'
 import WordPressPage from './templates/WordPressPage'
 import ContactUs from './templates/ContactUs'
 import ChildPagesGrid from './templates/ChildPagesGrid'
+import Search from './pages/Search'
 
 import GallerySingle from './pages/GallerySingle'
 import Galleries from './pages/Galleries'
@@ -30,6 +32,7 @@ import CourseSingle from './pages/CourseSingle'
 import Activities from './pages/Activities'
 import ActivitySingle from './pages/ActivitySingle'
 import FacultySingle from './pages/FacultySingle'
+import FacultyDepartmentSingle from './pages/FacultyDepartmentSingle'
 import InitiativesPage from './pages/InitiativesPage'
 import ScrollToTop from './components/ScrollToTop'
 import DocumentTitle from './components/DocumentTitle'
@@ -95,6 +98,9 @@ function App() {
       <Routes>
         <Route path="/" element={<Navigate to="/ml" replace />} />
         <Route path="/:lang" element={<Home />} />
+
+        <Route path="/search" element={<Search />} />
+        <Route path="/:lang/search" element={<Search />} />
         
         <Route path="/notifications" element={<Notifications />} />
         <Route path="/:lang/notifications" element={<Notifications />} />
@@ -107,6 +113,9 @@ function App() {
         <Route path="/faculties" element={<Faculties />} />
         <Route path="/:lang/faculties" element={<Faculties />} />
         <Route path="/:lang/ഫാക്കൽറ്റികൾ" element={<Faculties />} />
+        
+        <Route path="/faculty-department/:slug" element={<FacultyDepartmentSingle />} />
+        <Route path="/:lang/faculty-department/:slug" element={<FacultyDepartmentSingle />} />
         
         <Route path="/department/:id" element={<DepartmentSingle />} />
         <Route path="/:lang/department/:id" element={<DepartmentSingle />} />
@@ -184,6 +193,7 @@ function App() {
         <Route path="/:lang/:slug/*" element={<WordPressPage />} />
       </Routes>
       <Footer />
+      <FloatingSocial />
       </PageInfoProvider>
     </Router>
   )

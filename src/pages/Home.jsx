@@ -281,7 +281,7 @@ import { WP_CONFIG } from '../config/wpConfig'
 													</span>
 												)}
 												<span className="news-date-home">
-													{new Date(news.date).toLocaleDateString(lang === 'ml' ? 'ml-IN' : 'en-US')}
+													{new Date(news.date).toLocaleDateString(lang === 'ml' ? 'ml-IN' : 'en-US', { day: 'numeric', month: 'long', year: 'numeric' })}
 												</span>
 											</div>
 											<h3 className="news-title-home">{news.title}</h3>
@@ -305,7 +305,7 @@ import { WP_CONFIG } from '../config/wpConfig'
 			</section>
 
 			{/* Gallery Section */}
-			<section className="gallery-slider-section" id="gallery" style={{ minHeight: '400px' }}>
+			<section className="gallery-slider-section research-band" id="gallery" style={{ minHeight: '400px' }}>
 				<div className="container">
 					<div className="section-head reveal reveal-up">
 						<div>

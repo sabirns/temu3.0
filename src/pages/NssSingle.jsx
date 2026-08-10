@@ -79,7 +79,7 @@ function NssSingle() {
         <section className="inner-hero">
           <div className="container">
             <nav className="breadcrumb">
-              <Link to={lang === 'ml' ? '/' : `/${lang}`}>{lang === 'ml' ? 'ഹോം' : 'Home'}</Link>
+              <Link to={lang === 'ml' ? '/' : `/${lang}`}>{lang === 'ml' ? 'പൂമുഖം' : 'Home'}</Link>
               <span>/</span>
               <span>NSS</span>
             </nav>
@@ -117,7 +117,7 @@ function NssSingle() {
 
   const sidebarPosts = currentCategory
     ? posts.filter(p => p.primaryCategory?.slug === currentCategory.slug).sort((a, b) => a.title.localeCompare(b.title))
-    : []
+    : posts.sort((a, b) => a.title.localeCompare(b.title))
 
   const makePostUrl = (postSlug) => {
     return `/${lang}/nss/${postSlug}`
@@ -125,27 +125,23 @@ function NssSingle() {
 
   return (
     <>
-    <main className="nss-page">
-      <section className="inner-hero">
-        <div className="container">
-          <nav className="breadcrumb">
-            <Link to={lang === 'ml' ? '/' : `/${lang}`}>{lang === 'ml' ? 'ഹോം' : 'Home'}</Link>
-            <span>/</span>
-            <Link to={`/${lang}/nss`}>NSS</Link>
-            {currentCategory && (
-              <>
-                <span>/</span>
-                <span>{currentCategory.name}</span>
-              </>
-            )}
-            <span>/</span>
-            <span>{currentPost.title}</span>
-          </nav>
-          <h1 className="inner-hero-title">{currentPost.title}</h1>
-        </div>
-      </section>
-
-      <div className="container nss-section-top">
+    <main className="nss-page" style={{ paddingBottom: '80px' }}>
+      <div className="container nss-section-top" style={{ paddingTop: '40px' }}>
+        <nav className="breadcrumb" style={{ marginBottom: '16px' }}>
+          <Link to={lang === 'ml' ? '/' : `/${lang}`}>{lang === 'ml' ? 'പൂമുഖം' : 'Home'}</Link>
+          <span>/</span>
+          <Link to={`/${lang}/nss`}>NSS</Link>
+          {currentCategory && (
+            <>
+              <span>/</span>
+              <span>{currentCategory.name}</span>
+            </>
+          )}
+          <span>/</span>
+          <span style={{ color: 'var(--primary)', fontWeight: '600' }}>{currentPost.title}</span>
+        </nav>
+        
+        <h1 style={{ fontSize: '32px', color: 'var(--navy-900)', marginBottom: '30px' }}>{currentPost.title}</h1>
         {categories.length > 0 && (
           <nav className="nss-category-nav" aria-label={lang === 'ml' ? 'NSS വിഭാഗങ്ങൾ' : 'NSS Categories'}>
             {categories.map(cat => {

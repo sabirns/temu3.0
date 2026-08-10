@@ -48,7 +48,7 @@ function Activities() {
       <section className="inner-hero">
         <div className="container">
           <nav className="breadcrumb">
-            <Link to={`/${lang}`}>{lang === 'ml' ? 'ഹോം' : 'Home'}</Link>
+            <Link to={`/${lang}`}>{lang === 'ml' ? 'പൂമുഖം' : 'Home'}</Link>
             <span>/</span>
             {termSlug && <><Link to={`/${lang}/activities`}>{lang === 'ml' ? 'പ്രവർത്തനങ്ങൾ' : 'Activities'}</Link><span>/</span></>}
             <span>{deptName || heading}</span>

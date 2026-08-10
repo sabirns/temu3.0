@@ -16,6 +16,7 @@ function WordPressPage() {
   
   // Detect language from path or query
   const lang = getLanguageContext(location.pathname, searchParams)
+  const isCourseSubPage = (slug === 'our-courses-ml' || slug === 'courses-offered') && splat;
   
   const { setPageInfo } = usePageInfo()
 
@@ -285,26 +286,39 @@ function WordPressPage() {
 
   return (
     <article className="wordpress-page">
-      {/* Premium Hero Banner */}
-      <section className="inner-hero">
-        <div className="container">
-          <nav className="breadcrumb">
-            <Link to={`/?lang=${lang}`}>{lang === 'ml' ? 'ഹോം' : 'Home'}</Link>
-            <span>/</span>
-            <span dangerouslySetInnerHTML={{ __html: page.title }} />
-          </nav>
-          <h1 
-            className="inner-hero-title" 
-            dangerouslySetInnerHTML={{ __html: page.title }} 
-          />
-        </div>
-      </section>
+      {!isCourseSubPage && (
+        <section className="inner-hero">
+          <div className="container">
+            <nav className="breadcrumb">
+              <Link to={`/?lang=${lang}`}>{lang === 'ml' ? 'പൂമുഖം' : 'Home'}</Link>
+              <span>/</span>
+              <span dangerouslySetInnerHTML={{ __html: page.title }} />
+            </nav>
+            <h1 
+              className="inner-hero-title" 
+              dangerouslySetInnerHTML={{ __html: page.title }} 
+            />
+          </div>
+        </section>
+      )}
 
       {/* Page Content */}
-      <div className="page-content-wrapper" style={{ paddingBottom: '80px' }}>
+      <div className="page-content-wrapper" style={{ paddingTop: isCourseSubPage ? '40px' : '0', paddingBottom: '80px' }}>
         <div className="container">
           <div className="page-grid" style={{ gridTemplateColumns: '1fr' }}>
             <div className="main-content page-reveal reveal-up">
+              {isCourseSubPage && (
+                <>
+                  <nav className="breadcrumb" style={{ marginBottom: '20px', display: 'flex', alignItems: 'center' }}>
+                    <Link to={`/${lang}`} style={{ color: 'var(--muted)', textDecoration: 'none' }}>{lang === 'ml' ? 'പൂമുഖം' : 'Home'}</Link>
+                    <span style={{ margin: '0 12px', color: 'var(--muted2)' }}>/</span>
+                    <Link to={`/${lang}/${slug}`} style={{ color: 'var(--muted)', textDecoration: 'none' }}>{lang === 'ml' ? 'കോഴ്സുകൾ' : 'Courses'}</Link>
+                    <span style={{ margin: '0 12px', color: 'var(--muted2)' }}>/</span>
+                    <span style={{ color: 'var(--primary)', fontWeight: '600' }} dangerouslySetInnerHTML={{ __html: page.title }} />
+                  </nav>
+                  <h1 style={{ color: 'var(--primary-dark)', marginBottom: '30px', fontSize: '2.5rem', fontWeight: '800' }} dangerouslySetInnerHTML={{ __html: page.title }} />
+                </>
+              )}
               {page.featuredImage && (
                 <div className="page-featured-image" style={{ marginBottom: '40px', borderRadius: '24px', overflow: 'hidden', boxShadow: '0 20px 40px rgba(0,0,0,0.1)' }}>
                   <img src={page.featuredImage} alt={page.title} style={{ width: '100%', display: 'block' }} />
