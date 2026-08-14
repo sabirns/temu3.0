@@ -41,7 +41,12 @@ function Departments() {
   return (
     <main className="page-content departments-page">
       <section className="faculties-hero">
-        <div className="container">
+        <div className="container" style={{ position: 'relative', zIndex: 2 }}>
+          <nav className="breadcrumb">
+            <Link to={`/${lang}`}>{lang === 'ml' ? 'പൂമുഖം' : 'Home'}</Link>
+            <span>/</span>
+            <span>{heading}</span>
+          </nav>
           <h1 className="faculties-hero-title reveal-up active">{heading}</h1>
           <p className="faculties-hero-subtitle reveal-up active" style={{ transitionDelay: '0.1s' }}>{subtext}</p>
         </div>

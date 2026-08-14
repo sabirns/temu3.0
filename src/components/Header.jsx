@@ -236,7 +236,7 @@ function Header() {
             if (segments.length > 0) {
                 navigate(`/${siteLang}/${segments.join('/')}${suffix}`)
             } else {
-                navigate(`/${siteLang}/${suffix}`)
+                navigate(`/${siteLang}/home${suffix}`)
             }
         }
 
@@ -545,7 +545,7 @@ function Header() {
             <div className="header-top">
                 <div className="container">
                     <div className="header-top-inner">
-                        <Link className="logo-link" to="/" aria-label="Home">
+                        <Link className="logo-link" to={`/${siteLanguage}/home`} aria-label="Home">
                             <img src={siteLanguage === 'en' ? '/images/malayalam-university-logo-en.png' : '/images/malayalam-university-logo.png'} alt="Malayalam University Logo" />
                         </Link>
 

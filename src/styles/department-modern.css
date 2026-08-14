@@ -13,7 +13,7 @@
     --surface: #ffffff;
     --surface-soft: #f5f8fc;
     --shadow-mod: 0 24px 65px rgba(6, 22, 44, 0.14);
-    --left-width: min(40vw, 680px);
+    --left-width: min(35vw, 680px);
 }
 
 .page-shell-modern {
@@ -590,7 +590,7 @@
     left: 0;
     right: 0;
     padding: 12px;
-    background: linear-gradient(transparent, rgba(0,0,0,0.8));
+    background: linear-gradient(transparent, rgba(0, 0, 0, 0.8));
     color: #fff;
     opacity: 0;
     transform: translateY(10px);
@@ -745,11 +745,11 @@
     font-size: 40px;
     font-weight: 700;
     background-color: var(--navy-900);
-    background-image: 
-        radial-gradient(circle at 20% 30%, rgba(255,255,255,0.06) 10px, transparent 11px),
-        radial-gradient(circle at 80% 70%, rgba(255,255,255,0.06) 20px, transparent 21px),
-        radial-gradient(circle at 40% 80%, rgba(255,255,255,0.04) 30px, transparent 31px),
-        radial-gradient(circle at 75% 25%, rgba(255,255,255,0.04) 40px, transparent 41px);
+    background-image:
+        radial-gradient(circle at 20% 30%, rgba(255, 255, 255, 0.06) 10px, transparent 11px),
+        radial-gradient(circle at 80% 70%, rgba(255, 255, 255, 0.06) 20px, transparent 21px),
+        radial-gradient(circle at 40% 80%, rgba(255, 255, 255, 0.04) 30px, transparent 31px),
+        radial-gradient(circle at 75% 25%, rgba(255, 255, 255, 0.04) 40px, transparent 41px);
 }
 
 .modern-faculty-grid {
@@ -757,6 +757,7 @@
     grid-template-columns: 1fr 1fr;
     gap: 24px;
 }
+
 @media (max-width: 991px) {
     .modern-faculty-grid {
         grid-template-columns: 1fr;

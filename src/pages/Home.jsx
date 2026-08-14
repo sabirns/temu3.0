@@ -1,13 +1,14 @@
 import { useState, useEffect } from 'react'
 import { Link, useLocation, useSearchParams } from 'react-router-dom'
 import About, { ParallaxLetters } from '../components/About'
-import { fetchGallery, getLanguageContext, fetchPosts, fetchPage, fetchPageBySlug, fetchMenuByLocation } from '../services/wordpressApi'
+import { fetchGallery, getLanguageContext, fetchPosts, fetchPage, fetchPageBySlug, fetchMenuByLocation, fetchActivities } from '../services/wordpressApi'
+import SocialActivitiesGrid from '../components/SocialActivitiesGrid'
 import { WP_CONFIG } from '../config/wpConfig'
 
 
 
 
-	function Home() {
+function Home() {
 	const location = useLocation()
 	const [searchParams] = useSearchParams()
 	const lang = getLanguageContext(location.pathname, searchParams)
@@ -26,6 +27,7 @@ import { WP_CONFIG } from '../config/wpConfig'
 	const [cardsToShow, setCardsToShow] = useState(3)
 	const [topMenuItems, setTopMenuItems] = useState([])
 	const [portalTab, setPortalTab] = useState('all')
+	const [socialActivities, setSocialActivities] = useState([])
 
 	useEffect(() => {
 		const handleResize = () => {
@@ -45,12 +47,13 @@ import { WP_CONFIG } from '../config/wpConfig'
 			setLoadingSlides(true)
 			setNewsIndex(0)
 			try {
-				const [slidesData, gallery, news, homePage, topMenu] = await Promise.all([
+				const [slidesData, gallery, news, homePage, topMenu, activitiesData] = await Promise.all([
 					fetch(`${WP_CONFIG.API_URL}/slider?per_page=5&_embed&lang=${lang}&_t=${Date.now()}`).then(r => r.ok ? r.json() : []),
 					fetchGallery({ lang, per_page: 8 }),
 					fetchPosts({ lang, per_page: 6 }),
 					lang === 'ml' ? fetchPageBySlug('home-page-ml', { lang }) : fetchPage(465, { lang }),
-					fetchMenuByLocation('top_menu_1', lang)
+					fetchMenuByLocation('top_menu_1', lang),
+					fetchActivities({ activity_type: 1991, lang, per_page: 50 })
 				])
 				const slideLang = lang
 				const formattedSlides = (slidesData || [])
@@ -60,16 +63,17 @@ import { WP_CONFIG } from '../config/wpConfig'
 						return true
 					})
 					.map(s => ({
-					id: s.id,
-					title: s.title?.rendered || '',
-					sub: s.content?.rendered?.replace(/<[^>]+>/g, '').trim() || '',
-					image: s._embedded?.['wp:featuredmedia']?.[0]?.source_url || '/images/slider.jpg',
-					buttons: s.acf?.slider_buttons || []
-				}))
+						id: s.id,
+						title: s.title?.rendered || '',
+						sub: s.content?.rendered?.replace(/<[^>]+>/g, '').trim() || '',
+						image: s._embedded?.['wp:featuredmedia']?.[0]?.source_url || '/images/slider.jpg',
+						buttons: s.acf?.slider_buttons || []
+					}))
 				setSlides(formattedSlides)
 				setGalleryItems(gallery || [])
 				setNewsItems(news || [])
 				setTopMenuItems(topMenu || [])
+				setSocialActivities(activitiesData || [])
 
 				if (homePage?.acf?.buttons_2) {
 					const resolveMedia = async (id) => {
@@ -187,56 +191,56 @@ import { WP_CONFIG } from '../config/wpConfig'
 				<ParallaxLetters />
 				{/* Hero Slider */}
 				{slides.length > 0 && (
-				<div className="container slider_wrapper" style={{ position: 'relative', zIndex: 2 }}>
-					<div className="hero-slider" onMouseEnter={() => setIsHeroPaused(true)} onMouseLeave={() => setIsHeroPaused(false)}>
-                    <div className="slider-container">
-                        {slides.map((slide, index) => (
-                            <div key={slide.id} className={`slide ${index === currentSlide ? 'active' : ''}`}>
-                                <div className="slide-bg" style={{ backgroundImage: `url('${slide.image}')` }}></div>
-                                <div className="container">
-                                    <div className="slide-content-wrapper">
-                                        <div className="slide-content">
-                                            <h2 className="slide-title">{slide.title}</h2>
-                                            {slide.sub && <p className="slide-sub">{slide.sub}</p>}
-                                            {slide.buttons.length > 0 && (
-                                            <div className="slide-cta">
-                                                {slide.buttons.map((btn, i) => (
-                                                    <a key={i} href={btn.button_link?.url || '#'} className={`btn ${i === 0 ? 'primary' : ''}`} target={btn.button_link?.target || '_self'} rel={btn.button_link?.target === '_blank' ? 'noopener' : ''}>
-                                                        {btn.button_text}
-                                                    </a>
-                                                ))}
-                                            </div>
-                                            )}
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        ))}
-                    </div>
+					<div className="container slider_wrapper" style={{ position: 'relative', zIndex: 2 }}>
+						<div className="hero-slider" onMouseEnter={() => setIsHeroPaused(true)} onMouseLeave={() => setIsHeroPaused(false)}>
+							<div className="slider-container" style={{ transform: `translateX(-${currentSlide * 100}%)` }}>
+								{slides.map((slide, index) => (
+									<div key={slide.id} className={`slide ${index === currentSlide ? 'active' : ''}`}>
+										<div className="slide-bg" style={{ backgroundImage: `url('${slide.image}')` }}></div>
+										<div className="container">
+											<div className="slide-content-wrapper">
+												<div className="slide-content">
+													<h2 className="slide-title">{slide.title}</h2>
+													{slide.sub && <p className="slide-sub">{slide.sub}</p>}
+													{slide.buttons.length > 0 && (
+														<div className="slide-cta">
+															{slide.buttons.map((btn, i) => (
+																<a key={i} href={btn.button_link?.url || '#'} className={`btn ${i === 0 ? 'primary' : ''}`} target={btn.button_link?.target || '_self'} rel={btn.button_link?.target === '_blank' ? 'noopener' : ''}>
+																	{btn.button_text}
+																</a>
+															))}
+														</div>
+													)}
+												</div>
+											</div>
+										</div>
+									</div>
+								))}
+							</div>
 
-                    <div className="slider-dots">
-                        {slides.map((_, index) => (
-                            <button
-                                key={index}
-                                className={`dot ${index === currentSlide ? 'active' : ''}`}
-                                onClick={() => setCurrentSlide(index)}
-                                aria-label={`Go to slide ${index + 1}`}
-                            ></button>
-                        ))}
-                    </div>
+							<div className="slider-dots">
+								{slides.map((_, index) => (
+									<button
+										key={index}
+										className={`dot ${index === currentSlide ? 'active' : ''}`}
+										onClick={() => setCurrentSlide(index)}
+										aria-label={`Go to slide ${index + 1}`}
+									></button>
+								))}
+							</div>
 
-                    <button className="slider-arrow prev" onClick={() => setCurrentSlide((currentSlide - 1 + slides.length) % slides.length)} aria-label="Previous slide"></button>
-                    <button className="slider-arrow next" onClick={() => setCurrentSlide((currentSlide + 1) % slides.length)} aria-label="Next slide"></button>
+							<button className="slider-arrow prev" onClick={() => setCurrentSlide((currentSlide - 1 + slides.length) % slides.length)} aria-label="Previous slide"></button>
+							<button className="slider-arrow next" onClick={() => setCurrentSlide((currentSlide + 1) % slides.length)} aria-label="Next slide"></button>
 
-                    <div className="slide-counter">
-                        <span className="current">{String(currentSlide + 1).padStart(2, '0')}</span> / <span className="total">{String(slides.length).padStart(2, '0')}</span>
-                    </div>
-                </div>
-            </div>
-			)}
+							<div className="slide-counter">
+								<span className="current">{String(currentSlide + 1).padStart(2, '0')}</span> / <span className="total">{String(slides.length).padStart(2, '0')}</span>
+							</div>
+						</div>
+					</div>
+				)}
 
-			{/* About Section */}
-			<About homePageData={homePageData} />
+				{/* About Section */}
+				<About homePageData={homePageData} />
 			</section>
 
 			{/* News Section */}
@@ -247,8 +251,8 @@ import { WP_CONFIG } from '../config/wpConfig'
 							<h2>{lang === 'ml' ? '📰 വാർത്തകൾ' : '📰 Latest News & Announcements'}</h2>
 							<p>{lang === 'ml' ? 'സർവകലാശാലയിലെ പുതിയ സംഭവവികാസങ്ങളും പരിഷ്‌കാരങ്ങളും.' : 'The latest developments and reforms in the university.'}</p>
 						</div>
-						<Link 
-							to={lang === 'ml' ? '/news' : `/${lang}/news`} 
+						<Link
+							to={lang === 'ml' ? '/news' : `/${lang}/news`}
 							className="btn primary"
 						>
 							{lang === 'ml' ? 'എല്ലാ വാർത്തകളും കാണുക →' : 'View All News →'}
@@ -256,8 +260,8 @@ import { WP_CONFIG } from '../config/wpConfig'
 					</div>
 
 					<div className="news-slider-container">
-						<div 
-							className="news-slider-track" 
+						<div
+							className="news-slider-track"
 							id="newsSliderTrack"
 							style={{ transform: `translateX(-${newsIndex * (100 / cardsToShow)}%)` }}
 						>
@@ -268,8 +272,8 @@ import { WP_CONFIG } from '../config/wpConfig'
 								</div>
 							) : newsItems.length > 0 ? (
 								newsItems.map(news => (
-									<Link 
-										key={news.id} 
+									<Link
+										key={news.id}
 										to={lang === 'ml' ? `/news/${news.slug}` : `/${lang}/news/${news.slug}`}
 										className="news-text-card-home"
 									>
@@ -343,8 +347,8 @@ import { WP_CONFIG } from '../config/wpConfig'
 							<h2>{lang === 'ml' ? 'പദ്ധതികളും സംരംഭങ്ങളും' : 'Projects & Initiatives'}</h2>
 							<p>{lang === 'ml' ? 'മലയാളസർവകലാശാലയുടെ വിവിധ പദ്ധതികളും സംരംഭങ്ങളും.' : 'Various projects and initiatives of Malayalam University.'}</p>
 						</div>
-						<Link 
-							to={lang === 'ml' ? '/initiatives' : `/${lang}/initiatives`} 
+						<Link
+							to={lang === 'ml' ? '/initiatives' : `/${lang}/initiatives`}
 							className="btn primary"
 						>
 							{lang === 'ml' ? 'കൂടുതൽ കാണുക →' : 'View All Initiatives →'}
@@ -361,7 +365,7 @@ import { WP_CONFIG } from '../config/wpConfig'
 							homePageData.acf.buttons.map((btn, index) => {
 								const btnLinkField = btn.external_link || btn.link || '#'
 								const linkUrl = typeof btnLinkField === 'object' && btnLinkField?.url ? btnLinkField.url : btnLinkField
-								
+
 								const isExternal = linkUrl.startsWith('http') && !linkUrl.startsWith(WP_CONFIG.SITE_URL)
 								const internalPath = !isExternal && linkUrl.startsWith(WP_CONFIG.SITE_URL)
 									? linkUrl.replace(WP_CONFIG.SITE_URL, '') || '/'
@@ -404,6 +408,26 @@ import { WP_CONFIG } from '../config/wpConfig'
 				</div>
 			</section>
 
+			{/* Socially Committed Activities Section */}
+			<section id="social-activities" className="section" style={{ background: 'var(--bg0, #f8fafc)', padding: '30px 0 !important', borderTop: '1px solid var(--stroke, rgba(0,0,0,0.06))' }}>
+				<div className="container">
+					<div className="section-head reveal reveal-up active" style={{ marginBottom: '32px' }}>
+						<div>
+							<h2>{lang === 'ml' ? 'സാമൂഹികപ്രതിബദ്ധതാ പ്രവർത്തനങ്ങൾ' : 'Socially Committed Activities'}</h2>
+							<p>{lang === 'ml' ? 'മലയാളസർവകലാശാലയുടെ വിവിധ സാമൂഹിക പ്രതിബദ്ധതയുള്ള സേവന പ്രവർത്തനങ്ങൾ.' : 'Socially committed activities and community initiatives of Malayalam University.'}</p>
+						</div>
+						<Link
+							to={lang === 'ml' ? '/ml/%e0%b4%b8%e0%b4%be%e0%b4%ae%e0%b5%82%e0%b4%b9%e0%b4%bf%e0%b4%95-%e0%b4%aa%e0%b5%8d%e0%b4%b0%e0%b4%a4%e0%b4%bf%e0%b4%ac%e0%b4%a6%e0%b5%8d%e0%b4%a7%e0%b4%a4%e0%b4%af%e0%b5%81%e0%b4%b3%e0%b5%8d%e0%b4%b3/' : '/en/extension-activities'}
+							className="btn primary"
+						>
+							{lang === 'ml' ? 'കൂടുതൽ കാണുക →' : 'View All Activities →'}
+						</Link>
+					</div>
+
+					<SocialActivitiesGrid activities={socialActivities} lang={lang} />
+				</div>
+			</section>
+
 			<section className="principles-banner" id="principles">
 				<div className="container">
 					<div className="principles-statement reveal reveal-up active">
@@ -416,16 +440,16 @@ import { WP_CONFIG } from '../config/wpConfig'
 			<section className="campus-section" id="campus">
 				<div className="container">
 
-				
+
 					<div className="campus-story">
 						<div className="story-grid">
 							<div className="story-text">
 								<h3>{lang === 'ml' ? 'ക്യാമ്പസും സൗകര്യങ്ങളും' : 'Campus & Facilities'}</h3>
 								<p><b>{lang === 'ml' ? 'അറിവ് പ്രകൃതിയെയും സംസ്കാരത്തെയും ഒന്നിപ്പിക്കുന്നിടം' : 'Where Knowledge Unites Nature and Culture'}</b></p>
 								<p>
-									{lang === 'ml' ? 
-									'മലയാളസർവകലാശാലയുടെ കാമ്പസ് അവിശ്വസനീയമായ സ്വാഭാവിക സൗന്ദര്യവും, സമാധാനപൂർവകമായ പഠനവാതവരണവും വാഗ്ദാനം ചെയ്യുന്നു. ആധുനിക സൗകര്യങ്ങൾ, നീളംകൊണ്ട് വിരലെടുത്ത ശാഖകൾ, വൈവിധ്യമാർന്ന പഠനകേന്ദ്രങ്ങൾ, ഗവേഷണ പ്രോജക്റ്റുകൾ, ശാഖകളുമായി സമന്വയിച്ച കൃത്യമായ സൗകര്യങ്ങൾ എല്ലാം വിദ്യാർഥികൾക്ക് ഉത്തമമായ പഠന അനുഭവം നൽകുന്നു. വിപുലമായ ഗ്രന്ഥാലയം, വിശാലമായ ഗാർഡൻ, വിവിധ ശില്പകലാസംഗ്രഹങ്ങൾ, പൈതൃക മ്യൂസിയം തുടങ്ങിയവയും അതിന്റെ ഭാഗമാണ്. സഹജമായ പഠനവാതവരണവും സൗഹൃദപരമായ ക്ലാസുകൾ, വിദ്യാർത്ഥികളിൽ പ്രചോദനവും ഉന്നമനവും ഉണ്ടാക്കുന്നു.' :
-									'The campus of Malayalam University offers incredible natural beauty and a peaceful learning environment. Modern facilities, diverse learning centers, research projects, and well-integrated amenities provide students with an excellent educational experience. A comprehensive library, expansive gardens, various art collections, and a heritage museum are all part of this campus. The natural learning atmosphere and friendly classes inspire and uplift the students.'
+									{lang === 'ml' ?
+										'മലയാളസർവകലാശാലയുടെ കാമ്പസ് അവിശ്വസനീയമായ സ്വാഭാവിക സൗന്ദര്യവും, സമാധാനപൂർവകമായ പഠനവാതവരണവും വാഗ്ദാനം ചെയ്യുന്നു. ആധുനിക സൗകര്യങ്ങൾ, നീളംകൊണ്ട് വിരലെടുത്ത ശാഖകൾ, വൈവിധ്യമാർന്ന പഠനകേന്ദ്രങ്ങൾ, ഗവേഷണ പ്രോജക്റ്റുകൾ, ശാഖകളുമായി സമന്വയിച്ച കൃത്യമായ സൗകര്യങ്ങൾ എല്ലാം വിദ്യാർഥികൾക്ക് ഉത്തമമായ പഠന അനുഭവം നൽകുന്നു. വിപുലമായ ഗ്രന്ഥാലയം, വിശാലമായ ഗാർഡൻ, വിവിധ ശില്പകലാസംഗ്രഹങ്ങൾ, പൈതൃക മ്യൂസിയം തുടങ്ങിയവയും അതിന്റെ ഭാഗമാണ്. സഹജമായ പഠനവാതവരണവും സൗഹൃദപരമായ ക്ലാസുകൾ, വിദ്യാർത്ഥികളിൽ പ്രചോദനവും ഉന്നമനവും ഉണ്ടാക്കുന്നു.' :
+										'The campus of Malayalam University offers incredible natural beauty and a peaceful learning environment. Modern facilities, diverse learning centers, research projects, and well-integrated amenities provide students with an excellent educational experience. A comprehensive library, expansive gardens, various art collections, and a heritage museum are all part of this campus. The natural learning atmosphere and friendly classes inspire and uplift the students.'
 									}
 								</p>
 							</div>
@@ -434,7 +458,7 @@ import { WP_CONFIG } from '../config/wpConfig'
 						</div>
 					</div>
 
-				
+
 					<div className="campus-highlights">
 						<div className="campus-card has-image">
 							<div className="card-bg" style={{ backgroundImage: "url('/images/gallery1.jpg')" }}></div>
@@ -465,7 +489,7 @@ import { WP_CONFIG } from '../config/wpConfig'
 						</div>
 					</div>
 
-				
+
 					<div className="facility-grid">
 						{topMenuItems.length > 0 ? topMenuItems.map((item, index) => {
 							const url = item.url || '#'
@@ -486,7 +510,7 @@ import { WP_CONFIG } from '../config/wpConfig'
 							<>
 								<span className="facility-item">{lang === 'ml' ? 'പൈതൃക മ്യൂസിയം' : 'Heritage Museum'}</span>
 								<span className="facility-item">{lang === 'ml' ? 'ഐ.ടി സൗകര്യങ്ങൾ' : 'IT Facilities'}</span>
-								<span className="facility-item">{lang === 'ml' ? 'ഗ്രന്ഥാലയം' : 'Library'}</span>                
+								<span className="facility-item">{lang === 'ml' ? 'ഗ്രന്ഥാലയം' : 'Library'}</span>
 								<span className="facility-item">{lang === 'ml' ? 'തിയേറ്റർ' : 'Theater'}</span>
 								<span className="facility-item">{lang === 'ml' ? 'യാത്രാസൗകര്യങ്ങൾ' : 'Transport Facilities'}</span>
 								<span className="facility-item">{lang === 'ml' ? 'സ്പോർട്സ്' : 'Sports'}</span>
@@ -502,7 +526,7 @@ import { WP_CONFIG } from '../config/wpConfig'
 						)}
 					</div>
 
-					
+
 					{/* <div className="campus-cta">
 						<h3>കാമ്പസ് നേരിൽ കാണൂ ·</h3>
 						<p>മലയാളസർവകലാശാലയുടെ വിവിധ കാമ്പസ് സൗകര്യങ്ങൾ, അങ്കണങ്ങൾ, ക്ലാസുകൾ, ഗാർഡൻ, ലൈബ്രറി, മ്യൂസിയം എന്നിവ

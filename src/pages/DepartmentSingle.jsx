@@ -60,7 +60,7 @@ function DepartmentSingle() {
         if (cancelled) return
         if (!term) { setTermNotFound(true); return }
         setCurrentTerm(term)
-        
+
         const allTerms = await fetchFacultyDepartments({ lang, per_page: 100 })
         if (cancelled) return
         const childTermIds = allTerms.filter(t => t.parent === Number(termId)).map(t => t.id)
@@ -85,7 +85,7 @@ function DepartmentSingle() {
       const [facData, actData, courseData, termData, galleryData, termGalleryData, studentData, slugs] = await Promise.all([
         fetchFaculties({ lang }),
         deptTermIds.length > 0 ? fetchActivities({ faculty_department: deptTermIds[0], lang }) : Promise.resolve([]),
-        deptTermIds.length > 0 ? fetchCourses({ faculty_department: deptTermIds[0], lang }) : Promise.resolve([]),
+        deptTermIds.length > 0 ? fetchCourses({ faculty_department: deptTermIds[0], per_page: 100, lang }) : Promise.resolve([]),
         deptTermIds.length > 0 ? fetchFacultyDepartment(deptTermIds[0]) : Promise.resolve(null),
         galleryIds.length > 0 ? fetchGallery({ include: galleryIds.join(','), per_page: 50, lang }) : Promise.resolve([]),
         deptTermIds.length > 0 ? fetchGallery({ faculty_department: deptTermIds[0], per_page: 50, lang }) : Promise.resolve([]),
@@ -96,13 +96,13 @@ function DepartmentSingle() {
 
       const filtered = deptTermIds.length > 0
         ? facData.filter(f => {
-            const fTerms = (f._embedded?.['wp:term'] || []).flat().filter(t => t.taxonomy === 'faculty_department')
-            if (fTerms.length > 0) return fTerms.some(t => deptTermIds.includes(t.id))
-            if (f.faculty_department && Array.isArray(f.faculty_department)) {
-              return f.faculty_department.some(fid => deptTermIds.includes(Number(fid)))
-            }
-            return false
-          })
+          const fTerms = (f._embedded?.['wp:term'] || []).flat().filter(t => t.taxonomy === 'faculty_department')
+          if (fTerms.length > 0) return fTerms.some(t => deptTermIds.includes(t.id))
+          if (f.faculty_department && Array.isArray(f.faculty_department)) {
+            return f.faculty_department.some(fid => deptTermIds.includes(Number(fid)))
+          }
+          return false
+        })
         : []
 
       setFaculties(filtered)
@@ -110,7 +110,7 @@ function DepartmentSingle() {
       setCourses(courseData)
       setStudents(studentData)
       if (termData?.slug) setDeptTermSlug(termData.slug)
-      
+
       const mergedGallery = [...galleryData, ...termGalleryData]
       const uniqueGallery = Array.from(new Map(mergedGallery.map(item => [item.id, item])).values())
       if (uniqueGallery.length > 0) setGalleryItems(uniqueGallery)
@@ -247,6 +247,8 @@ function DepartmentSingle() {
                     { id: 'programs', title: lang === 'ml' ? 'പ്രോഗ്രാമുകൾ' : 'Programmes' },
                     { id: 'faculty', title: lang === 'ml' ? 'ഫാക്കൽറ്റി പ്രൊഫൈൽ' : 'Faculty Profile' },
                     { id: 'facilities', title: lang === 'ml' ? 'അടിസ്ഥാനസൗകര്യങ്ങളും സംവിധാനങ്ങളും' : 'Infrastructure & Facilities' },
+                    { id: 'student_projects', title: lang === 'ml' ? 'വിദ്യാർത്ഥി പ്രോജക്റ്റുകൾ' : 'Student Projects' },
+                    { id: 'former_students', title: lang === 'ml' ? 'മുൻകാല വിദ്യാർത്ഥികൾ' : 'Former Students' },
                   ]
                 },
                 {
@@ -282,12 +284,6 @@ function DepartmentSingle() {
                     { id: 'activities_mous', title: lang === 'ml' ? 'ധാരണാപത്രങ്ങൾ (MoUs)' : 'MoUs' },
                     { id: 'activities_addon_courses', title: lang === 'ml' ? 'ആഡ്-ഓൺ കോഴ്‌സുകൾ / ഓൺലൈൻ കോഴ്‌സുകൾ' : 'Add-on Courses / Online Courses' },
                   ]
-                },
-                {
-                  id: 'student_projects',
-                  title: lang === 'ml' ? 'വിദ്യാർത്ഥി പ്രോജക്റ്റുകൾ' : 'Student Projects',
-                  isSingle: true,
-                  tabId: 'student_projects'
                 },
                 {
                   id: 'achievements',
@@ -334,9 +330,9 @@ function DepartmentSingle() {
                       <span className="group-arrow" aria-hidden="true">
                         <svg width="10" height="10" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
                           {isOpen ? (
-                            <path d="M2.25 6H9.75" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                            <path d="M2.25 6H9.75" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
                           ) : (
-                            <path d="M6 2.25V9.75M2.25 6H9.75" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                            <path d="M6 2.25V9.75M2.25 6H9.75" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
                           )}
                         </svg>
                       </span>
@@ -384,8 +380,8 @@ function DepartmentSingle() {
                   {imageGallerySlides.length > 1 && (
                     <div className="dept-overview-slider-dots">
                       {imageGallerySlides.map((_, index) => (
-                        <button 
-                          key={index} 
+                        <button
+                          key={index}
                           onClick={() => setCurrentGallerySlide(index)}
                           className={`dept-overview-slider-dot ${index === currentGallerySlide ? 'active' : ''}`}
                           aria-label={`Go to slide ${index + 1}`}
@@ -395,7 +391,7 @@ function DepartmentSingle() {
                   )}
                 </div>
               )}
-              
+
               <h2 style={{ fontSize: '28px', color: 'var(--navy-900)', marginBottom: '24px' }}>
                 {lang === 'ml' ? 'അവലോകനം' : 'Overview'}
               </h2>
@@ -477,7 +473,7 @@ function DepartmentSingle() {
                 <h2 style={{ fontSize: '24px', margin: 0, color: 'var(--navy-900)' }}>{lang === 'ml' ? 'ഫോട്ടോ ഗാലറി' : 'Photo Gallery'}</h2>
                 <Link to={lang === 'ml' ? '/gallery' : `/${lang}/gallery`} className="btn btn-small">View All →</Link>
               </div>
-              
+
               {imageGalleries.length > 0 && (
                 <div style={{ marginBottom: videoGalleries.length > 0 ? '40px' : '0' }}>
                   <GalleryCarousel items={imageGalleries} lang={lang} />
@@ -524,44 +520,58 @@ function DepartmentSingle() {
             </div>
           )}
 
-          {(activeTab === 'curriculum_ba_bsc' || activeTab === 'curriculum_ma_msc' || activeTab === 'curriculum_phd') && (
-            <div className="content-section-modern">
-              <h2 style={{ fontSize: '24px', marginBottom: '24px', color: 'var(--navy-900)' }}>
-                {activeTab === 'curriculum_ba_bsc' ? (lang === 'ml' ? 'ബി.എ / ബി.എസ്.സി പാഠ്യപദ്ധതി' : 'BA / BSc Programmes') :
-                 activeTab === 'curriculum_ma_msc' ? (lang === 'ml' ? 'എം.എ / എം.എസ്.സി പാഠ്യപദ്ധതി' : 'MA / MSc Programmes') :
-                 (lang === 'ml' ? 'പിഎച്ച്.ഡി ഗവേഷണ പ്രോഗ്രാമുകൾ' : 'PhD Research Programmes')}
-              </h2>
-              {courses.length > 0 ? (
-                <div className="modern-program-grid" style={{ marginTop: 0, paddingTop: 0, borderTop: 'none' }}>
-                  {courses.map(course => {
-                    const courseImg = course._embedded?.['wp:featuredmedia']?.[0]?.source_url
-                    return (
-                      <div key={course.id} className="modern-program-card">
-                        <Link to={`/${lang}/courses/${course.slug}`} className="modern-program-link">
-                          {courseImg ? <img src={courseImg} alt="" className="modern-program-image" /> : <div className="modern-program-image-fallback"></div>}
-                          <div className="modern-program-content">
-                            <h5>{stripHtml(course.title?.rendered || course.title || '')}</h5>
-                            {course.excerpt?.rendered && <p>{stripHtml(course.excerpt.rendered).slice(0, 100)}...</p>}
-                          </div>
-                        </Link>
-                      </div>
-                    )
-                  })}
-                </div>
-              ) : (
-                <div className="dept-info-card">
-                  <p>{lang === 'ml' ? 'ഈ വിഭാഗത്തിലെ പഠന കോഴ്‌സുകളുടെയും ക്രെഡിറ്റ് ഘടനകളുടെയും വിവരങ്ങൾ ലഭ്യമാണ്.' : 'Curriculum structure, semester-wise credit layout, and syllabus specifications for this programme.'}</p>
-                </div>
-              )}
-            </div>
-          )}
+          {(activeTab === 'curriculum_ba_bsc' || activeTab === 'curriculum_ma_msc' || activeTab === 'curriculum_phd') && (() => {
+            const filteredCourses = filterCoursesForTab(courses, activeTab)
+            return (
+              <div className="content-section-modern">
+                <h2 style={{ fontSize: '24px', marginBottom: '24px', color: 'var(--navy-900)' }}>
+                  {activeTab === 'curriculum_ba_bsc' ? (lang === 'ml' ? 'ബി.എ / ബി.എസ്.സി പാഠ്യപദ്ധതി' : 'BA / BSc Programmes') :
+                    activeTab === 'curriculum_ma_msc' ? (lang === 'ml' ? 'എം.എ / എം.എസ്.സി പാഠ്യപദ്ധതി' : 'MA / MSc Programmes') :
+                      (lang === 'ml' ? 'പിഎച്ച്.ഡി ഗവേഷണ പ്രോഗ്രാമുകൾ' : 'PhD Research Programmes')}
+                </h2>
+                {filteredCourses.length > 0 ? (
+                  <div className="modern-program-grid" style={{ marginTop: 0, paddingTop: 0, borderTop: 'none' }}>
+                    {filteredCourses.map(course => {
+                      const courseImg = course._embedded?.['wp:featuredmedia']?.[0]?.source_url
+                      return (
+                        <div key={course.id} className="modern-program-card">
+                          <Link to={`/${lang}/courses/${course.slug}`} className="modern-program-link">
+                            {courseImg ? <img src={courseImg} alt="" className="modern-program-image" /> : <div className="modern-program-image-fallback"></div>}
+                            <div className="modern-program-content">
+                              <h5>{stripHtml(course.title?.rendered || course.title || '')}</h5>
+                              {course.excerpt?.rendered && <p>{stripHtml(course.excerpt.rendered).slice(0, 100)}...</p>}
+                            </div>
+                          </Link>
+                        </div>
+                      )
+                    })}
+                  </div>
+                ) : (
+                  <div className="dept-info-card">
+                    <p>
+                      {activeTab === 'curriculum_ba_bsc' ? (lang === 'ml' ? 'ഈ വിഭാഗത്തിൽ ബി.എ / ബി.എസ്.സി പ്രോഗ്രാമുകൾ ലഭ്യമല്ല.' : 'No BA / BSc programmes available in this department.') :
+                        activeTab === 'curriculum_ma_msc' ? (lang === 'ml' ? 'ഈ വിഭാഗത്തിൽ എം.എ / എം.എസ്.സി പ്രോഗ്രാമുകൾ ലഭ്യമല്ല.' : 'No MA / MSc programmes available in this department.') :
+                          (lang === 'ml' ? 'ഈ വിഭാഗത്തിൽ പിഎച്ച്.ഡി പ്രോഗ്രാമുകൾ ലഭ്യമല്ല.' : 'No PhD research programmes available in this department.')}
+                    </p>
+                  </div>
+                )}
+              </div>
+            )
+          })()}
 
           {activeTab === 'curriculum_po_pso' && (
             <div className="content-section-modern">
               <h2 style={{ fontSize: '24px', marginBottom: '24px', color: 'var(--navy-900)' }}>
                 {lang === 'ml' ? 'പി.ഒ & പി.എസ്.ഒ (കോഴ്സ് ലക്ഷ്യങ്ങൾ) & സിലബസ്' : 'PO & PSO (Program Outcomes) & Syllabus'}
               </h2>
-              {wpDept?.acf?.syllabus?.length > 0 ? (
+              
+              {wpDept?.acf?.po_and_pso && (
+                <div className="po-pso-content-container" style={{ marginBottom: '28px' }}>
+                  <GutenbergContent html={wpDept.acf.po_and_pso} className="gutenberg-content page-content-body" />
+                </div>
+              )}
+
+              {wpDept?.acf?.syllabus?.length > 0 && (
                 <div className="modern-table-wrap">
                   <table>
                     <thead>
@@ -591,7 +601,9 @@ function DepartmentSingle() {
                     </tbody>
                   </table>
                 </div>
-              ) : (
+              )}
+
+              {!wpDept?.acf?.po_and_pso && !wpDept?.acf?.syllabus?.length && (
                 <div className="dept-info-card">
                   <p>{lang === 'ml' ? 'പ്രോഗ്രാം ലക്‌ഷ്യങ്ങളും (PO) കോഴ്‌സ് ഔട്ട്‌കം വിവരങ്ങളും സിലബസ് കോപ്പികളും ഇവിടെ ലഭ്യമാണ്.' : 'Detailed documentation of Program Outcomes (PO), Program Specific Outcomes (PSO), and course syllabus documents.'}</p>
                 </div>
@@ -672,15 +684,15 @@ function DepartmentSingle() {
                     const actImg = activity._embedded?.['wp:featuredmedia']?.[0]?.source_url
                     const isOpen = openActivityId === activity.id
                     const isExpanded = expandedContentId === activity.id
-                    
+
                     const strippedContent = activity.content?.rendered ? stripHtml(activity.content.rendered).replace(/\[&hellip;\]|\.\.\./g, '').trim() : '';
                     const strippedExcerpt = activity.excerpt?.rendered ? stripHtml(activity.excerpt.rendered).replace(/\[&hellip;\]|\.\.\./g, '').trim() : '';
                     const hasMoreContent = strippedContent.length > strippedExcerpt.length;
 
                     return (
                       <div key={activity.id} className="modern-accordion-item">
-                        <button 
-                          className="modern-accordion-header" 
+                        <button
+                          className="modern-accordion-header"
                           onClick={() => {
                             setOpenActivityId(isOpen ? null : activity.id)
                             if (isOpen) setExpandedContentId(null)
@@ -701,14 +713,14 @@ function DepartmentSingle() {
                             ) : (
                               <p style={{ marginBottom: '12px' }}>{lang === 'ml' ? 'കൂടുതൽ വിവരങ്ങൾ ലഭ്യമല്ല.' : 'No more details available.'}</p>
                             )}
-                            
+
                             {hasMoreContent && (
-                              <button 
+                              <button
                                 onClick={() => setExpandedContentId(isExpanded ? null : activity.id)}
                                 style={{ color: 'var(--blue-500)', fontWeight: '600', textDecoration: 'none', fontSize: '13px', background: 'none', border: 'none', padding: 0, cursor: 'pointer' }}
                               >
-                                {isExpanded 
-                                  ? (lang === 'ml' ? 'ചുരുക്കുക' : 'Read less') 
+                                {isExpanded
+                                  ? (lang === 'ml' ? 'ചുരുക്കുക' : 'Read less')
                                   : (lang === 'ml' ? 'കൂടുതൽ വായിക്കുക' : 'Read more')} &rarr;
                               </button>
                             )}
@@ -817,11 +829,24 @@ function DepartmentSingle() {
           {activeTab === 'student_projects' && (
             <div className="content-section-modern">
               <h2 style={{ fontSize: '24px', marginBottom: '24px', color: 'var(--navy-900)' }}>{lang === 'ml' ? 'വിദ്യാർത്ഥി പ്രോജക്റ്റുകൾ' : 'Student Projects'}</h2>
+              {wpDept?.acf?.student_projects ? (
+                <GutenbergContent html={wpDept.acf.student_projects} />
+              ) : (
+                <div className="dept-info-card">
+                  <p>{lang === 'ml' ? 'വിദ്യാർത്ഥികളുടെ ഗവേഷണ പ്രോജക്റ്റുകളും ഫീൽഡ് പ്രോജക്റ്റ് റിപ്പോർട്ടുകളും.' : 'Student dissertations, field study projects, research monographs, and practical work.'}</p>
+                </div>
+              )}
+            </div>
+          )}
+
+          {activeTab === 'former_students' && (
+            <div className="content-section-modern">
+              <h2 style={{ fontSize: '24px', marginBottom: '24px', color: 'var(--navy-900)' }}>{lang === 'ml' ? 'മുൻകാല വിദ്യാർത്ഥികൾ' : 'Former Students'}</h2>
               {students.length > 0 ? (
                 <StudentAccordion items={students} lang={lang} />
               ) : (
                 <div className="dept-info-card">
-                  <p>{lang === 'ml' ? 'വിദ്യാർത്ഥികളുടെ ഗവേഷണ പ്രോജക്റ്റുകളും ഫീൽഡ് പ്രോജക്റ്റ് റിപ്പോർട്ടുകളും.' : 'Student dissertations, field study projects, research monographs, and practical work.'}</p>
+                  <p>{lang === 'ml' ? 'ഈ വിഭാഗത്തിൽ പഠിച്ച മുൻകാല വിദ്യാർത്ഥികളുടെ വിവരങ്ങൾ ലഭ്യമാണ്.' : 'List of former students who studied in this department.'}</p>
                 </div>
               )}
             </div>
@@ -899,17 +924,17 @@ function DepartmentSingle() {
                         <div>
                           <h4 className="modern-faculty-card-name">{name}</h4>
                           {role && <div className="modern-faculty-card-role-wrapper"><span className="modern-faculty-card-role">{role}</span></div>}
-                          
+
                           <div className="modern-faculty-card-contact">
                             {f.acf?.phone_number && (
                               <div className="modern-faculty-card-contact-item">
-                                <img src="/images/phone.png" alt="Phone" /> 
+                                <img src="/images/phone.png" alt="Phone" />
                                 <span>{f.acf.phone_number}</span>
                               </div>
                             )}
                             {f.acf?.email_address && (
                               <div className="modern-faculty-card-contact-item">
-                                <img src="/images/mail.png" alt="Email" /> 
+                                <img src="/images/mail.png" alt="Email" />
                                 <a href={`mailto:${f.acf.email_address}`}>{f.acf.email_address}</a>
                               </div>
                             )}
@@ -933,11 +958,11 @@ function DepartmentSingle() {
 
                         <div className="modern-faculty-card-actions">
                           {getFacultyProfileUrl(f) && (
-                            <a 
-                              href={getFacultyProfileUrl(f)} 
-                              target="_blank" 
-                              rel="noopener noreferrer" 
-                              className="btn primary modern-faculty-card-btn-primary" 
+                            <a
+                              href={getFacultyProfileUrl(f)}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="btn primary modern-faculty-card-btn-primary"
                             >
                               {lang === 'ml' ? 'വിശദമായ പ്രൊഫൈൽ' : 'Profile PDF'}
                             </a>
@@ -1078,11 +1103,11 @@ function GalleryCarousel({ items, lang, isVideo }) {
         {items.map(item => {
           const embedUrl = getYoutubeEmbedUrl(item.video)
           const linkTo = lang === 'ml' ? `/gallery/${item.slug}` : `/${lang}/gallery/${item.slug}`
-          
+
           const overlayStyle = { position: 'absolute', bottom: 0, left: 0, right: 0, padding: '12px', background: 'linear-gradient(transparent, rgba(0,0,0,0.8))', color: '#fff' };
           const playBtnStyle = { position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(0,0,0,0.3)' };
           const playIconStyle = { width: '48px', height: '48px', background: 'var(--blue-500)', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center' };
-          
+
           return (
             <div key={item.id} className="dept-grid-card" style={{ cursor: embedUrl ? 'pointer' : undefined, margin: 0, width: '100%', height: '130px', position: 'relative', overflow: 'hidden', borderRadius: '4px' }}>
               {embedUrl ? (
@@ -1138,9 +1163,9 @@ function GalleryCarousel({ items, lang, isVideo }) {
           )}
 
           <div className="lightbox-content">
-            <img 
-              src={getFullImageUrl(activeGalleryImages[currentIndex])} 
-              alt="Gallery Preview" 
+            <img
+              src={getFullImageUrl(activeGalleryImages[currentIndex])}
+              alt="Gallery Preview"
               onClick={(e) => e.stopPropagation()}
             />
             <div className="lightbox-info">
@@ -1157,4 +1182,36 @@ function GalleryCarousel({ items, lang, isVideo }) {
   )
 }
 
+const BA_BSC_CATS = [1375, 1377]
+const MA_MSC_CATS = [12, 30]
+const PHD_CATS = [14, 114]
+
+function filterCoursesForTab(courseList, tabId) {
+  if (!courseList || !Array.isArray(courseList)) return []
+  return courseList.filter(course => {
+    const cats = course.course_category || []
+    const rawTitle = course.title?.rendered || course.title || ''
+    const title = stripHtml(rawTitle).trim()
+    const slug = course.slug || ''
+
+    const isPhd = cats.some(id => PHD_CATS.includes(id)) ||
+      /(ph\.?d|m\.?phil|പി\.?\s*എച്ച്|പിഎച്ച്\.ഡി|എം\.?\s*ഫില്‍|ഗവേഷണം)/i.test(title) ||
+      /(phd|mphil)/i.test(slug)
+
+    const isBaBsc = cats.some(id => BA_BSC_CATS.includes(id)) ||
+      /(b\.?\s*sc|b\.?\s*a|b\.?\s*com|b\.?\s*voc|ബി\.?\s*എ|ബി\.?\s*എസ്\s*സി)/i.test(title) ||
+      /(ba-|bsc-|bcom-)/i.test(slug)
+
+    const isMaMsc = cats.some(id => MA_MSC_CATS.includes(id)) ||
+      /(m\.?\s*sc|m\.?\s*a|m\.?\s*com|m\.?\s*voc|എം\.?\s*എ|എം\.?\s*എസ്\s*സി)/i.test(title) ||
+      /(ma-|msc-|mcom-)/i.test(slug)
+
+    if (tabId === 'curriculum_phd') return isPhd
+    if (tabId === 'curriculum_ba_bsc') return isBaBsc && !isPhd
+    if (tabId === 'curriculum_ma_msc') return isMaMsc && !isPhd
+    return true
+  })
+}
+
 export default DepartmentSingle
+

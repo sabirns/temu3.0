@@ -1,9 +1,10 @@
 import { useState, useEffect } from 'react'
 import { useParams, Link, useSearchParams, useLocation } from 'react-router-dom'
-import { fetchPage, fetchPageBySlug, getPageContent, getLanguageContext, extractTranslationSlugs } from '../services/wordpressApi'
+import { fetchPage, fetchPageBySlug, getPageContent, getLanguageContext, extractTranslationSlugs, fetchActivities } from '../services/wordpressApi'
 import { WP_CONFIG } from '../config/wpConfig'
 import { usePageInfo } from '../services/PageInfoContext'
 import GutenbergContent from '../components/GutenbergContent'
+import SocialActivitiesGrid from '../components/SocialActivitiesGrid'
 
 
 function WordPressPage() {
@@ -13,11 +14,11 @@ function WordPressPage() {
   const fullSlug = splat ? `${slug}/${splat}` : slug
   const [searchParams] = useSearchParams()
   const location = useLocation()
-  
+
   // Detect language from path or query
   const lang = getLanguageContext(location.pathname, searchParams)
   const isCourseSubPage = (slug === 'our-courses-ml' || slug === 'courses-offered') && splat;
-  
+
   const { setPageInfo } = usePageInfo()
 
   const [page, setPage] = useState(null)
@@ -25,6 +26,8 @@ function WordPressPage() {
   const [error, setError] = useState(null)
   const [courses, setCourses] = useState([])
   const [coursesLoading, setCoursesLoading] = useState(false)
+  const [activities, setActivities] = useState([])
+  const [activitiesLoading, setActivitiesLoading] = useState(false)
   const [subLinks, setSubLinks] = useState([])
 
   useEffect(() => {
@@ -81,7 +84,7 @@ function WordPressPage() {
               const normalizedRequested = requestedPath.replace(/^\/+|\/+$/g, '')
               console.debug('WordPressPage [comparing link vs path]:', normalizedLink, 'vs', normalizedRequested)
               return normalizedLink === normalizedRequested ||
-                     normalizedLink.endsWith(`/${normalizedRequested}`)
+                normalizedLink.endsWith(`/${normalizedRequested}`)
             })
 
             if (matchedPage) {
@@ -105,7 +108,7 @@ function WordPressPage() {
                       if (pRes.ok) {
                         const pData = await pRes.json()
                         const expectedSlug = parentSlugs[i]
-                        const actualSlug   = decodeURIComponent(pData.slug || '')
+                        const actualSlug = decodeURIComponent(pData.slug || '')
                         console.debug('WordPressPage [parent chain check]: level', i, 'expected', expectedSlug, 'got', actualSlug)
                         if (actualSlug !== expectedSlug) { match = false; break }
                         currentId = pData.parent
@@ -165,6 +168,28 @@ function WordPressPage() {
               setCoursesLoading(false)
             }
           }
+
+          // Fetch activities for Socially Committed Activities page (activity_type=1991)
+          const decodedPath = decodeURIComponent(location.pathname)
+          const isSocialActivitiesPage =
+            data.id === 2079 ||
+            data.id === 700 ||
+            decodedPath.includes('സാമൂഹിക-പ്രതിബദ്ധതയുള്ള') ||
+            decodedPath.includes('extension-activities') ||
+            pageData.acf?.activity_type != null
+
+          if (isSocialActivitiesPage) {
+            setActivitiesLoading(true)
+            try {
+              const actTypeId = pageData.acf?.activity_type || 1991
+              const actData = await fetchActivities({ activity_type: actTypeId, lang, per_page: 50 })
+              setActivities(actData)
+            } catch (e) {
+              console.warn('Failed to fetch activities:', e)
+            } finally {
+              setActivitiesLoading(false)
+            }
+          }
         } else {
           setError('Page not found')
         }
@@ -184,12 +209,12 @@ function WordPressPage() {
     const tmp = document.createElement('div')
     tmp.innerHTML = page.content || ''
     const textContent = (tmp.textContent || tmp.innerText || '').trim()
-    
+
     // Check if content is effectively empty
     if (textContent === '') {
       let attempts = 0
       const currentPath = decodeURIComponent(window.location.pathname).replace(/\/$/, '') || '/'
-      
+
       const checkMenu = () => {
         const links = Array.from(document.querySelectorAll('#mega-menu-custom a'))
         if (links.length === 0) {
@@ -199,7 +224,7 @@ function WordPressPage() {
           }
           return
         }
-        
+
         const currentLink = links.find(a => {
           const href = a.getAttribute('href')
           if (!href || href === '#') return false
@@ -208,7 +233,7 @@ function WordPressPage() {
             return (decodeURIComponent(url.pathname).replace(/\/$/, '') || '/') === currentPath
           } catch { return false }
         })
-        
+
         if (currentLink) {
           const parentLi = currentLink.closest('li')
           if (parentLi) {
@@ -223,7 +248,7 @@ function WordPressPage() {
           }
         }
       }
-      
+
       checkMenu()
     } else {
       setSubLinks([])
@@ -294,9 +319,9 @@ function WordPressPage() {
               <span>/</span>
               <span dangerouslySetInnerHTML={{ __html: page.title }} />
             </nav>
-            <h1 
-              className="inner-hero-title" 
-              dangerouslySetInnerHTML={{ __html: page.title }} 
+            <h1
+              className="inner-hero-title"
+              dangerouslySetInnerHTML={{ __html: page.title }}
             />
           </div>
         </section>
@@ -324,13 +349,13 @@ function WordPressPage() {
                   <img src={page.featuredImage} alt={page.title} style={{ width: '100%', display: 'block' }} />
                 </div>
               )}
-              
-              <GutenbergContent 
+
+              <GutenbergContent
                 html={page.content}
                 className="page-content wordpress-content"
-                style={{ 
-                  fontSize: '18px', 
-                  lineHeight: '1.8', 
+                style={{
+                  fontSize: '18px',
+                  lineHeight: '1.8',
                   color: 'var(--text)',
                 }}
               />
@@ -348,6 +373,18 @@ function WordPressPage() {
                 )
               })()}
 
+              {/* Social Activities Grid section (post_type=activity, taxonomy=activity_type, tag_ID=1991) */}
+              {activitiesLoading ? (
+                <div style={{ marginTop: '40px', textAlign: 'center', padding: '40px' }}>
+                  <div className="loading-spinner"></div>
+                  <p style={{ marginTop: '16px', color: 'var(--muted)' }}>
+                    {lang === 'ml' ? 'പ്രവർത്തനങ്ങൾ ലോഡ് ചെയ്യുന്നു...' : 'Loading activities...'}
+                  </p>
+                </div>
+              ) : activities.length > 0 ? (
+                <SocialActivitiesGrid activities={activities} lang={lang} isGrid={true} />
+              ) : null}
+
               {/* Sub-menu Cards for empty pages */}
               {subLinks.length > 0 && (
                 <div className="submenu-cards-section" style={{ marginTop: '40px' }}>
@@ -355,7 +392,7 @@ function WordPressPage() {
                     {subLinks.map((link, idx) => {
                       const isInternal = link.url.startsWith('/') || link.url.startsWith(window.location.origin)
                       const path = isInternal && link.url.startsWith('http') ? new URL(link.url).pathname : link.url
-                      
+
                       return (
                         <div key={idx} className="portal-card" style={{ padding: '24px', textAlign: 'center' }}>
                           <h3 style={{ fontSize: '20px', color: 'var(--primary)', marginBottom: '16px' }}>{link.title}</h3>

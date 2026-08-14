@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useParams, Link, useLocation, useSearchParams } from 'react-router-dom'
-import { fetchGalleryBySlug, getLanguageContext, extractTranslationSlugs } from '../services/wordpressApi'
+import { fetchGalleryBySlug, fetchGallery, getLanguageContext, extractTranslationSlugs } from '../services/wordpressApi'
 import { usePageInfo } from '../services/PageInfoContext'
 import '../styles/pages.css'
 
@@ -41,6 +41,7 @@ function GallerySingle() {
   const { setPageInfo } = usePageInfo()
 
   const [gallery, setGallery] = useState(null)
+  const [otherGalleries, setOtherGalleries] = useState([])
   const [loading, setLoading] = useState(true)
   const [selectedImage, setSelectedImage] = useState(null)
   const [currentIndex, setCurrentIndex] = useState(0)
@@ -52,8 +53,14 @@ function GallerySingle() {
       try {
         const decodedSlug = decodeURIComponent(slug);
         const data = await fetchGalleryBySlug(decodedSlug, { lang, _t: Date.now() })
-        if (data) setPageInfo({ id: data.id, postType: 'gallery', translationSlugs: await extractTranslationSlugs(data, 'gallery') })
-        setGallery(data)
+        if (data) {
+          setPageInfo({ id: data.id, postType: 'gallery', translationSlugs: await extractTranslationSlugs(data, 'gallery') })
+          setGallery(data)
+
+          // Fetch other galleries for the section below
+          const allGalleries = await fetchGallery({ per_page: 8, lang }) || []
+          setOtherGalleries(allGalleries.filter(item => item.id !== data.id).slice(0, 6))
+        }
       } catch (error) {
         console.error("Error loading gallery:", error)
       }
@@ -147,7 +154,7 @@ function GallerySingle() {
           <nav className="breadcrumb">
             <Link to={`/?lang=${lang}`}>{lang === 'ml' ? 'പൂമുഖം' : 'Home'}</Link>
             <span>/</span>
-            <span>{lang === 'ml' ? 'ചിത്രശാല' : 'Gallery'}</span>
+            <Link to={lang === 'ml' ? '/gallery' : `/${lang}/gallery`}>{lang === 'ml' ? 'ചിത്രശാല' : 'Gallery'}</Link>
             <span>/</span>
             <span dangerouslySetInnerHTML={{ __html: gallery.title }} />
           </nav>
@@ -155,7 +162,8 @@ function GallerySingle() {
         </div>
       </section>
 
-      <div className="container" style={{ padding: '60px 0 100px' }}>
+      {/* Current Gallery Image Grid */}
+      <div className="container" style={{ padding: '60px 0 80px' }}>
         {images.length > 0 ? (
           <div className="gallery-grid">
             {images.map((img, index) => {
@@ -190,6 +198,41 @@ function GallerySingle() {
           </div>
         )}
       </div>
+
+      {/* Other Galleries Section (Matching Home Page) */}
+      {otherGalleries.length > 0 && (
+        <section className="gallery-slider-section research-band" id="gallery" style={{ minHeight: '380px' }}>
+          <div className="container">
+            <div className="section-head reveal reveal-up active" style={{ marginBottom: '32px' }}>
+              <div>
+                <h2>{lang === 'ml' ? '📸 മറ്റു ചിത്രശാലകൾ' : '📸 Other Galleries'}</h2>
+                <p>{lang === 'ml' ? 'മലയാളസർവകലാശാലയുടെ കൂടുതൽ ചിത്രശാലകൾ.' : 'Explore more photo galleries from Malayalam University.'}</p>
+              </div>
+              <Link to={lang === 'ml' ? '/gallery' : `/${lang}/gallery`} className="btn primary">
+                {lang === 'ml' ? 'എല്ലാ ചിത്രശാലകളും കാണുക →' : 'View All Galleries →'}
+              </Link>
+            </div>
+
+            <div className="gallery-slider-container">
+              <div className="gallery-slider-track" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '24px' }}>
+                {otherGalleries.map(item => (
+                  <Link
+                    key={item.id}
+                    to={lang === 'ml' ? `/gallery/${item.slug}` : `/${lang}/gallery/${item.slug}`}
+                    className="gallery-card"
+                  >
+                    <img src={item.image} alt={item.title} loading="lazy" />
+                    <div className="gallery-overlay">
+                      <h3>{item.title}</h3>
+                      {item.desc && <p>{item.desc}</p>}
+                    </div>
+                  </Link>
+                ))}
+              </div>
+            </div>
+          </div>
+        </section>
+      )}
 
       {/* Lightbox Modal */}
       {selectedImage && (

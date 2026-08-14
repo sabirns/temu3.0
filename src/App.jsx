@@ -38,6 +38,8 @@ import ScrollToTop from './components/ScrollToTop'
 import DocumentTitle from './components/DocumentTitle'
 import { PageInfoProvider } from './services/PageInfoContext'
 
+import Landing from './pages/landing'
+
 function TaxonomyRedirect({ base }) {
   const params = useParams()
   const lang = params.lang || ''
@@ -85,18 +87,19 @@ function LinkInterceptor() {
   return null
 }
 
-function App() {
+function AppContent() {
+  const location = useLocation()
+  const isLandingPage = location.pathname === '/' || location.pathname === '/landing'
+
   return (
-    <Router>
-      <LinkInterceptor />
-      <ScrollToTop />
-      <LangFont />
-      <DocumentTitle />
-      <PageInfoProvider>
-      <div className="grid-bg" aria-hidden="true"></div>
-      <Header />
+    <PageInfoProvider>
+      {!isLandingPage && <div className="grid-bg" aria-hidden="true"></div>}
+      {!isLandingPage && <Header />}
       <Routes>
-        <Route path="/" element={<Navigate to="/ml" replace />} />
+        <Route path="/" element={<Landing />} />
+        <Route path="/landing" element={<Landing />} />
+        <Route path="/home" element={<Navigate to="/ml/home" replace />} />
+        <Route path="/:lang/home" element={<Home />} />
         <Route path="/:lang" element={<Home />} />
 
         <Route path="/search" element={<Search />} />
@@ -192,9 +195,20 @@ function App() {
         <Route path="/:slug/*" element={<WordPressPage />} />
         <Route path="/:lang/:slug/*" element={<WordPressPage />} />
       </Routes>
-      <Footer />
-      <FloatingSocial />
-      </PageInfoProvider>
+      {!isLandingPage && <Footer />}
+      {!isLandingPage && <FloatingSocial />}
+    </PageInfoProvider>
+  )
+}
+
+function App() {
+  return (
+    <Router>
+      <LinkInterceptor />
+      <ScrollToTop />
+      <LangFont />
+      <DocumentTitle />
+      <AppContent />
     </Router>
   )
 }

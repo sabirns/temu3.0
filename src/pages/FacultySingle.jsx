@@ -180,107 +180,6 @@ function FacultySingle() {
               </div>
             )}
 
-            {/* Left Sidebar Profile PDF Button matching Department Single Faculty Card */}
-            <div className="faculty-download-sidebar-card" style={{ marginBottom: '16px' }}>
-              {profileUrl ? (
-                <a
-                  href={profileUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="btn primary modern-faculty-card-btn-primary"
-                  style={{
-                    width: '100%',
-                    justifyContent: 'center',
-                    textAlign: 'center',
-                    padding: '11px 16px',
-                    fontSize: '14px',
-                    fontWeight: '600',
-                    borderRadius: 'var(--radius)',
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '6px',
-                    textDecoration: 'none'
-                  }}
-                >
-                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><polyline points="9 15 12 18 15 15"/></svg>
-                  <span>{lang === 'ml' ? 'വിശദമായ പ്രൊഫൈൽ' : 'Profile PDF'}</span>
-                </a>
-              ) : (
-                <button
-                  type="button"
-                  onClick={() => window.print()}
-                  className="btn primary modern-faculty-card-btn-primary"
-                  style={{
-                    width: '100%',
-                    justifyContent: 'center',
-                    textAlign: 'center',
-                    padding: '11px 16px',
-                    fontSize: '14px',
-                    fontWeight: '600',
-                    borderRadius: 'var(--radius)',
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '6px',
-                    cursor: 'pointer'
-                  }}
-                >
-                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><polyline points="9 15 12 18 15 15"/></svg>
-                  <span>{lang === 'ml' ? 'വിശദമായ പ്രൊഫൈൽ' : 'Profile PDF'}</span>
-                </button>
-              )}
-            </div>
-
-            {hasContactInfo && (
-              <div className="faculty-contact-card">
-                <h3 className="faculty-contact-title">
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#ffd700" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
-                  {lang === 'ml' ? 'ബന്ധപ്പെടേണ്ട വിവരങ്ങൾ' : 'Contact Details'}
-                </h3>
-                <div className="faculty-contact-list">
-                  {faculty.acf?.phone_number && (
-                    <div className="faculty-contact-item">
-                      <span className="faculty-contact-icon">
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
-                      </span>
-                      <div>
-                        <div style={{ fontSize: '12px', opacity: 0.7 }}>{lang === 'ml' ? 'ഫോൺ' : 'Phone'}</div>
-                        <a href={`tel:${faculty.acf.phone_number}`} className="faculty-contact-link">
-                          {faculty.acf.phone_number}
-                        </a>
-                      </div>
-                    </div>
-                  )}
-                  {faculty.acf?.email_address && (
-                    <div className="faculty-contact-item">
-                      <span className="faculty-contact-icon">
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
-                      </span>
-                      <div>
-                        <div style={{ fontSize: '12px', opacity: 0.7 }}>{lang === 'ml' ? 'ഇമെയിൽ' : 'Email'}</div>
-                        <a href={`mailto:${faculty.acf.email_address}`} className="faculty-contact-link">
-                          {faculty.acf.email_address}
-                        </a>
-                      </div>
-                    </div>
-                  )}
-                  {profileUrl && (
-                    <div className="faculty-contact-item" style={{ marginTop: '6px' }}>
-                      <a
-                        href={profileUrl}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="btn primary modern-faculty-card-btn-primary"
-                        style={{ width: '100%', textAlign: 'center', justifyContent: 'center', fontSize: '13.5px', padding: '9px 12px', display: 'flex', alignItems: 'center', gap: '6px' }}
-                      >
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><polyline points="9 15 12 18 15 15"/></svg>
-                        <span>{lang === 'ml' ? 'വിശദമായ പ്രൊഫൈൽ' : 'Profile PDF'}</span>
-                      </a>
-                    </div>
-                  )}
-                </div>
-              </div>
-            )}
-
             {/* Side Sticky Navigation Menu */}
             <div className="faculty-side-menu-card">
               <div className="faculty-side-menu-header">
@@ -359,12 +258,54 @@ function FacultySingle() {
                       )}
                     </div>
 
+                    {/* Contact Details Box near Expertise */}
+                    {(faculty.acf?.phone_number || faculty.acf?.email_address) && (
+                      <div className="faculty-contact-inline-box">
+                        <h3 className="faculty-contact-inline-title">
+                          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                          <span>{lang === 'ml' ? 'ബന്ധപ്പെടേണ്ട വിവരങ്ങൾ' : 'Contact Details'}</span>
+                        </h3>
+                        <div className="faculty-contact-inline-grid">
+                          {faculty.acf?.phone_number && (
+                            <div className="faculty-contact-inline-item">
+                              <span className="faculty-contact-inline-icon">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+                              </span>
+                              <div>
+                                <div style={{ fontSize: '11.5px', opacity: 0.7, fontWeight: 500 }}>{lang === 'ml' ? 'ഫോൺ' : 'Phone'}</div>
+                                <a href={`tel:${faculty.acf.phone_number}`} className="faculty-contact-inline-link">
+                                  {faculty.acf.phone_number}
+                                </a>
+                              </div>
+                            </div>
+                          )}
+                          {faculty.acf?.email_address && (
+                            <div className="faculty-contact-inline-item">
+                              <span className="faculty-contact-inline-icon">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+                              </span>
+                              <div>
+                                <div style={{ fontSize: '11.5px', opacity: 0.7, fontWeight: 500 }}>{lang === 'ml' ? 'ഇമെയിൽ' : 'Email'}</div>
+                                <a href={`mailto:${faculty.acf.email_address}`} className="faculty-contact-inline-link">
+                                  {faculty.acf.email_address}
+                                </a>
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    )}
+
                     {/* Area of Expertise Box */}
                     {faculty.acf?.description && (
                       <div className="faculty-expertise-box">
                         <h3 className="faculty-expertise-title">
                           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"/></svg>
-                          <span>{lang === 'ml' ? 'വൈദഗ്ധ്യ മേഖല' : 'Area of Expertise'}</span>
+                          <span>
+                            {faculty.acf?.description_title
+                              ? faculty.acf.description_title
+                              : (lang === 'ml' ? 'വൈദഗ്ധ്യ മേഖല' : 'Area of Expertise')}
+                          </span>
                         </h3>
                         <p className="faculty-expertise-text">
                           {faculty.acf.description}

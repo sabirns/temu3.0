@@ -293,13 +293,20 @@ export async function fetchFacultyDepartments(params = {}) {
 
 export function getFacultyProfileUrl(f) {
   if (!f) return null
-  if (f.profilePdf) return f.profilePdf
   const profile = f.acf?.profile
-  if (typeof profile === 'string' && (profile.startsWith('http') || profile.startsWith('/'))) return profile
+  if (typeof profile === 'string' && profile.trim().length > 0) {
+    const trimmed = profile.trim()
+    if (trimmed.startsWith('http://') || trimmed.startsWith('https://') || trimmed.startsWith('/') || trimmed.endsWith('.pdf')) {
+      return trimmed
+    }
+  }
   if (typeof profile === 'object' && profile !== null) {
     if (profile.url) return profile.url
     if (profile.source_url) return profile.source_url
     if (profile.link) return profile.link
+  }
+  if (f.profilePdf && typeof f.profilePdf === 'string' && f.profilePdf.trim().length > 0) {
+    return f.profilePdf.trim()
   }
   const attachments = (f._embedded?.['wp:attachment'] || []).flat()
   const pdf = attachments.find(att => att.mime_type === 'application/pdf' || (att.source_url && att.source_url.endsWith('.pdf')))
@@ -481,6 +488,22 @@ export async function fetchActivityBySlug(slug, params = {}) {
     const data = await response.json()
     if (data.length > 0) {
       const post = data[0]
+      let activityTypeId = null
+      let activityTypeName = ''
+      const terms = post._embedded?.['wp:term'] || []
+      if (Array.isArray(terms)) {
+        for (const group of terms) {
+          if (Array.isArray(group)) {
+            for (const term of group) {
+              if (term.taxonomy === 'activity_type') {
+                activityTypeId = term.id
+                activityTypeName = term.name
+                break
+              }
+            }
+          }
+        }
+      }
       return {
         id: post.id,
         title: stripHtml(post.title?.rendered || ''),
@@ -489,7 +512,9 @@ export async function fetchActivityBySlug(slug, params = {}) {
         link: post.link,
         slug: post.slug,
         featuredImage: getFeaturedImage(post),
-        excerpt: stripHtml(post.excerpt?.rendered || '')
+        excerpt: stripHtml(post.excerpt?.rendered || ''),
+        activityTypeId,
+        activityTypeName
       }
     }
     return null
@@ -505,6 +530,7 @@ export async function fetchFacultyBySlug(slug, params = {}) {
     const defaultParams = {
       slug: decodedSlug,
       _embed: true,
+      acf_format: 'standard',
       _t: Date.now(),
       lang: 'ml',
       ...params
@@ -529,8 +555,16 @@ export async function fetchFacultyBySlug(slug, params = {}) {
       const embeddedTerms = post._embedded?.['wp:term'] || []
       const departments = embeddedTerms.flat().filter(term => term.taxonomy === 'faculty_department')
       const childDepartments = departments.filter(term => term.parent !== 0)
-      const displayDepartments = childDepartments.length > 0 ? childDepartments : departments
-      const departmentNames = displayDepartments.map(d => d.name).join(', ')
+      
+      // Select strictly the child department term
+      let selectedDepartment = null
+      if (childDepartments.length > 0) {
+        selectedDepartment = childDepartments[childDepartments.length - 1]
+      } else if (departments.length > 0) {
+        selectedDepartment = departments[0]
+      }
+
+      const departmentName = selectedDepartment ? stripHtml(selectedDepartment.name || '') : ''
 
       // Extract attachments/PDF profiles if available
       const attachments = post._embedded?.['wp:attachment'] || []
@@ -548,7 +582,7 @@ export async function fetchFacultyBySlug(slug, params = {}) {
         featuredImage: getFeaturedImage(post),
         excerpt: stripHtml(post.excerpt?.rendered || ''),
         acf: post.acf || {},
-        department: departmentNames,
+        department: departmentName,
         profilePdf: profileUrl,
         attachments: attachments.map(att => ({ id: att.id, title: stripHtml(att.title?.rendered || ''), url: att.source_url }))
       }

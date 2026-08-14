@@ -56,13 +56,35 @@
     font-weight: 600;
 }
 
-.inner-hero .breadcrumb a {
-    color: #fff;
+.inner-hero .breadcrumb a,
+.department-hero .breadcrumb a,
+.faculties-hero .breadcrumb a {
+    color: rgba(255, 255, 255, 0.9);
 }
 
-.inner-hero .breadcrumb span {
-    color: #fff;
-    opacity: 0.75;
+.inner-hero .breadcrumb a:hover,
+.department-hero .breadcrumb a:hover,
+.faculties-hero .breadcrumb a:hover {
+    color: #ffffff;
+    text-decoration: underline;
+}
+
+.inner-hero .breadcrumb span,
+.department-hero .breadcrumb span,
+.faculties-hero .breadcrumb span {
+    color: rgba(255, 255, 255, 0.75);
+    opacity: 1;
+}
+
+.inner-hero .breadcrumb span:last-child,
+.inner-hero .breadcrumb .current,
+.department-hero .breadcrumb span:last-child,
+.department-hero .breadcrumb .current,
+.faculties-hero .breadcrumb span:last-child,
+.faculties-hero .breadcrumb .current {
+    color: #ffffff;
+    opacity: 1;
+    font-weight: 600;
 }
 
 .inner-hero-title {
@@ -4962,6 +4984,66 @@
 .faculty-download-btn:hover {
     transform: translateY(-2px);
     box-shadow: 0 6px 18px rgba(180, 40, 40, 0.35);
+}
+
+/* Inline Contact Details Box near Expertise */
+.faculty-contact-inline-box {
+    background: linear-gradient(135deg, rgba(26, 58, 110, 0.05) 0%, var(--bg1) 100%);
+    border: 1px solid var(--stroke);
+    border-radius: var(--radius);
+    padding: 18px 24px;
+    margin-bottom: 20px;
+}
+
+.faculty-contact-inline-title {
+    font-size: 13.5px;
+    font-weight: 700;
+    color: var(--primary);
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.faculty-contact-inline-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 28px;
+    align-items: center;
+}
+
+.faculty-contact-inline-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 14.5px;
+    color: var(--fg);
+}
+
+.faculty-contact-inline-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: rgba(180, 40, 40, 0.08);
+    color: var(--primary);
+    flex-shrink: 0;
+}
+
+.faculty-contact-inline-link {
+    color: var(--primary);
+    font-weight: 600;
+    text-decoration: none;
+    transition: color 0.2s ease;
+}
+
+.faculty-contact-inline-link:hover {
+    text-decoration: underline;
+    color: var(--primary-hover, #8b1d1d);
 }
 
 /* Area of Expertise Box */
