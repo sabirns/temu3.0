@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { Link, useSearchParams, useLocation } from 'react-router-dom'
-import { fetchFacultyDepartments, fetchDepartments, stripHtml, getLanguageContext } from '../services/wordpressApi'
+import { fetchFacultyDepartments, fetchDepartments, stripHtml, getLanguageContext, fixAssetUrl } from '../services/wordpressApi'
 import '../styles/faculties.css'
 
 // Fallback high quality imagery tailored for each academic faculty domain
@@ -23,14 +23,14 @@ const DEFAULT_IMAGE = 'https://images.unsplash.com/photo-1523240795612-9a054b0db
 
 function getFacultyImage(faculty, facultyDepts) {
   if (faculty._embedded?.['wp:featuredmedia']?.[0]?.source_url) {
-    return faculty._embedded['wp:featuredmedia'][0].source_url
+    return fixAssetUrl(faculty._embedded['wp:featuredmedia'][0].source_url)
   }
   if (typeof faculty.acf?.file === 'string' && faculty.acf.file.startsWith('http')) {
-    return faculty.acf.file
+    return fixAssetUrl(faculty.acf.file)
   }
   const deptWithImage = facultyDepts?.find(d => d._embedded?.['wp:featuredmedia']?.[0]?.source_url)
   if (deptWithImage) {
-    return deptWithImage._embedded['wp:featuredmedia'][0].source_url
+    return fixAssetUrl(deptWithImage._embedded['wp:featuredmedia'][0].source_url)
   }
   if (faculty.slug && FACULTY_FALLBACK_IMAGES[faculty.slug]) {
     return FACULTY_FALLBACK_IMAGES[faculty.slug]

@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react'
 import { useParams, useSearchParams, useLocation, Link } from 'react-router-dom'
-import { fetchDepartment, fetchDepartments, fetchFaculties, fetchActivities, fetchCourses, fetchStudents, fetchFacultyDepartment, fetchFacultyDepartments, fetchGallery, stripHtml, getLanguageContext, extractTranslationSlugs, getFacultyProfileUrl } from '../services/wordpressApi'
+import { fetchDepartment, fetchDepartments, fetchFaculties, fetchActivities, fetchCourses, fetchStudents, fetchFacultyDepartment, fetchFacultyDepartments, fetchGallery, stripHtml, getLanguageContext, extractTranslationSlugs, getFacultyProfileUrl, fixAssetUrl } from '../services/wordpressApi'
 import { usePageInfo } from '../services/PageInfoContext'
 import GutenbergContent from '../components/GutenbergContent'
 import '../styles/pages.css'
@@ -17,6 +17,7 @@ function DepartmentSingle() {
   const [wpDept, setWpDept] = useState(null)
   const [faculties, setFaculties] = useState([])
   const [activities, setActivities] = useState([])
+  const [seminarActivities, setSeminarActivities] = useState([])
   const [courses, setCourses] = useState([])
   const [deptTermSlug, setDeptTermSlug] = useState('')
   const [showFullContent, setShowFullContent] = useState(false)
@@ -37,6 +38,12 @@ function DepartmentSingle() {
   const title = wpDept?.title?.rendered || wpDept?.title || ''
   const content = wpDept?.acf?.overview || wpDept?.content?.rendered || wpDept?.content || ''
 
+  const isHidden = (field) => {
+    if (!wpDept?.acf) return false
+    const val = wpDept.acf[field]
+    return val === true || val === '1' || val === 1
+  }
+
   const isTermRoute = id.startsWith('term-')
 
   useEffect(() => {
@@ -49,6 +56,7 @@ function DepartmentSingle() {
     setTermNotFound(false)
     setFaculties([])
     setActivities([])
+    setSeminarActivities([])
     setCourses([])
     setStudents([])
     setGalleryItems([])
@@ -82,9 +90,10 @@ function DepartmentSingle() {
         ? rawGallery.map(g => (typeof g === 'object' ? g.ID || g.id : g)).filter(Boolean)
         : []
 
-      const [facData, actData, courseData, termData, galleryData, termGalleryData, studentData, slugs] = await Promise.all([
+      const [facData, actData, semActData, courseData, termData, galleryData, termGalleryData, studentData, slugs] = await Promise.all([
         fetchFaculties({ lang }),
         deptTermIds.length > 0 ? fetchActivities({ faculty_department: deptTermIds[0], lang }) : Promise.resolve([]),
+        deptTermIds.length > 0 ? fetchActivities({ faculty_department: deptTermIds[0], activity_type: 1992, lang, per_page: 50 }) : Promise.resolve([]),
         deptTermIds.length > 0 ? fetchCourses({ faculty_department: deptTermIds[0], per_page: 100, lang }) : Promise.resolve([]),
         deptTermIds.length > 0 ? fetchFacultyDepartment(deptTermIds[0]) : Promise.resolve(null),
         galleryIds.length > 0 ? fetchGallery({ include: galleryIds.join(','), per_page: 50, lang }) : Promise.resolve([]),
@@ -107,6 +116,15 @@ function DepartmentSingle() {
 
       setFaculties(filtered)
       setActivities(actData)
+
+      const extraSeminarsFromActData = actData.filter(a => {
+        const terms = (a._embedded?.['wp:term'] || []).flat()
+        return terms.some(t => t.taxonomy === 'activity_type' && (t.id === 1992 || (t.name && t.name.includes('സെമിനാറുകൾ'))))
+      })
+      const mergedSeminars = [...semActData, ...extraSeminarsFromActData]
+      const uniqueSeminars = Array.from(new Map(mergedSeminars.map(item => [item.id, item])).values())
+      setSeminarActivities(uniqueSeminars)
+
       setCourses(courseData)
       setStudents(studentData)
       if (termData?.slug) setDeptTermSlug(termData.slug)
@@ -145,6 +163,32 @@ function DepartmentSingle() {
     }, 4000)
     return () => clearInterval(timer)
   }, [activeTab, imageGallerySlides.length])
+
+  useEffect(() => {
+    if (!wpDept?.acf) return
+    const hiddenTabMap = {
+      facilities: isHidden('hide_facility_tab_in_website'),
+      student_projects: isHidden('hide_students_projects_tab_in_website'),
+      curriculum_po_pso: isHidden('hide_po_and_so_tab_in_website') && isHidden('hide_syllabus_tab_in_website'),
+      research_thrust: isHidden('hide_key_research_areas_tab_in_website'),
+      research_publications: isHidden('hide_students_publication_tab_in_website') || isHidden('hide_publication_tab_in_website'),
+      projects: isHidden('hide_projects_tab_in_website'),
+      activities_seminars: isHidden('hide_seminars_tab_in_website'),
+      activities_workshops: isHidden('hide_seminars_tab_in_website') || isHidden('hide_workshops_tab_in_website'),
+      activities_best_practices: isHidden('hide_best_practices_tab_in_website'),
+      activities_mous: isHidden('hide_mou_tab_in_website'),
+      activities_addon_courses: isHidden('hide_addon_tab_in_website') || isHidden('hide_addon_courses_tab_in_website'),
+      awards_grants: isHidden('hide_awards_tab_in_website'),
+      student_achievements: isHidden('hide_students_achievement_tab_in_website') || isHidden('hide_student_achievements_tab_in_website'),
+      faculty_achievements: isHidden('hide_faculty_achievement_tab_in_website') || isHidden('hide_faculty_achievements_tab_in_website'),
+      scholarships: isHidden('hide_scholarship_tab_in_website') || isHidden('hide_scholarships_tab_in_website'),
+      placement_career: isHidden('hide_placement_tab_in_website') || isHidden('hide_placements_tab_in_website'),
+    }
+
+    if (hiddenTabMap[activeTab]) {
+      setActiveTab('overview')
+    }
+  }, [wpDept, activeTab])
 
   if (isTermRoute && termNotFound) {
     return (
@@ -207,6 +251,52 @@ function DepartmentSingle() {
     )
   }
 
+  const parseOtherContents = (rawList, prefix, defaultLabel) => {
+    if (!rawList || !Array.isArray(rawList)) return []
+    return rawList
+      .filter(item => item && (item.content || item.other_content_tab_title || item.title || item.main_content_title))
+      .map((item, idx) => ({
+        id: `${prefix}_${idx}`,
+        title: item.other_content_tab_title || item.title || item.main_content_title || `${defaultLabel} ${idx + 1}`,
+        content: item.content || '',
+        hide: false
+      }))
+  }
+
+  const otherAboutItems = parseOtherContents(
+    wpDept?.acf?.other_content_in_about_school || wpDept?.acf?.other_content,
+    'other_about',
+    lang === 'ml' ? 'മറ്റ് വിവരങ്ങൾ' : 'Other Details'
+  )
+  const otherResearchItems = parseOtherContents(
+    wpDept?.acf?.other_content_research_section,
+    'other_research',
+    lang === 'ml' ? 'മറ്റ് വിവരങ്ങൾ' : 'Other Details'
+  )
+  const otherActivitiesItems = parseOtherContents(
+    wpDept?.acf?.other_content_activities_section,
+    'other_activities',
+    lang === 'ml' ? 'മറ്റ് വിവരങ്ങൾ' : 'Other Details'
+  )
+  const otherAchievementsItems = parseOtherContents(
+    wpDept?.acf?.other_content_achievements_section,
+    'other_achievements',
+    lang === 'ml' ? 'മറ്റ് വിവരങ്ങൾ' : 'Other Details'
+  )
+  const otherContactItems = parseOtherContents(
+    wpDept?.acf?.other_content_contact_section,
+    'other_contact',
+    lang === 'ml' ? 'മറ്റ് വിവരങ്ങൾ' : 'Other Details'
+  )
+
+  const allOtherContentItems = [
+    ...otherAboutItems,
+    ...otherResearchItems,
+    ...otherActivitiesItems,
+    ...otherAchievementsItems,
+    ...otherContactItems
+  ]
+
   return (
     <div className="page-shell-modern">
       <aside className="department-hero-modern">
@@ -246,9 +336,10 @@ function DepartmentSingle() {
                     { id: 'highlights', title: lang === 'ml' ? 'സ്കൂൾ സവിശേഷതകൾ' : 'School Highlights' },
                     { id: 'programs', title: lang === 'ml' ? 'പ്രോഗ്രാമുകൾ' : 'Programmes' },
                     { id: 'faculty', title: lang === 'ml' ? 'ഫാക്കൽറ്റി പ്രൊഫൈൽ' : 'Faculty Profile' },
-                    { id: 'facilities', title: lang === 'ml' ? 'അടിസ്ഥാനസൗകര്യങ്ങളും സംവിധാനങ്ങളും' : 'Infrastructure & Facilities' },
-                    { id: 'student_projects', title: lang === 'ml' ? 'വിദ്യാർത്ഥി പ്രോജക്റ്റുകൾ' : 'Student Projects' },
+                    { id: 'facilities', title: lang === 'ml' ? 'അടിസ്ഥാനസൗകര്യങ്ങളും സംവിധാനങ്ങളും' : 'Infrastructure & Facilities', hide: isHidden('hide_facility_tab_in_website') },
+                    { id: 'student_projects', title: lang === 'ml' ? 'വിദ്യാർത്ഥി പ്രോജക്റ്റുകൾ' : 'Student Projects', hide: isHidden('hide_students_projects_tab_in_website') },
                     { id: 'former_students', title: lang === 'ml' ? 'മുൻകാല വിദ്യാർത്ഥികൾ' : 'Former Students' },
+                    ...otherAboutItems
                   ]
                 },
                 {
@@ -258,51 +349,60 @@ function DepartmentSingle() {
                     { id: 'curriculum_ba_bsc', title: lang === 'ml' ? 'ബി.എ / ബി.എസ്.സി' : 'BA / BSc' },
                     { id: 'curriculum_ma_msc', title: lang === 'ml' ? 'എം.എ / എം.എസ്.സി' : 'MA / MSc' },
                     { id: 'curriculum_phd', title: lang === 'ml' ? 'പിഎച്ച്.ഡി' : 'PhD' },
-                    { id: 'curriculum_po_pso', title: lang === 'ml' ? 'പി.ഒ & പി.എസ്.ഒ' : 'PO & PSO' },
+                    { id: 'curriculum_po_pso', title: lang === 'ml' ? 'പി.ഒ & പി.എസ്.ഒ' : 'PO & PSO', hide: isHidden('hide_po_and_so_tab_in_website') && isHidden('hide_syllabus_tab_in_website') },
                   ]
                 },
                 {
                   id: 'research',
                   title: lang === 'ml' ? 'ഗവേഷണം' : 'Research',
                   items: [
-                    { id: 'research_thrust', title: lang === 'ml' ? 'പ്രധാന ഗവേഷണ മേഖലകൾ' : 'Thrust Areas' },
-                    { id: 'research_publications', title: lang === 'ml' ? 'വിദ്യാർത്ഥി പ്രസിദ്ധീകരണങ്ങൾ' : 'Student Publications' },
-                    { id: 'projects', title: lang === 'ml' ? 'ഗവേഷണ പ്രോജക്റ്റുകൾ' : 'Research Projects' },
+                    { id: 'research_thrust', title: lang === 'ml' ? 'പ്രധാന ഗവേഷണ മേഖലകൾ' : 'Thrust Areas', hide: isHidden('hide_key_research_areas_tab_in_website') },
+                    { id: 'research_publications', title: lang === 'ml' ? 'വിദ്യാർത്ഥി പ്രസിദ്ധീകരണങ്ങൾ' : 'Student Publications', hide: isHidden('hide_students_publication_tab_in_website') || isHidden('hide_publication_tab_in_website') },
+                    { id: 'projects', title: lang === 'ml' ? 'ഗവേഷണ പ്രോജക്റ്റുകൾ' : 'Research Projects', hide: isHidden('hide_projects_tab_in_website') },
+                    ...otherResearchItems
                   ]
                 },
                 {
                   id: 'activities',
                   title: lang === 'ml' ? 'വിഭാഗത്തിലെ പ്രവർത്തനങ്ങൾ' : 'Department Activities',
                   items: [
-                    { id: 'activities_seminars', title: lang === 'ml' ? 'സെമിനാറുകൾ / പ്രഭാഷണങ്ങൾ / പരിശീലനങ്ങൾ' : 'Seminars / Talks / Training Programs' },
-                    { id: 'activities_awards', title: lang === 'ml' ? 'അവാർഡുകളും അംഗീകാരങ്ങളും' : 'Awards & Recognition' },
-                    { id: 'activities_workshops', title: lang === 'ml' ? 'വർക്ക്‌ഷോപ്പുകൾ / സ്‌കിൽ പ്രോഗ്രാമുകൾ' : 'Workshops / Student Development Programs' },
-                    { id: 'activities_best_practices', title: lang === 'ml' ? 'മികച്ച മാതൃകകൾ' : 'Best Practices' },
+                    { id: 'activities_seminars', title: lang === 'ml' ? 'സെമിനാറുകൾ / പ്രഭാഷണങ്ങൾ / പരിശീലനങ്ങൾ' : 'Seminars / Talks / Training Programs', hide: isHidden('hide_seminars_tab_in_website') },
+                    { id: 'activities_workshops', title: lang === 'ml' ? 'വർക്ക്‌ഷോപ്പുകൾ / സ്‌കിൽ പ്രോഗ്രാമുകൾ' : 'Workshops / Student Development Programs', hide: isHidden('hide_seminars_tab_in_website') || isHidden('hide_workshops_tab_in_website') },
+                    { id: 'activities_best_practices', title: lang === 'ml' ? 'മികച്ച മാതൃകകൾ' : 'Best Practices', hide: isHidden('hide_best_practices_tab_in_website') },
                     { id: 'activities_extension', title: lang === 'ml' ? 'സാമൂഹിക വിപുലീകരണ പ്രവർത്തനങ്ങൾ' : 'Social Extension Activities' },
                     { id: 'activities_field_visits', title: lang === 'ml' ? 'ഫീൽഡ് സന്ദർശനങ്ങൾ' : 'Field Visits' },
                     { id: 'activities_events', title: lang === 'ml' ? 'വിഭാഗത്തിലെ പ്രധാന പരിപാടികൾ' : 'Department Events' },
-                    { id: 'activities_mous', title: lang === 'ml' ? 'ധാരണാപത്രങ്ങൾ (MoUs)' : 'MoUs' },
-                    { id: 'activities_addon_courses', title: lang === 'ml' ? 'ആഡ്-ഓൺ കോഴ്‌സുകൾ / ഓൺലൈൻ കോഴ്‌സുകൾ' : 'Add-on Courses / Online Courses' },
+                    { id: 'activities_mous', title: lang === 'ml' ? 'ധാരണാപത്രങ്ങൾ (MoUs)' : 'MoUs', hide: isHidden('hide_mou_tab_in_website') },
+                    { id: 'activities_addon_courses', title: lang === 'ml' ? 'ആഡ്-ഓൺ കോഴ്‌സുകൾ / ഓൺലൈൻ കോഴ്‌സുകൾ' : 'Add-on Courses / Online Courses', hide: isHidden('hide_addon_tab_in_website') || isHidden('hide_addon_courses_tab_in_website') },
+                    ...otherActivitiesItems
                   ]
                 },
                 {
                   id: 'achievements',
                   title: lang === 'ml' ? 'നേട്ടങ്ങൾ' : 'Achievements',
                   items: [
-                    { id: 'student_achievements', title: lang === 'ml' ? 'വിദ്യാർത്ഥികളുടെ നേട്ടങ്ങൾ' : 'Student Achievements' },
-                    { id: 'faculty_achievements', title: lang === 'ml' ? 'ഫാക്കൽറ്റിയുടെ നേട്ടങ്ങൾ' : 'Faculty Achievements' },
-                    { id: 'awards_grants', title: lang === 'ml' ? 'അവാർഡുകൾ / ഗ്രാന്റുകൾ' : 'Awards / Recognitions / Grants' },
-                    { id: 'scholarships', title: lang === 'ml' ? 'സ്‌കോളർഷിപ്പുകൾ' : 'Scholarships' },
+                    { id: 'student_achievements', title: lang === 'ml' ? 'വിദ്യാർത്ഥികളുടെ നേട്ടങ്ങൾ' : 'Student Achievements', hide: isHidden('hide_students_achievement_tab_in_website') || isHidden('hide_student_achievements_tab_in_website') },
+                    { id: 'faculty_achievements', title: lang === 'ml' ? 'ഫാക്കൽറ്റിയുടെ നേട്ടങ്ങൾ' : 'Faculty Achievements', hide: isHidden('hide_faculty_achievement_tab_in_website') || isHidden('hide_faculty_achievements_tab_in_website') },
+                    { id: 'awards_grants', title: lang === 'ml' ? 'അവാർഡുകൾ / ഗ്രാന്റുകൾ' : 'Awards / Recognitions / Grants', hide: isHidden('hide_awards_tab_in_website') },
+                    { id: 'scholarships', title: lang === 'ml' ? 'സ്‌കോളർഷിപ്പുകൾ' : 'Scholarships', hide: isHidden('hide_scholarship_tab_in_website') || isHidden('hide_scholarships_tab_in_website') },
+                    ...otherAchievementsItems
                   ]
                 },
                 {
                   id: 'resources_contact',
                   title: lang === 'ml' ? 'വിഭവങ്ങളും ബന്ധപ്പെടലും' : 'Resources & Contact',
                   items: [
-                    { id: 'placement_career', title: lang === 'ml' ? 'പ്ലേസ്‌മെന്റ് & കരിയർ സപ്പോർട്ട്' : 'Placement & Career Support' },
+                    { id: 'placement_career', title: lang === 'ml' ? 'പ്ലേസ്‌മെന്റ് & കരിയർ സപ്പോർട്ട്' : 'Placement & Career Support', hide: isHidden('hide_placement_tab_in_website') || isHidden('hide_placements_tab_in_website') },
+                    ...otherContactItems
                   ]
                 }
-              ].map((group) => {
+              ]
+                .map(group => ({
+                  ...group,
+                  items: group.items ? group.items.filter(item => !item.hide) : []
+                }))
+                .filter(group => group.isSingle || (group.items && group.items.length > 0))
+                .map((group) => {
                 if (group.isSingle) {
                   const isActive = activeTab === group.tabId
                   return (
@@ -583,7 +683,8 @@ function DepartmentSingle() {
                     </thead>
                     <tbody>
                       {wpDept.acf.syllabus.map((item, idx) => {
-                        const fileUrl = typeof item.file === 'object' ? item.file?.url : item.file;
+                        const rawFile = typeof item.file === 'object' ? item.file?.url : item.file;
+                        const fileUrl = fixAssetUrl(rawFile);
                         return (
                           <tr key={idx}>
                             <td>{idx + 1}</td>
@@ -616,9 +717,13 @@ function DepartmentSingle() {
               <h2 style={{ fontSize: '24px', marginBottom: '24px', color: 'var(--navy-900)' }}>
                 {lang === 'ml' ? 'പ്രധാന ഗവേഷണ മേഖലകൾ' : 'Thrust Areas of Research'}
               </h2>
-              <div className="dept-info-card">
-                <p>{lang === 'ml' ? 'സ്കൂളിൽ നടക്കുന്ന പ്രധാന അന്തർവൈജ്ഞാനിക ഗവേഷണ മേഖലകളും പദ്ധതികളും.' : 'Primary interdisciplinary research domains, key focus areas, and institutional research priorities.'}</p>
-              </div>
+              {wpDept?.acf?.key_research_areas ? (
+                <GutenbergContent html={wpDept.acf.key_research_areas} />
+              ) : (
+                <div className="dept-info-card">
+                  <p>{lang === 'ml' ? 'സ്കൂളിൽ നടക്കുന്ന പ്രധാന അന്തർവൈജ്ഞാനിക ഗവേഷണ മേഖലകളും പദ്ധതികളും.' : 'Primary interdisciplinary research domains, key focus areas, and institutional research priorities.'}</p>
+                </div>
+              )}
             </div>
           )}
 
@@ -627,9 +732,13 @@ function DepartmentSingle() {
               <h2 style={{ fontSize: '24px', marginBottom: '24px', color: 'var(--navy-900)' }}>
                 {lang === 'ml' ? 'വിദ്യാർത്ഥി പ്രസിദ്ധീകരണങ്ങൾ' : 'Student & Scholar Publications'}
               </h2>
-              <div className="dept-info-card">
-                <p>{lang === 'ml' ? 'വിദ്യാർത്ഥികളും ഗവേഷകരും പ്രസിദ്ധീകരിച്ച റിസർച്ച് പേപ്പറുകളും ബുക്കുകളും.' : 'Peer-reviewed research articles, books, conference proceedings, and publications authored by department scholars.'}</p>
-              </div>
+              {(wpDept?.acf?.students_publications || wpDept?.acf?.student_publications) ? (
+                <GutenbergContent html={wpDept.acf.students_publications || wpDept.acf.student_publications} />
+              ) : (
+                <div className="dept-info-card">
+                  <p>{lang === 'ml' ? 'വിദ്യാർത്ഥികളും ഗവേഷകരും പ്രസിദ്ധീകരിച്ച റിസർച്ച് പേപ്പറുകളും ബുക്കുകളും.' : 'Peer-reviewed research articles, books, conference proceedings, and publications authored by department scholars.'}</p>
+                </div>
+              )}
             </div>
           )}
 
@@ -705,24 +814,11 @@ function DepartmentSingle() {
                           <span style={{ fontSize: '20px', color: 'var(--navy-900)' }}>{isOpen ? '−' : '+'}</span>
                         </button>
                         {isOpen && (
-                          <div className="modern-accordion-body">
-                            {isExpanded && activity.content?.rendered ? (
-                              <div style={{ marginBottom: '12px' }} className="gutenberg-content" dangerouslySetInnerHTML={{ __html: activity.content.rendered }} />
-                            ) : activity.excerpt?.rendered ? (
-                              <div style={{ marginBottom: '12px' }} dangerouslySetInnerHTML={{ __html: activity.excerpt.rendered }} />
+                          <div className="modern-accordion-body" style={{ padding: '16px 20px' }}>
+                            {activity.content?.rendered || activity.excerpt?.rendered ? (
+                              <GutenbergContent html={activity.content?.rendered || activity.excerpt?.rendered || ''} className="gutenberg-content" />
                             ) : (
-                              <p style={{ marginBottom: '12px' }}>{lang === 'ml' ? 'കൂടുതൽ വിവരങ്ങൾ ലഭ്യമല്ല.' : 'No more details available.'}</p>
-                            )}
-
-                            {hasMoreContent && (
-                              <button
-                                onClick={() => setExpandedContentId(isExpanded ? null : activity.id)}
-                                style={{ color: 'var(--blue-500)', fontWeight: '600', textDecoration: 'none', fontSize: '13px', background: 'none', border: 'none', padding: 0, cursor: 'pointer' }}
-                              >
-                                {isExpanded
-                                  ? (lang === 'ml' ? 'ചുരുക്കുക' : 'Read less')
-                                  : (lang === 'ml' ? 'കൂടുതൽ വായിക്കുക' : 'Read more')} &rarr;
-                              </button>
+                              <p style={{ marginBottom: '12px', color: 'var(--muted)' }}>{lang === 'ml' ? 'കൂടുതൽ വിവരങ്ങൾ ലഭ്യമല്ല.' : 'No more details available.'}</p>
                             )}
                           </div>
                         )}
@@ -743,20 +839,59 @@ function DepartmentSingle() {
               <h2 style={{ fontSize: '24px', marginBottom: '24px', color: 'var(--navy-900)' }}>
                 {lang === 'ml' ? 'സെമിനാറുകൾ / പ്രഭാഷണങ്ങൾ / പരിശീലനങ്ങൾ' : 'Seminars / Talks / Training Programs'}
               </h2>
-              <div className="dept-info-card">
-                <p>{lang === 'ml' ? 'വിഭാഗം സംഘടിപ്പിക്കുന്ന ദേശീയ-അന്തർദേശീയ സെമിനാറുകൾ, വിസിറ്റിംഗ് പ്രൊഫസർമാരുടെ പ്രഭാഷണങ്ങൾ, അധ്യാപക-വിദ്യാർത്ഥി പരിശീലന പരിപാടികൾ.' : 'National and international seminars, endowment lectures, invited talks, and faculty development training programs.'}</p>
-              </div>
-            </div>
-          )}
 
-          {activeTab === 'activities_awards' && (
-            <div className="content-section-modern">
-              <h2 style={{ fontSize: '24px', marginBottom: '24px', color: 'var(--navy-900)' }}>
-                {lang === 'ml' ? 'അവാർഡുകളും അംഗീകാരങ്ങളും' : 'Awards & Recognition'}
-              </h2>
-              <div className="dept-info-card">
-                <p>{lang === 'ml' ? 'വിഭാഗത്തിനും ഗവേഷകർക്കും ലഭിച്ച പ്രധാന പുരസ്കാരങ്ങളും ബഹുമതികളും.' : 'Academic awards, honors, and recognitions bestowed upon the department and its members.'}</p>
-              </div>
+              {wpDept?.acf?.seminar_workshops && (
+                <div style={{ marginBottom: seminarActivities.length > 0 ? '32px' : '0' }}>
+                  <GutenbergContent html={wpDept.acf.seminar_workshops} />
+                </div>
+              )}
+
+              {seminarActivities.length > 0 && (
+                <div className="seminar-activities-list">
+                  {seminarActivities.map(activity => {
+                    const actImg = activity._embedded?.['wp:featuredmedia']?.[0]?.source_url
+                    const isOpen = openActivityId === activity.id
+                    const isExpanded = expandedContentId === activity.id
+
+                    const strippedContent = activity.content?.rendered ? stripHtml(activity.content.rendered).replace(/\[&hellip;\]|\.\.\./g, '').trim() : ''
+                    const strippedExcerpt = activity.excerpt?.rendered ? stripHtml(activity.excerpt.rendered).replace(/\[&hellip;\]|\.\.\./g, '').trim() : ''
+                    const hasMoreContent = strippedContent.length > strippedExcerpt.length
+
+                    return (
+                      <div key={activity.id} className="modern-accordion-item">
+                        <button
+                          className="modern-accordion-header"
+                          onClick={() => {
+                            setOpenActivityId(isOpen ? null : activity.id)
+                            if (isOpen) setExpandedContentId(null)
+                          }}
+                        >
+                          <span style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                            {actImg && <img src={actImg} alt="" style={{ width: '32px', height: '32px', borderRadius: '50%', objectFit: 'cover' }} />}
+                            {stripHtml(activity.title?.rendered || activity.title || '')}
+                          </span>
+                          <span style={{ fontSize: '20px', color: 'var(--navy-900)' }}>{isOpen ? '−' : '+'}</span>
+                        </button>
+                        {isOpen && (
+                          <div className="modern-accordion-body" style={{ padding: '16px 20px' }}>
+                            {activity.content?.rendered || activity.excerpt?.rendered ? (
+                              <GutenbergContent html={activity.content?.rendered || activity.excerpt?.rendered || ''} className="gutenberg-content" />
+                            ) : (
+                              <p style={{ marginBottom: '12px', color: 'var(--muted)' }}>{lang === 'ml' ? 'കൂടുതൽ വിവരങ്ങൾ ലഭ്യമല്ല.' : 'No more details available.'}</p>
+                            )}
+                          </div>
+                        )}
+                      </div>
+                    )
+                  })}
+                </div>
+              )}
+
+              {!wpDept?.acf?.seminar_workshops && seminarActivities.length === 0 && (
+                <div className="dept-info-card">
+                  <p>{lang === 'ml' ? 'വിഭാഗം സംഘടിപ്പിക്കുന്ന ദേശീയ-അന്തർദേശീയ സെമിനാറുകൾ, വിസിറ്റിംഗ് പ്രൊഫസർമാരുടെ പ്രഭാഷണങ്ങൾ, അധ്യാപക-വിദ്യാർത്ഥി പരിശീലന പരിപാടികൾ.' : 'National and international seminars, endowment lectures, invited talks, and faculty development training programs.'}</p>
+                </div>
+              )}
             </div>
           )}
 
@@ -765,9 +900,13 @@ function DepartmentSingle() {
               <h2 style={{ fontSize: '24px', marginBottom: '24px', color: 'var(--navy-900)' }}>
                 {lang === 'ml' ? 'വർക്ക്‌ഷോപ്പുകൾ / സ്‌കിൽ പ്രോഗ്രാമുകൾ' : 'Workshops / Student Development Programs'}
               </h2>
-              <div className="dept-info-card">
-                <p>{lang === 'ml' ? 'പ്രാക്ടിക്കൽ പരിശീലന വർക്ക്‌ഷോപ്പുകൾ, കപ്പാസിറ്റി ബിൽഡിംഗ് പ്രോഗ്രാമുകൾ, കരിയർ സ്‌കിൽ സെഷനുകൾ.' : 'Hands-on workshops, methodology training sessions, and student capacity development programs.'}</p>
-              </div>
+              {wpDept?.acf?.seminar_workshops ? (
+                <GutenbergContent html={wpDept.acf.seminar_workshops} />
+              ) : (
+                <div className="dept-info-card">
+                  <p>{lang === 'ml' ? 'പ്രാക്ടിക്കൽ പരിശീലന വർക്ക്‌ഷോപ്പുകൾ, കപ്പാസിറ്റി ബിൽഡിംഗ് പ്രോഗ്രാമുകൾ, കരിയർ സ്‌കിൽ സെഷനുകൾ.' : 'Hands-on workshops, methodology training sessions, and student capacity development programs.'}</p>
+                </div>
+              )}
             </div>
           )}
 
@@ -776,9 +915,13 @@ function DepartmentSingle() {
               <h2 style={{ fontSize: '24px', marginBottom: '24px', color: 'var(--navy-900)' }}>
                 {lang === 'ml' ? 'മികച്ച മാതൃകകൾ' : 'Best Practices'}
               </h2>
-              <div className="dept-info-card">
-                <p>{lang === 'ml' ? 'പഠന-ഗവേഷണ രംഗത്ത് വിഭാഗം നടപ്പിലാക്കുന്ന മാതൃകാപരമായ പ്രവർത്തനങ്ങളും നവീന രീതികളും.' : 'Distinctive academic, environmental, and cultural best practices implemented by the department.'}</p>
-              </div>
+              {wpDept?.acf?.best_practices ? (
+                <GutenbergContent html={wpDept.acf.best_practices} />
+              ) : (
+                <div className="dept-info-card">
+                  <p>{lang === 'ml' ? 'പഠന-ഗവേഷണ രംഗത്ത് വിഭാഗം നടപ്പിലാക്കുന്ന മാതൃകാപരമായ പ്രവർത്തനങ്ങളും നവീന രീതികളും.' : 'Distinctive academic, environmental, and cultural best practices implemented by the department.'}</p>
+                </div>
+              )}
             </div>
           )}
 
@@ -809,9 +952,13 @@ function DepartmentSingle() {
               <h2 style={{ fontSize: '24px', marginBottom: '24px', color: 'var(--navy-900)' }}>
                 {lang === 'ml' ? 'ധാരണാപത്രങ്ങൾ (MoUs)' : 'Memorandums of Understanding (MoUs)'}
               </h2>
-              <div className="dept-info-card">
-                <p>{lang === 'ml' ? 'മറ്റ് സർവകലാശാലകളുമായും സ്ഥാപനങ്ങളുമായുമുള്ള അക്കാദമിക സഹകരണ കരാറുകൾ.' : 'Academic collaborations, research partnerships, and MoUs signed with partner institutions.'}</p>
-              </div>
+              {wpDept?.acf?.mous ? (
+                <GutenbergContent html={wpDept.acf.mous} />
+              ) : (
+                <div className="dept-info-card">
+                  <p>{lang === 'ml' ? 'മറ്റ് സർവകലാശാലകളുമായും സ്ഥാപനങ്ങളുമായുമുള്ള അക്കാദമിക സഹകരണ കരാറുകൾ.' : 'Academic collaborations, research partnerships, and MoUs signed with partner institutions.'}</p>
+                </div>
+              )}
             </div>
           )}
 
@@ -820,17 +967,21 @@ function DepartmentSingle() {
               <h2 style={{ fontSize: '24px', marginBottom: '24px', color: 'var(--navy-900)' }}>
                 {lang === 'ml' ? 'ആഡ്-ഓൺ കോഴ്‌സുകൾ / ഓൺലൈൻ കോഴ്‌സുകൾ' : 'Add-on Courses / Online Courses'}
               </h2>
-              <div className="dept-info-card">
-                <p>{lang === 'ml' ? 'വിദ്യാർത്ഥികളുടെ തൊഴിൽ നൈപുണ്യം വർദ്ധിപ്പിക്കുന്ന ആഡ്-ഓൺ, സർട്ടിഫിക്കറ്റ്, ഓൺലൈൻ കോഴ്‌സുകൾ.' : 'Certificate courses, value-added skill modules, and online learning courses.'}</p>
-              </div>
+              {(wpDept?.acf?.['add-on_courses_copy'] || wpDept?.acf?.add_on_courses_copy || wpDept?.acf?.['add-on_courses'] || wpDept?.acf?.add_on_courses) ? (
+                <GutenbergContent html={wpDept.acf['add-on_courses_copy'] || wpDept.acf.add_on_courses_copy || wpDept.acf['add-on_courses'] || wpDept.acf.add_on_courses} />
+              ) : (
+                <div className="dept-info-card">
+                  <p>{lang === 'ml' ? 'വിദ്യാർത്ഥികളുടെ തൊഴിൽ നൈപുണ്യം വർദ്ധിപ്പിക്കുന്ന ആഡ്-ഓൺ, സർട്ടിഫിക്കറ്റ്, ഓൺലൈൻ കോഴ്‌സുകൾ.' : 'Certificate courses, value-added skill modules, and online learning courses.'}</p>
+                </div>
+              )}
             </div>
           )}
 
           {activeTab === 'student_projects' && (
             <div className="content-section-modern">
               <h2 style={{ fontSize: '24px', marginBottom: '24px', color: 'var(--navy-900)' }}>{lang === 'ml' ? 'വിദ്യാർത്ഥി പ്രോജക്റ്റുകൾ' : 'Student Projects'}</h2>
-              {wpDept?.acf?.student_projects ? (
-                <GutenbergContent html={wpDept.acf.student_projects} />
+              {(wpDept?.acf?.students_projects || wpDept?.acf?.student_projects) ? (
+                <GutenbergContent html={wpDept.acf.students_projects || wpDept.acf.student_projects} />
               ) : (
                 <div className="dept-info-card">
                   <p>{lang === 'ml' ? 'വിദ്യാർത്ഥികളുടെ ഗവേഷണ പ്രോജക്റ്റുകളും ഫീൽഡ് പ്രോജക്റ്റ് റിപ്പോർട്ടുകളും.' : 'Student dissertations, field study projects, research monographs, and practical work.'}</p>
@@ -868,39 +1019,76 @@ function DepartmentSingle() {
           {activeTab === 'faculty_achievements' && (
             <div className="content-section-modern">
               <h2 style={{ fontSize: '24px', marginBottom: '24px', color: 'var(--navy-900)' }}>{lang === 'ml' ? 'ഫാക്കൽറ്റിയുടെ നേട്ടങ്ങൾ' : 'Faculty Achievements'}</h2>
-              <div className="dept-info-card">
-                <p>{lang === 'ml' ? 'ഫാക്കൽറ്റി അംഗങ്ങൾക്ക് ലഭിച്ച ദേശീയ-അന്തർദേശീയ അംഗീകാരങ്ങളും അവാർഡുകളും.' : 'National and international honors, editorial board appointments, and prestigious fellowships awarded to faculty members.'}</p>
-              </div>
+              {(wpDept?.acf?.faculty_members_achievement || wpDept?.acf?.faculty_achievements) ? (
+                <GutenbergContent html={wpDept.acf.faculty_members_achievement || wpDept.acf.faculty_achievements} />
+              ) : (
+                <div className="dept-info-card">
+                  <p>{lang === 'ml' ? 'ഫാക്കൽറ്റി അംഗങ്ങൾക്ക് ലഭിച്ച ദേശീയ-അന്തർദേശീയ അംഗീകാരങ്ങളും അവാർഡുകളും.' : 'National and international honors, editorial board appointments, and prestigious fellowships awarded to faculty members.'}</p>
+                </div>
+              )}
             </div>
           )}
 
           {activeTab === 'awards_grants' && (
             <div className="content-section-modern">
               <h2 style={{ fontSize: '24px', marginBottom: '24px', color: 'var(--navy-900)' }}>{lang === 'ml' ? 'അവാർഡുകൾ / ഗ്രാന്റുകൾ' : 'Awards / Recognitions / Grants'}</h2>
-              <div className="dept-info-card">
-                <p>{lang === 'ml' ? 'സ്കൂളിനും വകുപ്പിനും ലഭിച്ച വിശിഷ്ട സാമ്പത്തിക സാങ്കേതിക അവാർഡുകളും ഗ്രാൻറുകളും.' : 'Institutional recognitions, infrastructure grants, and academic awards received by the school.'}</p>
-              </div>
+              {wpDept?.acf?.awards ? (
+                <GutenbergContent html={wpDept.acf.awards} />
+              ) : (
+                <div className="dept-info-card">
+                  <p>{lang === 'ml' ? 'സ്കൂളിനും വകുപ്പിനും ലഭിച്ച വിശിഷ്ട സാമ്പത്തിക സാങ്കേതിക അവാർഡുകളും ഗ്രാൻറുകളും.' : 'Institutional recognitions, infrastructure grants, and academic awards received by the school.'}</p>
+                </div>
+              )}
             </div>
           )}
 
           {activeTab === 'scholarships' && (
             <div className="content-section-modern">
               <h2 style={{ fontSize: '24px', marginBottom: '24px', color: 'var(--navy-900)' }}>{lang === 'ml' ? 'സ്‌കോളർഷിപ്പുകൾ' : 'Scholarships & Financial Aid'}</h2>
-              <div className="dept-info-card">
-                <p>{lang === 'ml' ? 'വിദ്യാർത്ഥികൾക്കായി സർവകലാശാലയും സർക്കാരും നൽകുന്ന സാമ്പത്തിക ആനുകൂല്യങ്ങളും സ്‌കോളർഷിപ്പുകളും.' : 'State, central, and university merit/means scholarships, stipends, and research fellowships available to department students.'}</p>
-              </div>
+              {wpDept?.acf?.scholarships ? (
+                <GutenbergContent html={wpDept.acf.scholarships} />
+              ) : (
+                <div className="dept-info-card">
+                  <p>{lang === 'ml' ? 'വിദ്യാർത്ഥികൾക്കായി സർവകലാശാലയും സർക്കാരും നൽകുന്ന സാമ്പത്തിക ആനുകൂല്യങ്ങളും സ്‌കോളർഷിപ്പുകളും.' : 'State, central, and university merit/means scholarships, stipends, and research fellowships available to department students.'}</p>
+                </div>
+              )}
             </div>
           )}
 
           {activeTab === 'placement_career' && (
             <div className="content-section-modern">
               <h2 style={{ fontSize: '24px', marginBottom: '24px', color: 'var(--navy-900)' }}>{lang === 'ml' ? 'പ്ലേസ്‌മെന്റ് & കരിയർ സപ്പോർട്ട്' : 'Placement & Career Support'}</h2>
-              <div className="dept-info-card">
-                <h3>{lang === 'ml' ? 'കരിയർ മാർഗ്ഗനിർദ്ദേശവും പ്ലേസ്‌മെന്റും' : 'Career Guidance & Placement Cell'}</h3>
-                <p>{lang === 'ml' ? 'വിദ്യാർത്ഥികളുടെ ഉന്നതപഠനം, തൊഴിലവസരങ്ങൾ, ഇന്റേൺഷിപ്പ് എന്നിവയ്ക്കായുള്ള വിവരങ്ങളും കൗൺസിലിംഗും.' : 'Career placement services, internship assistance, higher studies guidance, and industry recruitment tie-ups.'}</p>
-              </div>
+              {(wpDept?.acf?.placement_and_career_support || wpDept?.acf?.placements) ? (
+                <GutenbergContent html={wpDept.acf.placement_and_career_support || wpDept.acf.placements} />
+              ) : (
+                <div className="dept-info-card">
+                  <h3>{lang === 'ml' ? 'കരിയർ മാർഗ്ഗനിർദ്ദേശവും പ്ലേസ്‌മെന്റും' : 'Career Guidance & Placement Cell'}</h3>
+                  <p>{lang === 'ml' ? 'വിദ്യാർത്ഥികളുടെ ഉന്നതപഠനം, തൊഴിലവസരങ്ങൾ, ഇന്റേൺഷിപ്പ് എന്നിവയ്ക്കായുള്ള വിവരങ്ങളും കൗൺസിലിംഗും.' : 'Career placement services, internship assistance, higher studies guidance, and industry recruitment tie-ups.'}</p>
+                </div>
+              )}
             </div>
           )}
+
+          {allOtherContentItems.map((item) => {
+            const isMatch = activeTab === item.id || (item.id === 'other_about_0' && (activeTab === 'other_content' || activeTab === 'other_content_0'))
+            if (!isMatch) return null
+            return (
+              <div key={item.id} className="content-section-modern">
+                <h2 style={{ fontSize: '24px', marginBottom: '24px', color: 'var(--navy-900)' }}>
+                  {item.title}
+                </h2>
+                {item.content ? (
+                  <GutenbergContent html={item.content} />
+                ) : (
+                  <div className="dept-info-card">
+                    <p style={{ color: 'var(--muted)' }}>
+                      {lang === 'ml' ? 'വിവരങ്ങൾ ലഭ്യമല്ല.' : 'No details available.'}
+                    </p>
+                  </div>
+                )}
+              </div>
+            )
+          })}
 
           {activeTab === 'faculty' && (
             <div className="content-section-modern">
@@ -947,7 +1135,7 @@ function DepartmentSingle() {
                           {f.acf?.description && (
                             <div className="modern-faculty-card-desc-wrapper">
                               <strong className="modern-faculty-card-desc-title">
-                                {lang === 'ml' ? 'വൈദഗ്ധ്യ മേഖലഃ' : 'Area of Expertise:'}
+                                {f.acf?.description_title || (lang === 'ml' ? 'വൈദഗ്ധ്യ മേഖലഃ' : 'Area of Expertise:')}
                               </strong>
                               <p className="modern-faculty-card-desc-text">
                                 {stripHtml(f.acf.description)}

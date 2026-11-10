@@ -1,44 +1,140 @@
 import { BrowserRouter as Router, Routes, Route, Navigate, useParams, useLocation, useNavigate } from 'react-router-dom'
-import { useEffect } from 'react'
+import { useEffect, lazy, Suspense, Component } from 'react'
 import { WP_CONFIG } from './config/wpConfig'
+import { fixAssetUrl } from './services/wordpressApi'
 import Header from './components/Header'
 import Footer from './components/Footer'
 import FloatingSocial from './components/FloatingSocial'
-import Home from './pages/Home'
-import Departments from './pages/Departments'
-import Faculties from './pages/Faculties'
-import DepartmentSingle from './pages/DepartmentSingle'
-import Notifications from './pages/Notifications'
-import NotificationSingle from './pages/NotificationSingle'
-import WordPressPage from './templates/WordPressPage'
-import ContactUs from './templates/ContactUs'
-import ChildPagesGrid from './templates/ChildPagesGrid'
-import Search from './pages/Search'
-
-import GallerySingle from './pages/GallerySingle'
-import Galleries from './pages/Galleries'
-import News from './pages/News'
-import NewsSingle from './pages/NewsSingle'
-import Naac from './pages/Naac'
-import NaacSingle from './pages/NaacSingle'
-import IqacDashboard from './pages/IqacDashboard'
-import IqacSingle from './pages/IqacSingle'
-import NssDashboard from './pages/NssDashboard'
-import NssSingle from './pages/NssSingle'
-import Publications from './pages/Publications'
-import PublicationSingle from './pages/PublicationSingle'
-import PublicationCategory from './pages/PublicationCategory'
-import CourseSingle from './pages/CourseSingle'
-import Activities from './pages/Activities'
-import ActivitySingle from './pages/ActivitySingle'
-import FacultySingle from './pages/FacultySingle'
-import FacultyDepartmentSingle from './pages/FacultyDepartmentSingle'
-import InitiativesPage from './pages/InitiativesPage'
 import ScrollToTop from './components/ScrollToTop'
 import DocumentTitle from './components/DocumentTitle'
 import { PageInfoProvider } from './services/PageInfoContext'
-
 import Landing from './pages/landing'
+
+// Lazy-loaded page components for route code-splitting
+const Home = lazy(() => import('./pages/Home'))
+const Departments = lazy(() => import('./pages/Departments'))
+const Faculties = lazy(() => import('./pages/Faculties'))
+const DepartmentSingle = lazy(() => import('./pages/DepartmentSingle'))
+const Notifications = lazy(() => import('./pages/Notifications'))
+const NotificationSingle = lazy(() => import('./pages/NotificationSingle'))
+const WordPressPage = lazy(() => import('./templates/WordPressPage'))
+const ContactUs = lazy(() => import('./templates/ContactUs'))
+const ChildPagesGrid = lazy(() => import('./templates/ChildPagesGrid'))
+const Search = lazy(() => import('./pages/Search'))
+const GallerySingle = lazy(() => import('./pages/GallerySingle'))
+const Galleries = lazy(() => import('./pages/Galleries'))
+const News = lazy(() => import('./pages/News'))
+const NewsSingle = lazy(() => import('./pages/NewsSingle'))
+const Naac = lazy(() => import('./pages/Naac'))
+const NaacSingle = lazy(() => import('./pages/NaacSingle'))
+const IqacDashboard = lazy(() => import('./pages/IqacDashboard'))
+const IqacSingle = lazy(() => import('./pages/IqacSingle'))
+const NssDashboard = lazy(() => import('./pages/NssDashboard'))
+const NssSingle = lazy(() => import('./pages/NssSingle'))
+const Publications = lazy(() => import('./pages/Publications'))
+const PublicationSingle = lazy(() => import('./pages/PublicationSingle'))
+const PublicationCategory = lazy(() => import('./pages/PublicationCategory'))
+const CourseSingle = lazy(() => import('./pages/CourseSingle'))
+const Activities = lazy(() => import('./pages/Activities'))
+const ActivitySingle = lazy(() => import('./pages/ActivitySingle'))
+const FacultySingle = lazy(() => import('./pages/FacultySingle'))
+const FacultyDepartmentSingle = lazy(() => import('./pages/FacultyDepartmentSingle'))
+const InitiativesPage = lazy(() => import('./pages/InitiativesPage'))
+
+class ErrorBoundary extends Component {
+  constructor(props) {
+    super(props)
+    this.state = { hasError: false, error: null }
+  }
+
+  static getDerivedStateFromError(error) {
+    return { hasError: true, error }
+  }
+
+  componentDidCatch(error, errorInfo) {
+    console.error('App ErrorBoundary caught an error:', error, errorInfo)
+  }
+
+  render() {
+    if (this.state.hasError) {
+      return (
+        <div style={{
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          justifyContent: 'center',
+          minHeight: '80vh',
+          padding: '24px',
+          textAlign: 'center',
+          fontFamily: 'Inter, system-ui, sans-serif'
+        }}>
+          <h2 style={{ color: '#1a3a6e', marginBottom: '12px' }}>എന്തോ തകരാർ സംഭവിച്ചു (Something went wrong)</h2>
+          <p style={{ color: '#555', maxWidth: '500px', marginBottom: '24px', lineHeight: 1.6 }}>
+            പേജ് ലോഡ് ചെയ്യുന്നതിൽ തടസ്സം നേരിട്ടു. ദയവായി പേജ് വീണ്ടും റീലോഡ് ചെയ്യുക.
+          </p>
+          <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap', justifyContent: 'center' }}>
+            <button
+              onClick={() => window.location.reload()}
+              style={{
+                background: '#1a3a6e',
+                color: '#fff',
+                border: 'none',
+                padding: '10px 22px',
+                borderRadius: '25px',
+                fontWeight: '600',
+                cursor: 'pointer'
+              }}
+            >
+              റീലോഡ് ചെയ്യുക (Reload)
+            </button>
+            <a
+              href="/ml/home"
+              style={{
+                background: '#f0b429',
+                color: '#0f2347',
+                border: 'none',
+                padding: '10px 22px',
+                borderRadius: '25px',
+                fontWeight: '700',
+                textDecoration: 'none'
+              }}
+            >
+              ഹോം പേജിലേക്ക് (Go Home)
+            </a>
+          </div>
+        </div>
+      )
+    }
+    return this.props.children
+  }
+}
+
+function PageLoader() {
+  return (
+    <div style={{
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      minHeight: '60vh',
+      width: '100%'
+    }}>
+      <div style={{
+        width: '40px',
+        height: '40px',
+        border: '3px solid rgba(178, 34, 34, 0.15)',
+        borderTopColor: '#B22222',
+        borderRadius: '50%',
+        animation: 'appSpin 0.8s linear infinite'
+      }} />
+      <style>{`
+        @keyframes appSpin {
+          0% { transform: rotate(0deg); }
+          100% { transform: rotate(360deg); }
+        }
+      `}</style>
+    </div>
+  )
+}
 
 function TaxonomyRedirect({ base }) {
   const params = useParams()
@@ -65,23 +161,67 @@ function LinkInterceptor() {
       if (!anchor) return
       
       const href = anchor.getAttribute('href')
-      if (!href) return
+      if (!href || href === '#' || href.startsWith('javascript:') || href.startsWith('mailto:') || href.startsWith('tel:')) return
 
-      if (anchor.target === '_blank' || anchor.hasAttribute('download')) return
-      
       if (e.ctrlKey || e.metaKey || e.shiftKey || e.altKey) return
 
-      const siteUrl = WP_CONFIG.SITE_URL
-      
-      if (href.startsWith(siteUrl)) {
-        e.preventDefault()
-        const relativePath = href.replace(siteUrl, '') || '/'
-        navigate(relativePath)
+      // Check if this is a file asset or media link
+      const isFileAsset = /\.(jpg|jpeg|png|gif|pdf|doc|docx|xls|xlsx|ppt|pptx|zip|rar|tar|gz|7z|mp4|mp3|avi|mov|webp|svg|avif)(?:[?#].*)?$/i.test(href) ||
+                          href.includes('/wp-content/') ||
+                          href.includes('/wp-includes/') ||
+                          href.includes('/uploads/')
+
+      if (isFileAsset) {
+        // Ensure href points directly to CMS backend and opens cleanly
+        const fixed = fixAssetUrl(href)
+        if (fixed && fixed !== href) {
+          anchor.setAttribute('href', fixed)
+        }
+        if (!anchor.target) {
+          anchor.setAttribute('target', '_blank')
+          anchor.setAttribute('rel', 'noopener noreferrer')
+        }
+        // Do NOT intercept file attachments with React Router; let the browser open/download them directly
+        return
       }
+
+      if (anchor.target === '_blank' || anchor.hasAttribute('download')) return
+
+      try {
+        const url = new URL(href, window.location.origin)
+        const wpHost = new URL(WP_CONFIG.SITE_URL).host
+
+        // Strictly exclude archive subdomain
+        if (url.host === 'archive.malayalamuniversity.edu.in') {
+          return
+        }
+
+        const isInternal = url.host === window.location.host ||
+                           url.host === wpHost ||
+                           url.host === 'malayalamuniversity.edu.in' ||
+                           url.host === 'www.malayalamuniversity.edu.in' ||
+                           url.host === 'localhost' ||
+                           url.host === '127.0.0.1'
+        
+        if (isInternal) {
+          e.preventDefault()
+          let path = url.pathname
+          const wpBasePath = new URL(WP_CONFIG.SITE_URL).pathname.replace(/\/$/, '')
+          const knownBasePaths = ['/sabir/mu', wpBasePath].filter(Boolean)
+          for (const bp of knownBasePaths) {
+            if (bp !== '/' && path.startsWith(bp)) {
+              path = path.slice(bp.length)
+              break
+            }
+          }
+          const destination = (path || '/') + url.search + url.hash
+          navigate(destination)
+        }
+      } catch {}
     }
 
-    document.addEventListener('click', handleGlobalClick)
-    return () => document.removeEventListener('click', handleGlobalClick)
+    document.addEventListener('click', handleGlobalClick, true)
+    return () => document.removeEventListener('click', handleGlobalClick, true)
   }, [navigate])
 
   return null
@@ -89,17 +229,25 @@ function LinkInterceptor() {
 
 function AppContent() {
   const location = useLocation()
-  const isLandingPage = location.pathname === '/' || location.pathname === '/landing'
+  const isLandingPage = location.pathname === '/' || location.pathname === '/landing' || location.pathname === '/landing/'
 
   return (
     <PageInfoProvider>
       {!isLandingPage && <div className="grid-bg" aria-hidden="true"></div>}
       {!isLandingPage && <Header />}
-      <Routes>
+      <Suspense fallback={<PageLoader />}>
+        <Routes>
         <Route path="/" element={<Landing />} />
         <Route path="/landing" element={<Landing />} />
         <Route path="/home" element={<Navigate to="/ml/home" replace />} />
+        <Route path="/home-page" element={<Navigate to="/ml/home" replace />} />
+        <Route path="/home-page-ml" element={<Navigate to="/ml/home" replace />} />
+        <Route path="/home-page-en" element={<Navigate to="/en/home" replace />} />
         <Route path="/:lang/home" element={<Home />} />
+        <Route path="/:lang/home/*" element={<Home />} />
+        <Route path="/:lang/home-page" element={<Navigate to="/:lang/home" replace />} />
+        <Route path="/:lang/home-page-ml" element={<Navigate to="/ml/home" replace />} />
+        <Route path="/:lang/home-page-en" element={<Navigate to="/en/home" replace />} />
         <Route path="/:lang" element={<Home />} />
 
         <Route path="/search" element={<Search />} />
@@ -195,6 +343,7 @@ function AppContent() {
         <Route path="/:slug/*" element={<WordPressPage />} />
         <Route path="/:lang/:slug/*" element={<WordPressPage />} />
       </Routes>
+      </Suspense>
       {!isLandingPage && <Footer />}
       {!isLandingPage && <FloatingSocial />}
     </PageInfoProvider>
@@ -203,13 +352,15 @@ function AppContent() {
 
 function App() {
   return (
-    <Router>
-      <LinkInterceptor />
-      <ScrollToTop />
-      <LangFont />
-      <DocumentTitle />
-      <AppContent />
-    </Router>
+    <ErrorBoundary>
+      <Router>
+        <LinkInterceptor />
+        <ScrollToTop />
+        <LangFont />
+        <DocumentTitle />
+        <AppContent />
+      </Router>
+    </ErrorBoundary>
   )
 }
 

@@ -60,25 +60,36 @@ function Departments() {
               <div key={i} className="department-skeleton" style={{ height: '180px' }} />
             ))
           ) : departments.length > 0 ? (
-            departments.map(dept => (
-              <Link
-                key={dept.id}
-                className="department-card reveal-up active"
-                to={`/${lang}/department/${dept.slug}`}
-              >
-                <h3 className="department-card-title">
-                  {stripHtml(dept.title?.rendered || dept.title || '')}
-                </h3>
-                {dept.excerpt?.rendered && (
-                  <p className="department-card-desc">
-                    {stripHtml(dept.excerpt.rendered).substring(0, 80)}...
-                  </p>
-                )}
-                <span className="department-card-link">
-                  {cta}
-                </span>
-              </Link>
-            ))
+            departments.map(dept => {
+              const featImg = dept._embedded?.['wp:featuredmedia']?.[0]?.source_url || dept.featured_media_url || dept.acf?.image || dept.acf?.banner || dept.acf?.featured_image
+              const titleText = stripHtml(dept.title?.rendered || dept.title || '')
+              return (
+                <Link
+                  key={dept.id}
+                  className={`department-card reveal-up active ${featImg ? 'has-image' : ''}`}
+                  to={`/${lang}/department/${dept.slug}`}
+                >
+                  {featImg && (
+                    <div className="department-card-image-wrap">
+                      <img src={featImg} alt={titleText} className="department-card-image" />
+                    </div>
+                  )}
+                  <div className="department-card-body">
+                    <h3 className="department-card-title">
+                      {titleText}
+                    </h3>
+                    {dept.excerpt?.rendered && (
+                      <p className="department-card-desc">
+                        {stripHtml(dept.excerpt.rendered).substring(0, 80)}...
+                      </p>
+                    )}
+                    <span className="department-card-link">
+                      {cta}
+                    </span>
+                  </div>
+                </Link>
+              )
+            })
           ) : (
             <div className="faculty-empty-state" style={{ gridColumn: '1 / -1' }}>
               {lang === 'ml' ? 'വിഭാഗങ്ങളൊന്നുമില്ല.' : 'No departments found.'}

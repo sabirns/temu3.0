@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useLocation, useSearchParams } from 'react-router-dom'
-import { getLanguageContext } from '../services/wordpressApi'
+import { getLanguageContext, fetchPageBySlug } from '../services/wordpressApi'
 
 function Footer() {
     const location = useLocation()
@@ -17,7 +17,6 @@ function Footer() {
         async function fetchContactInfo() {
             try {
                 const slug = lang === 'ml' ? 'contact-us-ml' : 'contact-us'
-                const { fetchPageBySlug } = await import('../services/wordpressApi')
                 const page = await fetchPageBySlug(slug, { lang })
                 if (page && page.acf) {
                     let phone = contactInfo.phone
@@ -63,6 +62,7 @@ function Footer() {
                         <p className="footer-group-heading">{lang === 'ml' ? 'കേന്ദ്ര / സംസ്ഥാന സർക്കാർ വെബ്സൈറ്റുകൾ' : 'Central / State Govt Websites'}</p>
                         <ul className="footer-list">
                             {[
+                                { label: lang === 'ml' ? 'പഴയ വെബ്സൈറ്റ് (Old Website)' : 'Old Website (Main Portal)', href: 'http://archive.malayalamuniversity.edu.in' },
                                 { label: lang === 'ml' ? 'കേരള സർക്കാർ ഔദ്യോഗിക വെബ് പോർട്ടൽ' : 'Kerala Govt Official Web Portal', href: 'https://kerala.gov.in/' },
                                 { label: lang === 'ml' ? 'ഐടി മിഷൻ, കേരള' : 'IT Mission, Kerala', href: 'http://www.itmission.kerala.gov.in/' },
                                 { label: lang === 'ml' ? 'ഉന്നത വിദ്യാഭ്യാസ വകുപ്പ്, കേരള' : 'Dept. of Higher Education, Kerala', href: 'http://www.highereducation.kerala.gov.in/' },

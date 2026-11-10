@@ -170,15 +170,12 @@ img {
     display: flex;
     align-items: center;
     gap: 15px;
-    margin-right: 15px;
-    border-right: 1px solid rgba(26, 58, 110, 0.12);
-    padding-right: 15px;
 }
 
 .contact-link-inline {
     color: var(--text);
     text-decoration: none;
-    font-size: 13px;
+    font-size: 12px;
     font-weight: 600;
     display: flex;
     align-items: center;
@@ -197,6 +194,168 @@ img {
 @media (max-width: 980px) {
     .header-contact-inline {
         display: none;
+    }
+}
+
+/* Quick Action Old Website Pill Button */
+.btn-old-site-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 10px;
+    background: rgba(26, 58, 110, 0.06);
+    border: 1px solid rgba(26, 58, 110, 0.18);
+    border-radius: 20px;
+    color: var(--primary);
+    font-size: 11px;
+    font-weight: 600;
+    text-decoration: none;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+}
+
+.btn-old-site-pill:hover {
+    background: var(--primary);
+    color: #ffffff;
+    border-color: var(--primary);
+    box-shadow: 0 3px 10px rgba(26, 58, 110, 0.2);
+}
+
+.btn-old-site-pill .old-site-pill-icon {
+    font-size: 0;
+    line-height: 1;
+    display: none;
+}
+
+/* Mobile Old Website Link */
+.mobile-old-site-item {
+    margin-top: 10px;
+    border-top: 1px dashed rgba(26, 58, 110, 0.18);
+    padding-top: 8px;
+}
+
+.mobile-old-site-link {
+    display: flex !important;
+    align-items: center;
+    justify-content: space-between;
+    color: #b71c1c !important;
+    font-weight: 700 !important;
+}
+
+.mobile-old-site-arrow {
+    font-size: 13px;
+    opacity: 0.8;
+}
+
+/* =========================================================
+   VERTICAL BETA VERSION BADGE (SMALL TEXT)
+   ========================================================= */
+.vertical-beta-tab {
+    position: fixed;
+    right: 0;
+    top: 48%;
+    transform: translateY(-50%) rotate(180deg);
+    z-index: 9995;
+    background: linear-gradient(180deg, #d32f2f 0%, #b71c1c 100%);
+    color: #ffffff;
+    font-size: 8.5px;
+    font-weight: 800;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    padding: 10px 4px;
+    border-radius: 0 5px 5px 0;
+    box-shadow: -2px 2px 10px rgba(0, 0, 0, 0.22);
+    writing-mode: vertical-rl;
+    text-orientation: mixed;
+    user-select: none;
+    border-right: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    cursor: default;
+    line-height: 1;
+}
+
+.vertical-beta-dot {
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+    background: #ffffff;
+    box-shadow: 0 0 4px #ffffff;
+    display: inline-block;
+    animation: betaPulseSmall 1.8s infinite;
+}
+
+@keyframes betaPulseSmall {
+    0% {
+        opacity: 1;
+        transform: scale(1);
+    }
+
+    50% {
+        opacity: 0.35;
+        transform: scale(0.7);
+    }
+
+    100% {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+.vertical-beta-text {
+    display: inline-block;
+    line-height: 1;
+}
+
+@media (max-width: 768px) {
+    .vertical-beta-tab {
+        top: 40%;
+        font-size: 7.5px;
+        letter-spacing: 1.2px;
+        padding: 8px 3px;
+    }
+
+    .vertical-beta-dot {
+        width: 3.5px;
+        height: 3.5px;
+    }
+}
+
+@keyframes betaPulseSmall {
+    0% {
+        opacity: 1;
+        transform: scale(1);
+    }
+
+    50% {
+        opacity: 0.35;
+        transform: scale(0.7);
+    }
+
+    100% {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+.vertical-beta-text {
+    display: inline-block;
+    line-height: 1;
+}
+
+@media (max-width: 768px) {
+    .vertical-beta-tab {
+        top: 40%;
+        font-size: 7.5px;
+        letter-spacing: 1.2px;
+        padding: 8px 3px;
+        border-radius: 4px 0 0 4px;
+    }
+
+    .vertical-beta-dot {
+        width: 3.5px;
+        height: 3.5px;
     }
 }
 
@@ -781,8 +940,8 @@ img {
 }
 
 .btn-small {
-    padding: 8px 16px;
-    font-size: 12px;
+    padding: 8px 8px;
+    font-size: 11px;
     border-radius: 10px;
     font-weight: 600
 }
@@ -2364,6 +2523,17 @@ img {
     line-height: 1.7;
     max-width: 65ch;
     text-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+}
+
+.slide-sub p {
+    margin: 0 0 10px;
+    color: inherit;
+    font-size: inherit;
+    line-height: inherit;
+}
+
+.slide-sub p:last-child {
+    margin-bottom: 0;
 }
 
 .slide-cta {

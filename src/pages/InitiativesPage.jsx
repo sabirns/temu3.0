@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useLocation, useSearchParams, Link } from 'react-router-dom'
-import { getLanguageContext, fetchPageBySlug, fetchActivities } from '../services/wordpressApi'
+import { getLanguageContext, fetchPageBySlug, fetchActivities, cleanWordPressUrl } from '../services/wordpressApi'
 import { WP_CONFIG } from '../config/wpConfig'
 import SocialActivitiesGrid from '../components/SocialActivitiesGrid'
 
@@ -61,10 +61,9 @@ function InitiativesPage() {
                   const btnLinkField = btn.external_link || btn.link || '#'
                   const linkUrl = typeof btnLinkField === 'object' && btnLinkField?.url ? btnLinkField.url : btnLinkField
                   
-                  const isExternal = linkUrl.startsWith('http') && !linkUrl.startsWith(WP_CONFIG.SITE_URL)
-                  const internalPath = !isExternal && linkUrl.startsWith(WP_CONFIG.SITE_URL)
-                    ? linkUrl.replace(WP_CONFIG.SITE_URL, '') || '/'
-                    : linkUrl
+                  const cleanedPath = cleanWordPressUrl(linkUrl)
+                  const isExternal = cleanedPath.startsWith('http')
+                  const internalPath = isExternal ? linkUrl : cleanedPath
 
                   const linkText = typeof btnLinkField === 'object' && btnLinkField?.title ? btnLinkField.title : (lang === 'ml' ? 'കൂടുതൽ അറിയുക →' : 'Explore →')
                   const iconUrl = typeof btn.icon === 'object' && btn.icon?.url ? btn.icon.url : btn.icon

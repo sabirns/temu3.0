@@ -1,16 +1,69 @@
 import { useState, useEffect, useCallback } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
+import { fetchSliders } from '../services/wordpressApi'
 import '../styles/landing.css'
 
-const SLIDES = [
+const DEFAULT_SLIDES = [
     '/images/landing/landing-slider1.jpg',
     '/images/landing/landing-slider2.jpg',
     '/images/landing/landing-slider3.jpg',
     '/images/landing/landing-slider4.jpg'
 ]
 
+const STORAGE_KEY = 'temu_landing_slider_images'
+
+// Synchronous cache read for 0ms initial render on repeat visits
+function getCachedLandingSlides() {
+    try {
+        if (typeof window !== 'undefined') {
+            const cached = sessionStorage.getItem(STORAGE_KEY) || localStorage.getItem(STORAGE_KEY)
+            if (cached) {
+                const parsed = JSON.parse(cached)
+                if (Array.isArray(parsed) && parsed.length > 0) return parsed
+            }
+        }
+    } catch {}
+    return DEFAULT_SLIDES
+}
+
+// Prefetch slides from WordPress
+let landingFetchPromise = null
+function loadLandingSlides() {
+    if (!landingFetchPromise) {
+        landingFetchPromise = fetchSliders({ location: 'landing-page', lang: 'ml' })
+            .then(items => {
+                const images = (items || [])
+                    .map(item => item.image)
+                    .filter(img => img && !img.includes('placeholder'))
+                if (images.length > 0) {
+                    try {
+                        if (typeof window !== 'undefined') {
+                            sessionStorage.setItem(STORAGE_KEY, JSON.stringify(images))
+                            localStorage.setItem(STORAGE_KEY, JSON.stringify(images))
+                        }
+                    } catch {}
+                    // Preload images into browser memory immediately
+                    if (typeof window !== 'undefined' && typeof Image !== 'undefined') {
+                        images.forEach(src => {
+                            const img = new Image()
+                            img.src = src
+                        })
+                    }
+                    return images
+                }
+                return DEFAULT_SLIDES
+            })
+            .catch(err => {
+                console.warn('Failed to load landing sliders:', err)
+                return DEFAULT_SLIDES
+            })
+    }
+    return landingFetchPromise
+}
+
 export default function Landing() {
     const navigate = useNavigate()
+    const [slides, setSlides] = useState(getCachedLandingSlides)
     const [currentSlide, setCurrentSlide] = useState(0)
     const [secondsLeft, setSecondsLeft] = useState(30)
     const [progress, setProgress] = useState(0)
@@ -18,6 +71,21 @@ export default function Landing() {
     const goToHome = useCallback(() => {
         navigate('/ml/home')
     }, [navigate])
+
+    // Load landing page slides from WordPress slider post type
+    useEffect(() => {
+        let mounted = true
+        loadLandingSlides().then(images => {
+            if (!mounted) return
+            if (images && images.length > 0) {
+                setSlides(images)
+            }
+        })
+
+        return () => {
+            mounted = false
+        }
+    }, [])
 
     // 30-second countdown timer for auto-navigation to home page
     useEffect(() => {
@@ -42,12 +110,13 @@ export default function Landing() {
 
     // Background slideshow rotation
     useEffect(() => {
+        if (slides.length <= 1) return
         const slideTimer = setInterval(() => {
-            setCurrentSlide((prev) => (prev + 1) % SLIDES.length)
+            setCurrentSlide((prev) => (prev + 1) % slides.length)
         }, 6500)
 
         return () => clearInterval(slideTimer)
-    }, [])
+    }, [slides.length])
 
     const handleDotClick = (index) => {
         setCurrentSlide(index)
@@ -67,15 +136,17 @@ export default function Landing() {
             </div>
 
             <main className="landing-hero">
-                <div className="landing-slides" aria-hidden="true">
-                    {SLIDES.map((imgSrc, index) => (
-                        <div
-                            key={index}
-                            className={`landing-slide ${index === currentSlide ? 'active' : ''}`}
-                            style={{ backgroundImage: `url(${imgSrc})` }}
-                        />
-                    ))}
-                </div>
+                {slides.length > 0 && (
+                    <div className="landing-slides" aria-hidden="true">
+                        {slides.map((imgSrc, index) => (
+                            <div
+                                key={index}
+                                className={`landing-slide ${index === currentSlide ? 'active' : ''}`}
+                                style={{ backgroundImage: `url('${imgSrc}')` }}
+                            />
+                        ))}
+                    </div>
+                )}
                 <div className="landing-shade"></div>
 
                 <section className="landing-content" id="home">
@@ -150,20 +221,22 @@ export default function Landing() {
                     </div>
                 </section>
 
-                <footer className="landing-footer">
-                    <div className="landing-slide-nav" aria-label="ചിത്രങ്ങൾ മാറ്റുക">
-                        {SLIDES.map((_, index) => (
-                            <button
-                                key={index}
-                                className={`landing-dot ${index === currentSlide ? 'active' : ''}`}
-                                type="button"
-                                aria-label={`ചിത്രം ${index + 1}`}
-                                aria-current={index === currentSlide ? 'true' : 'false'}
-                                onClick={() => handleDotClick(index)}
-                            />
-                        ))}
-                    </div>
-                </footer>
+                {slides.length > 1 && (
+                    <footer className="landing-footer">
+                        <div className="landing-slide-nav" aria-label="ചിത്രങ്ങൾ മാറ്റുക">
+                            {slides.map((_, index) => (
+                                <button
+                                    key={index}
+                                    className={`landing-dot ${index === currentSlide ? 'active' : ''}`}
+                                    type="button"
+                                    aria-label={`ചിത്രം ${index + 1}`}
+                                    aria-current={index === currentSlide ? 'true' : 'false'}
+                                    onClick={() => handleDotClick(index)}
+                                />
+                            ))}
+                        </div>
+                    </footer>
+                )}
             </main>
         </div>
     )

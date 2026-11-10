@@ -4,10 +4,18 @@ import '../styles/social-activities.css'
 
 function getLimitedExcerpt(activity, maxChars = 140) {
   const rawHtml = activity.excerpt?.rendered || activity.content?.rendered || ''
-  if (typeof window === 'undefined') return ''
-  const tmp = document.createElement('div')
-  tmp.innerHTML = rawHtml
-  let text = (tmp.textContent || tmp.innerText || '').trim()
+  if (!rawHtml) return ''
+  let text = ''
+  if (typeof DOMParser !== 'undefined') {
+    try {
+      const doc = new DOMParser().parseFromString(rawHtml, 'text/html')
+      text = (doc.body.textContent || '').trim()
+    } catch {
+      text = rawHtml.replace(/<[^>]*>?/gm, '').trim()
+    }
+  } else {
+    text = rawHtml.replace(/<[^>]*>?/gm, '').trim()
+  }
   text = text.replace(/\s+/g, ' ')
   if (text.length > maxChars) {
     return text.slice(0, maxChars).trim() + '...'

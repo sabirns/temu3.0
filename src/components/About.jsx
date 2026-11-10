@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { Link, useSearchParams, useLocation } from 'react-router-dom'
-import { fetchNotifications, getLanguageContext } from '../services/wordpressApi'
+import { fetchNotifications, getLanguageContext, cleanWordPressUrl } from '../services/wordpressApi'
+import { WP_CONFIG } from '../config/wpConfig'
 
 const malayalamLetters = [
   'അ', 'ആ', 'ഇ', 'ഈ', 'ഉ', 'ഊ', 'ഋ', 'എ', 'ഏ', 'ഐ',
@@ -159,19 +160,14 @@ function About({ homePageData }) {
                     url = lang === 'ml' ? '/faculties' : `/${lang}/faculties`
                     isExternal = false
                   } else if (originalText.toLowerCase().includes('read more') || originalText.includes('കൂടുതൽ വായിക്കുക') || originalText.includes('readmore')) {
-                    url = 'https://tessst.com/temu_cms/ml/%e0%b4%b8%e0%b5%bc%e0%b4%b5%e0%b4%95%e0%b4%b2%e0%b4%be%e0%b4%b6%e0%b4%be%e0%b4%b2/'
+                    url = `${WP_CONFIG.SITE_URL}/ml/%e0%b4%b8%e0%b5%bc%e0%b4%b5%e0%b4%95%e0%b4%b2%e0%b4%be%e0%b4%b6%e0%b4%be%e0%b4%b2/`
                     isExternal = true
-                  } else if (url.startsWith('http') && !url.startsWith(window.location.origin)) {
-                     // Keep external
                   } else {
-                     // Check if it's internal WP link (if WP_CONFIG was imported, but let's just make it relative if possible)
-                     try {
-                        if (url.startsWith('http')) {
-                            const u = new URL(url)
-                            url = u.pathname
-                            isExternal = false
-                        }
-                     } catch(e) {}
+                    const cleaned = cleanWordPressUrl(url)
+                    if (!cleaned.startsWith('http')) {
+                      url = cleaned
+                      isExternal = false
+                    }
                   }
 
                   if (!isExternal || url.startsWith('/')) {

@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { Link, useLocation, useSearchParams } from 'react-router-dom'
 import About, { ParallaxLetters } from '../components/About'
-import { fetchGallery, getLanguageContext, fetchPosts, fetchPage, fetchPageBySlug, fetchMenuByLocation, fetchActivities } from '../services/wordpressApi'
+import { fetchGallery, getLanguageContext, fetchPosts, fetchPage, fetchPageBySlug, fetchMenuByLocation, fetchActivities, fetchWithCache, cleanWordPressUrl, fixWordPressUrls, fetchMedia, fetchSliders } from '../services/wordpressApi'
 import SocialActivitiesGrid from '../components/SocialActivitiesGrid'
 import { WP_CONFIG } from '../config/wpConfig'
 
@@ -48,87 +48,47 @@ function Home() {
 			setNewsIndex(0)
 			try {
 				const [slidesData, gallery, news, homePage, topMenu, activitiesData] = await Promise.all([
-					fetch(`${WP_CONFIG.API_URL}/slider?per_page=5&_embed&lang=${lang}&_t=${Date.now()}`).then(r => r.ok ? r.json() : []),
+					fetchSliders({ location: 'home-page', lang }),
 					fetchGallery({ lang, per_page: 8 }),
 					fetchPosts({ lang, per_page: 6 }),
 					lang === 'ml' ? fetchPageBySlug('home-page-ml', { lang }) : fetchPage(465, { lang }),
 					fetchMenuByLocation('top_menu_1', lang),
 					fetchActivities({ activity_type: 1991, lang, per_page: 50 })
 				])
-				const slideLang = lang
-				const formattedSlides = (slidesData || [])
-					.filter(s => {
-						if (s.lang) return s.lang === slideLang
-						if (s.translations) return !!s.translations[slideLang === 'ml' ? 'ml_IN' : 'en_US'] || s.translations[slideLang]
-						return true
-					})
-					.map(s => ({
-						id: s.id,
-						title: s.title?.rendered || '',
-						sub: s.content?.rendered?.replace(/<[^>]+>/g, '').trim() || '',
-						image: s._embedded?.['wp:featuredmedia']?.[0]?.source_url || '/images/slider.jpg',
-						buttons: s.acf?.slider_buttons || []
-					}))
-				setSlides(formattedSlides)
+				setSlides(slidesData || [])
 				setGalleryItems(gallery || [])
 				setNewsItems(news || [])
 				setTopMenuItems(topMenu || [])
 				setSocialActivities(activitiesData || [])
 
-				if (homePage?.acf?.buttons_2) {
-					const resolveMedia = async (id) => {
-						try {
-							const res = await fetch(`${WP_CONFIG.API_URL}/media/${id}`)
-							if (res.ok) {
-								const media = await res.json()
-								return media.source_url
-							}
-						} catch (e) {
-							console.warn('Failed to resolve media:', e)
-						}
-						return null
-					}
-					for (const item of homePage.acf.buttons_2) {
-						if (item.image) {
+				if (homePage?.acf?.buttons_2 && Array.isArray(homePage.acf.buttons_2)) {
+					await Promise.all(
+						homePage.acf.buttons_2.map(async (item) => {
+							if (!item.image) return
 							if (typeof item.image === 'number') {
-								const url = await resolveMedia(item.image)
-								item.image = url
-							} else if (typeof item.image === 'string') {
-								if (/^\d+$/.test(item.image)) {
-									const url = await resolveMedia(item.image)
-									item.image = url
-								}
+								item.image = await fetchMedia(item.image)
+							} else if (typeof item.image === 'string' && /^\d+$/.test(item.image)) {
+								item.image = await fetchMedia(item.image)
 							} else if (typeof item.image === 'object') {
 								if (item.image.url) {
 									item.image = item.image.url
 								} else if (item.image.ID || item.image.id) {
-									const url = await resolveMedia(item.image.ID || item.image.id)
-									item.image = url
+									item.image = await fetchMedia(item.image.ID || item.image.id)
 								} else {
 									item.image = null
 								}
 							}
-						}
-					}
+						})
+					)
 				}
-				if (homePage?.acf?.buttons) {
-					const resolveMedia = async (id) => {
-						try {
-							const res = await fetch(`${WP_CONFIG.API_URL}/media/${id}`)
-							if (res.ok) {
-								const media = await res.json()
-								return media.source_url
+				if (homePage?.acf?.buttons && Array.isArray(homePage.acf.buttons)) {
+					await Promise.all(
+						homePage.acf.buttons.map(async (item) => {
+							if (item.icon && typeof item.icon === 'number') {
+								item.icon = await fetchMedia(item.icon)
 							}
-						} catch (e) {
-							console.warn('Failed to resolve media:', e)
-						}
-						return null
-					}
-					for (const item of homePage.acf.buttons) {
-						if (item.icon && typeof item.icon === 'number') {
-							item.icon = await resolveMedia(item.icon)
-						}
-					}
+						})
+					)
 				}
 				setHomePageData(homePage || null)
 			} catch (error) {
@@ -201,14 +161,33 @@ function Home() {
 											<div className="slide-content-wrapper">
 												<div className="slide-content">
 													<h2 className="slide-title">{slide.title}</h2>
-													{slide.sub && <p className="slide-sub">{slide.sub}</p>}
+													{slide.content && (
+														<div
+															className="slide-sub"
+															dangerouslySetInnerHTML={{ __html: slide.content }}
+														/>
+													)}
 													{slide.buttons.length > 0 && (
 														<div className="slide-cta">
-															{slide.buttons.map((btn, i) => (
-																<a key={i} href={btn.button_link?.url || '#'} className={`btn ${i === 0 ? 'primary' : ''}`} target={btn.button_link?.target || '_self'} rel={btn.button_link?.target === '_blank' ? 'noopener' : ''}>
-																	{btn.button_text}
-																</a>
-															))}
+															{slide.buttons.map((btn, i) => {
+																const linkUrl = typeof btn.button_link === 'string'
+																	? cleanWordPressUrl(btn.button_link)
+																	: (btn.button_link?.url ? cleanWordPressUrl(btn.button_link.url) : '#')
+																const target = (typeof btn.button_link === 'object' && btn.button_link?.target)
+																	? btn.button_link.target
+																	: '_self'
+																return (
+																	<a
+																		key={i}
+																		href={linkUrl}
+																		className={`btn ${i === 0 ? 'primary' : ''}`}
+																		target={target}
+																		rel={target === '_blank' ? 'noopener noreferrer' : undefined}
+																	>
+																		{btn.button_text}
+																	</a>
+																)
+															})}
 														</div>
 													)}
 												</div>
@@ -366,17 +345,16 @@ function Home() {
 								const btnLinkField = btn.external_link || btn.link || '#'
 								const linkUrl = typeof btnLinkField === 'object' && btnLinkField?.url ? btnLinkField.url : btnLinkField
 
-								const isExternal = linkUrl.startsWith('http') && !linkUrl.startsWith(WP_CONFIG.SITE_URL)
-								const internalPath = !isExternal && linkUrl.startsWith(WP_CONFIG.SITE_URL)
-									? linkUrl.replace(WP_CONFIG.SITE_URL, '') || '/'
-									: linkUrl
+								const cleanedPath = cleanWordPressUrl(linkUrl)
+								const isExternal = cleanedPath.startsWith('http')
+								const internalPath = isExternal ? linkUrl : cleanedPath
 
 								const linkText = typeof btnLinkField === 'object' && btnLinkField?.title ? btnLinkField.title : (lang === 'ml' ? 'കൂടുതൽ അറിയുക →' : 'Explore →')
 								const iconUrl = typeof btn.icon === 'object' && btn.icon?.url ? btn.icon.url : btn.icon
 								return (
 									<article className="card" key={index}>
 										{iconUrl ? (
-											<img className="icon" src={iconUrl} alt={btn.title || ''} />
+											<img className="icon" src={iconUrl} alt={btn.title || ''} loading="lazy" decoding="async" />
 										) : (
 											<div className="icon">⟡</div>
 										)}
@@ -493,10 +471,9 @@ function Home() {
 					<div className="facility-grid">
 						{topMenuItems.length > 0 ? topMenuItems.map((item, index) => {
 							const url = item.url || '#'
-							const isExternal = url.startsWith('http') && !url.startsWith(WP_CONFIG.SITE_URL)
-							const internalPath = !isExternal && url.startsWith(WP_CONFIG.SITE_URL)
-								? url.replace(WP_CONFIG.SITE_URL, '') || '/'
-								: url
+							const cleanedPath = cleanWordPressUrl(url)
+							const isExternal = cleanedPath.startsWith('http')
+							const internalPath = isExternal ? url : cleanedPath
 							return isExternal ? (
 								<a key={item.id || index} href={url} className="facility-item" target={item.target || '_self'} rel={item.target === '_blank' ? 'noopener noreferrer' : undefined}>
 									{item.title?.rendered || item.title}
@@ -587,7 +564,7 @@ function Home() {
 													>
 														<div className="portal-icon">
 															{imgSrc ? (
-																<img src={imgSrc} alt={item.title} />
+																<img src={imgSrc} alt={item.title} loading="lazy" decoding="async" />
 															) : (
 																<span className={item.icon}></span>
 															)}
@@ -609,7 +586,7 @@ function Home() {
 						<div className="portals-grid">
 							<a href="https://ugc.ac.in" target="_blank" rel="noopener noreferrer" className="portal-card">
 								<div className="portal-icon">
-									<img src="https://upload.wikimedia.org/wikipedia/en/thumb/9/91/University_Grants_Commission_%28India%29_logo.png/220px-University_Grants_Commission_%28India%29_logo.png" alt="UGC" />
+									<img src="https://upload.wikimedia.org/wikipedia/en/thumb/9/91/University_Grants_Commission_%28India%29_logo.png/220px-University_Grants_Commission_%28India%29_logo.png" alt="UGC" loading="lazy" decoding="async" />
 								</div>
 								<div className="portal-text">
 									<h3>UGC</h3>

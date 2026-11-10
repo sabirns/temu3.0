@@ -111,11 +111,28 @@ function PublicationCategory() {
                 to={lang === 'ml' ? `/publications/${pub.slug}` : `/${lang}/publications/${pub.slug}`}
                 className="publications-card"
               >
-                {pub.featuredImage && (
+                {pub.pdf && (
+                  <span className="publications-card-pdf-badge">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor">
+                      <path d="M14 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/>
+                    </svg>
+                    PDF
+                  </span>
+                )}
+                {pub.featuredImage ? (
                   <div className="publications-card-img">
                     <img src={pub.featuredImage} alt={pub.title} loading="lazy" />
                   </div>
-                )}
+                ) : pub.pdf ? (
+                  <div className="publications-card-img publications-card-pdf-placeholder">
+                    <div className="publications-pdf-doc-icon">
+                      <svg width="48" height="48" viewBox="0 0 24 24" fill="#ef4444">
+                        <path d="M14 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/>
+                      </svg>
+                      <span>PDF DOCUMENT</span>
+                    </div>
+                  </div>
+                ) : null}
                 <div className="publications-card-body">
                   <h3 className="publications-card-title">{pub.title}</h3>
                   {pub.editor && (

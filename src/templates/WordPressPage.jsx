@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
-import { useParams, Link, useSearchParams, useLocation } from 'react-router-dom'
-import { fetchPage, fetchPageBySlug, getPageContent, getLanguageContext, extractTranslationSlugs, fetchActivities } from '../services/wordpressApi'
+import { useParams, Link, useSearchParams, useLocation, Navigate } from 'react-router-dom'
+import { fetchPage, fetchPageBySlug, getPageContent, getLanguageContext, extractTranslationSlugs, fetchActivities, cleanWordPressUrl, fixAssetUrl } from '../services/wordpressApi'
 import { WP_CONFIG } from '../config/wpConfig'
 import { usePageInfo } from '../services/PageInfoContext'
 import GutenbergContent from '../components/GutenbergContent'
@@ -9,14 +9,19 @@ import SocialActivitiesGrid from '../components/SocialActivitiesGrid'
 
 function WordPressPage() {
   const { pageId, slug, '*': splat } = useParams()
-  // React Router v6 treats :slug* as :slug/* — slug captures only first segment,
-  // remaining segments go into the "*" param. Recombine them.
-  const fullSlug = splat ? `${slug}/${splat}` : slug
   const [searchParams] = useSearchParams()
   const location = useLocation()
 
   // Detect language from path or query
   const lang = getLanguageContext(location.pathname, searchParams)
+
+  if (slug === 'home' || slug === 'home-page' || slug === 'home-page-ml' || slug === 'home-page-en') {
+    return <Navigate to={`/${lang}/home`} replace />
+  }
+
+  // React Router v6 treats :slug* as :slug/* — slug captures only first segment,
+  // remaining segments go into the "*" param. Recombine them.
+  const fullSlug = splat ? `${slug}/${splat}` : slug
   const isCourseSubPage = (slug === 'our-courses-ml' || slug === 'courses-offered') && splat;
 
   const { setPageInfo } = usePageInfo()
@@ -138,7 +143,7 @@ function WordPressPage() {
               const res = await fetch(`${WP_CONFIG.API_URL}/media/${fileField}`)
               if (res.ok) {
                 const media = await res.json()
-                pageData.acf.file = { url: media.source_url, mime_type: media.mime_type }
+                pageData.acf.file = { url: fixAssetUrl(media.source_url), mime_type: media.mime_type }
               }
             } catch (e) {
               console.warn('Failed to resolve ACF file media:', e)
@@ -206,9 +211,8 @@ function WordPressPage() {
 
   useEffect(() => {
     if (!page || loading) return
-    const tmp = document.createElement('div')
-    tmp.innerHTML = page.content || ''
-    const textContent = (tmp.textContent || tmp.innerText || '').trim()
+    const doc = new DOMParser().parseFromString(page.content || '', 'text/html')
+    const textContent = (doc.body.textContent || '').trim()
 
     // Check if content is effectively empty
     if (textContent === '') {
@@ -363,7 +367,8 @@ function WordPressPage() {
               {(() => {
                 const f = page.acf?.file
                 if (!f) return null
-                const url = typeof f === 'string' ? f : f.url
+                const rawUrl = typeof f === 'string' ? f : f.url
+                const url = fixAssetUrl(rawUrl)
                 const mime = typeof f === 'object' ? f.mime_type : (url?.match(/\.pdf$/i) ? 'application/pdf' : '')
                 if (!url || mime !== 'application/pdf') return null
                 return (
@@ -390,8 +395,9 @@ function WordPressPage() {
                 <div className="submenu-cards-section" style={{ marginTop: '40px' }}>
                   <div className="portals-grid" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))' }}>
                     {subLinks.map((link, idx) => {
-                      const isInternal = link.url.startsWith('/') || link.url.startsWith(window.location.origin)
-                      const path = isInternal && link.url.startsWith('http') ? new URL(link.url).pathname : link.url
+                      const cleaned = cleanWordPressUrl(link.url)
+                      const isInternal = !cleaned.startsWith('http')
+                      const path = isInternal ? cleaned : link.url
 
                       return (
                         <div key={idx} className="portal-card" style={{ padding: '24px', textAlign: 'center' }}>

@@ -1,6 +1,46 @@
-import { WP_CONFIG } from '../config/wpConfig'
+import { WP_CONFIG } from '../config/wpConfig.js'
 
 const WORDPRESS_API_URL = WP_CONFIG.API_URL
+
+// In-memory cache & request deduplication store
+const apiCache = new Map()
+const pendingRequests = new Map()
+const DEFAULT_TTL_MS = 3 * 60 * 1000 // 3 minutes TTL
+
+export async function fetchWithCache(url, options = {}, ttlMs = DEFAULT_TTL_MS) {
+  const cacheKey = typeof url === 'string' ? url : JSON.stringify(url)
+
+  const cached = apiCache.get(cacheKey)
+  if (cached && Date.now() - cached.timestamp < ttlMs) {
+    return cached.data
+  }
+
+  if (pendingRequests.has(cacheKey)) {
+    return pendingRequests.get(cacheKey)
+  }
+
+  const requestPromise = (async () => {
+    try {
+      const res = await fetch(url, options)
+      if (!res.ok) {
+        throw new Error(`HTTP error ${res.status} for ${url}`)
+      }
+      const data = await res.json()
+      apiCache.set(cacheKey, { data, timestamp: Date.now() })
+      return data
+    } finally {
+      pendingRequests.delete(cacheKey)
+    }
+  })()
+
+  pendingRequests.set(cacheKey, requestPromise)
+  return requestPromise
+}
+
+export function clearApiCache() {
+  apiCache.clear()
+  pendingRequests.clear()
+}
 
 export async function fetchPage(pageId, params = {}) {
   try {
@@ -11,9 +51,7 @@ export async function fetchPage(pageId, params = {}) {
       ...params
     }
     const queryString = new URLSearchParams(defaultParams).toString()
-    const response = await fetch(`${WORDPRESS_API_URL}/pages/${pageId}?${queryString}`)
-    if (!response.ok) throw new Error('Page not found')
-    return await response.json()
+    return await fetchWithCache(`${WORDPRESS_API_URL}/pages/${pageId}?${queryString}`)
   } catch (error) {
     console.error('Error fetching page:', error)
     return null
@@ -30,11 +68,8 @@ export async function fetchPageBySlug(slug, params = {}) {
       ...params
     }
     const queryString = new URLSearchParams(defaultParams).toString()
-    const response = await fetch(`${WORDPRESS_API_URL}/pages?${queryString}`)
-    if (!response.ok) throw new Error('Page not found')
-    const data = await response.json()
-    // Returns an array, we want the first match
-    return data.length > 0 ? data[0] : null
+    const data = await fetchWithCache(`${WORDPRESS_API_URL}/pages?${queryString}`)
+    return data && data.length > 0 ? data[0] : null
   } catch (error) {
     console.error('Error fetching page by slug:', error)
     return null
@@ -44,9 +79,7 @@ export async function fetchPageBySlug(slug, params = {}) {
 export async function fetchPages(params = {}) {
   try {
     const queryString = new URLSearchParams(params).toString()
-    const response = await fetch(`${WORDPRESS_API_URL}/pages?${queryString}`)
-    if (!response.ok) throw new Error('Failed to fetch pages')
-    return await response.json()
+    return await fetchWithCache(`${WORDPRESS_API_URL}/pages?${queryString}`)
   } catch (error) {
     console.error('Error fetching pages:', error)
     return []
@@ -62,15 +95,12 @@ export async function searchContent(query, lang = 'ml') {
       per_page: 20
     })
     
-    // Search posts
-    const postsRes = await fetch(`${WORDPRESS_API_URL}/posts?${params.toString()}`)
-    const posts = postsRes.ok ? await postsRes.json() : []
+    const [posts, pages] = await Promise.all([
+      fetchWithCache(`${WORDPRESS_API_URL}/posts?${params.toString()}`),
+      fetchWithCache(`${WORDPRESS_API_URL}/pages?${params.toString()}`)
+    ])
     
-    // Search pages
-    const pagesRes = await fetch(`${WORDPRESS_API_URL}/pages?${params.toString()}`)
-    const pages = pagesRes.ok ? await pagesRes.json() : []
-    
-    return { posts, pages }
+    return { posts: posts || [], pages: pages || [] }
   } catch (error) {
     console.error('Error searching content:', error)
     return { posts: [], pages: [] }
@@ -79,9 +109,7 @@ export async function searchContent(query, lang = 'ml') {
 
 export async function fetchMenus() {
   try {
-    const response = await fetch(`${WORDPRESS_API_URL}/menus`)
-    if (!response.ok) throw new Error('Menus not found')
-    return await response.json()
+    return await fetchWithCache(`${WORDPRESS_API_URL}/menus`, {}, 10 * 60 * 1000)
   } catch (error) {
     console.error('Error fetching menus:', error)
     return []
@@ -91,16 +119,16 @@ export async function fetchMenus() {
 export async function fetchMenuByLocation(location, lang = '') {
   try {
     const locUrl = lang ? `${WORDPRESS_API_URL}/menu-locations/${location}?lang=${lang}` : `${WORDPRESS_API_URL}/menu-locations/${location}`
-    const locRes = await fetch(locUrl, { cache: 'no-cache' })
-    if (locRes.ok) {
-      const locData = await locRes.json()
-      const menuId = locData.menu
-      if (menuId) {
-        const itemsUrl = lang ? `${WORDPRESS_API_URL}/menu-items?menus=${menuId}&lang=${lang}` : `${WORDPRESS_API_URL}/menu-items?menus=${menuId}`
-        const itemsRes = await fetch(itemsUrl, { cache: 'no-cache' })
-        if (itemsRes.ok) {
-          return await itemsRes.json()
-        }
+    const locData = await fetchWithCache(locUrl, {}, 10 * 60 * 1000)
+    const menuId = locData?.menu
+    if (menuId) {
+      const itemsUrl = lang ? `${WORDPRESS_API_URL}/menu-items?menus=${menuId}&lang=${lang}` : `${WORDPRESS_API_URL}/menu-items?menus=${menuId}`
+      const items = await fetchWithCache(itemsUrl, {}, 10 * 60 * 1000)
+      if (Array.isArray(items)) {
+        return items.map(item => ({
+          ...item,
+          url: cleanWordPressUrl(item.url)
+        }))
       }
     }
   } catch (e) { /* fall through */ }
@@ -110,7 +138,7 @@ export async function fetchMenuByLocation(location, lang = '') {
 
 export function getFeaturedImage(page) {
   if (page._embedded && page._embedded['wp:featuredmedia']) {
-    return page._embedded['wp:featuredmedia'][0].source_url
+    return fixAssetUrl(page._embedded['wp:featuredmedia'][0].source_url)
   }
   return null
 }
@@ -140,14 +168,9 @@ export async function fetchNotifications(params = {}) {
     }
 
     const queryString = new URLSearchParams(defaultParams).toString()
-    const response = await fetch(`${WORDPRESS_API_URL}/notifications?${queryString}`)
+    const data = await fetchWithCache(`${WORDPRESS_API_URL}/notifications?${queryString}`)
+    if (!Array.isArray(data)) return []
 
-    if (!response.ok) {
-      console.warn('Notifications endpoint not found')
-      return []
-    }
-
-    const data = await response.json()
     return data.map(notification => {
       // Find notification categories in embedded data
       const embeddedTerms = notification._embedded?.['wp:term'] || []
@@ -170,9 +193,9 @@ export async function fetchNotifications(params = {}) {
       return {
         id: notification.id,
         title: stripHtml(notification.title?.rendered || ''),
-        content: notification.content?.rendered || '',
-        excerpt: notification.excerpt?.rendered || '',
-        link: notification.link || '#',
+        content: fixWordPressUrls(notification.content?.rendered || ''),
+        excerpt: fixWordPressUrls(notification.excerpt?.rendered || ''),
+        link: cleanWordPressUrl(notification.link || '#'),
         date: notification.date,
         slug: notification.slug || '',
         // Store both IDs and the primary category info for display
@@ -196,10 +219,9 @@ export async function fetchDepartments(params = {}) {
       lang: 'ml',
       ...params
     }
-    const qs = new URLSearchParams(defaultParams)
-    const res = await fetch(`${WORDPRESS_API_URL}/departments?${qs}`)
-    if (!res.ok) throw new Error('Failed to fetch departments')
-    return await res.json()
+    const qs = new URLSearchParams(defaultParams).toString()
+    const data = await fetchWithCache(`${WORDPRESS_API_URL}/departments?${qs}`)
+    return Array.isArray(data) ? data : []
   } catch (error) {
     console.error('Error fetching departments:', error)
     return []
@@ -215,10 +237,9 @@ export async function fetchActivities(params = {}) {
       lang: 'ml',
       ...params
     }
-    const qs = new URLSearchParams(defaultParams)
-    const res = await fetch(`${WORDPRESS_API_URL}/activity?${qs}`)
-    if (!res.ok) throw new Error('Failed to fetch activities')
-    return await res.json()
+    const qs = new URLSearchParams(defaultParams).toString()
+    const data = await fetchWithCache(`${WORDPRESS_API_URL}/activity?${qs}`)
+    return Array.isArray(data) ? data : []
   } catch (error) {
     console.error('Error fetching activities:', error)
     return []
@@ -234,10 +255,9 @@ export async function fetchCourses(params = {}) {
       lang: 'ml',
       ...params
     }
-    const qs = new URLSearchParams(defaultParams)
-    const res = await fetch(`${WORDPRESS_API_URL}/courses?${qs}`)
-    if (!res.ok) throw new Error('Failed to fetch courses')
-    return await res.json()
+    const qs = new URLSearchParams(defaultParams).toString()
+    const data = await fetchWithCache(`${WORDPRESS_API_URL}/courses?${qs}`)
+    return Array.isArray(data) ? data : []
   } catch (error) {
     console.error('Error fetching courses:', error)
     return []
@@ -253,10 +273,9 @@ export async function fetchStudents(params = {}) {
       lang: 'ml',
       ...params
     }
-    const qs = new URLSearchParams(defaultParams)
-    const res = await fetch(`${WORDPRESS_API_URL}/student?${qs}`)
-    if (!res.ok) throw new Error('Failed to fetch students')
-    return await res.json()
+    const qs = new URLSearchParams(defaultParams).toString()
+    const data = await fetchWithCache(`${WORDPRESS_API_URL}/student?${qs}`)
+    return Array.isArray(data) ? data : []
   } catch (error) {
     console.error('Error fetching students:', error)
     return []
@@ -265,10 +284,9 @@ export async function fetchStudents(params = {}) {
 
 export async function fetchFacultyDepartment(id, params = {}) {
   try {
-    const qs = new URLSearchParams(params)
-    const res = await fetch(`${WORDPRESS_API_URL}/faculty_department/${id}?${qs}`)
-    if (!res.ok) throw new Error('Faculty department not found')
-    return await res.json()
+    const qs = new URLSearchParams(params).toString()
+    const url = qs ? `${WORDPRESS_API_URL}/faculty_department/${id}?${qs}` : `${WORDPRESS_API_URL}/faculty_department/${id}`
+    return await fetchWithCache(url)
   } catch (error) {
     console.error('Error fetching faculty department:', error)
     return null
@@ -281,10 +299,9 @@ export async function fetchFacultyDepartments(params = {}) {
       per_page: 100,
       ...params
     }
-    const qs = new URLSearchParams(defaultParams)
-    const res = await fetch(`${WORDPRESS_API_URL}/faculty_department?${qs}`)
-    if (!res.ok) throw new Error('Failed to fetch faculty departments')
-    return await res.json()
+    const qs = new URLSearchParams(defaultParams).toString()
+    const data = await fetchWithCache(`${WORDPRESS_API_URL}/faculty_department?${qs}`)
+    return Array.isArray(data) ? data : []
   } catch (error) {
     console.error('Error fetching faculty departments:', error)
     return []
@@ -297,20 +314,20 @@ export function getFacultyProfileUrl(f) {
   if (typeof profile === 'string' && profile.trim().length > 0) {
     const trimmed = profile.trim()
     if (trimmed.startsWith('http://') || trimmed.startsWith('https://') || trimmed.startsWith('/') || trimmed.endsWith('.pdf')) {
-      return trimmed
+      return fixAssetUrl(trimmed)
     }
   }
   if (typeof profile === 'object' && profile !== null) {
-    if (profile.url) return profile.url
-    if (profile.source_url) return profile.source_url
-    if (profile.link) return profile.link
+    if (profile.url) return fixAssetUrl(profile.url)
+    if (profile.source_url) return fixAssetUrl(profile.source_url)
+    if (profile.link) return fixAssetUrl(profile.link)
   }
   if (f.profilePdf && typeof f.profilePdf === 'string' && f.profilePdf.trim().length > 0) {
-    return f.profilePdf.trim()
+    return fixAssetUrl(f.profilePdf.trim())
   }
   const attachments = (f._embedded?.['wp:attachment'] || []).flat()
   const pdf = attachments.find(att => att.mime_type === 'application/pdf' || (att.source_url && att.source_url.endsWith('.pdf')))
-  return pdf?.source_url || null
+  return pdf?.source_url ? fixAssetUrl(pdf.source_url) : null
 }
 
 export async function fetchFaculties(params = {}) {
@@ -323,10 +340,9 @@ export async function fetchFaculties(params = {}) {
       lang: 'ml',
       ...params
     }
-    const qs = new URLSearchParams(defaultParams)
-    const res = await fetch(`${WORDPRESS_API_URL}/faculties?${qs}`)
-    if (!res.ok) throw new Error('Failed to fetch faculties')
-    return await res.json()
+    const qs = new URLSearchParams(defaultParams).toString()
+    const data = await fetchWithCache(`${WORDPRESS_API_URL}/faculties?${qs}`)
+    return Array.isArray(data) ? data : []
   } catch (error) {
     console.error('Error fetching faculties:', error)
     return []
@@ -345,16 +361,16 @@ export async function fetchDepartment(id, params = {}) {
 
     // Try fetching by numeric ID first
     if (/^\d+$/.test(id)) {
-      const res = await fetch(`${WORDPRESS_API_URL}/departments/${id}?${qs}`)
-      if (res.ok) return await res.json()
+      try {
+        const data = await fetchWithCache(`${WORDPRESS_API_URL}/departments/${id}?${qs.toString()}`)
+        if (data) return data
+      } catch {}
     }
 
     // Fallback: search by slug
     qs.set('slug', id)
-    const res = await fetch(`${WORDPRESS_API_URL}/departments?${qs}`)
-    if (!res.ok) throw new Error('Department not found')
-    const data = await res.json()
-    return data.length > 0 ? data[0] : null
+    const data = await fetchWithCache(`${WORDPRESS_API_URL}/departments?${qs.toString()}`)
+    return Array.isArray(data) && data.length > 0 ? data[0] : null
   } catch (error) {
     console.error('Error fetching department:', error)
     return null
@@ -367,17 +383,14 @@ export async function fetchPosts(params = {}) {
       per_page: 5,
       status: 'publish',
       _embed: true,
-      _t: Date.now(),
       lang: 'ml',
       ...params
     }
 
     const queryString = new URLSearchParams(defaultParams).toString()
-    const response = await fetch(`${WORDPRESS_API_URL}/posts?${queryString}`)
+    const data = await fetchWithCache(`${WORDPRESS_API_URL}/posts?${queryString}`)
+    if (!Array.isArray(data)) return []
 
-    if (!response.ok) throw new Error('Failed to fetch posts')
-
-    const data = await response.json()
     return data.map(post => {
       const terms = post._embedded?.['wp:term']?.[0] || []
       const primaryCategory = terms[0] || {}
@@ -385,10 +398,10 @@ export async function fetchPosts(params = {}) {
       return {
         id: post.id,
         title: stripHtml(post.title?.rendered || ''),
-        excerpt: post.excerpt?.rendered || '',
-        content: post.content?.rendered || '',
+        excerpt: fixWordPressUrls(post.excerpt?.rendered || ''),
+        content: fixWordPressUrls(post.content?.rendered || ''),
         date: post.date,
-        link: post.link,
+        link: cleanWordPressUrl(post.link || '#'),
         slug: post.slug,
         featuredImage: getFeaturedImage(post),
         category: primaryCategory.name || null,
@@ -406,16 +419,13 @@ export async function fetchPostBySlug(slug, params = {}) {
     const defaultParams = {
       slug,
       _embed: true,
-      _t: Date.now(),
       lang: 'ml',
       ...params
     }
     const queryString = new URLSearchParams(defaultParams).toString()
-    const response = await fetch(`${WORDPRESS_API_URL}/posts?${queryString}`)
-    if (!response.ok) throw new Error('Post not found')
-    const data = await response.json()
+    const data = await fetchWithCache(`${WORDPRESS_API_URL}/posts?${queryString}`)
     
-    if (data.length > 0) {
+    if (Array.isArray(data) && data.length > 0) {
       const post = data[0]
       const terms = post._embedded?.['wp:term']?.[0] || []
       const primaryCategory = terms[0] || {}
@@ -423,9 +433,9 @@ export async function fetchPostBySlug(slug, params = {}) {
       return {
         id: post.id,
         title: stripHtml(post.title?.rendered || ''),
-        content: post.content?.rendered || '',
+        content: fixWordPressUrls(post.content?.rendered || ''),
         date: post.date,
-        link: post.link,
+        link: cleanWordPressUrl(post.link || '#'),
         slug: post.slug,
         featuredImage: getFeaturedImage(post),
         category: primaryCategory.name || null,
@@ -444,16 +454,13 @@ export async function fetchCourseBySlug(slug, params = {}) {
     const defaultParams = {
       slug,
       _embed: true,
-      _t: Date.now(),
       lang: 'ml',
       ...params
     }
     const queryString = new URLSearchParams(defaultParams).toString()
-    const response = await fetch(`${WORDPRESS_API_URL}/courses?${queryString}`)
-    if (!response.ok) throw new Error('Course not found')
-    const data = await response.json()
+    const data = await fetchWithCache(`${WORDPRESS_API_URL}/courses?${queryString}`)
 
-    if (data.length > 0) {
+    if (Array.isArray(data) && data.length > 0) {
       const post = data[0]
       return {
         id: post.id,
@@ -478,15 +485,12 @@ export async function fetchActivityBySlug(slug, params = {}) {
     const defaultParams = {
       slug,
       _embed: true,
-      _t: Date.now(),
       lang: 'ml',
       ...params
     }
     const queryString = new URLSearchParams(defaultParams).toString()
-    const response = await fetch(`${WORDPRESS_API_URL}/activity?${queryString}`)
-    if (!response.ok) throw new Error('Activity not found')
-    const data = await response.json()
-    if (data.length > 0) {
+    const data = await fetchWithCache(`${WORDPRESS_API_URL}/activity?${queryString}`)
+    if (Array.isArray(data) && data.length > 0) {
       const post = data[0]
       let activityTypeId = null
       let activityTypeName = ''
@@ -531,22 +535,16 @@ export async function fetchFacultyBySlug(slug, params = {}) {
       slug: decodedSlug,
       _embed: true,
       acf_format: 'standard',
-      _t: Date.now(),
       lang: 'ml',
       ...params
     }
     const queryString = new URLSearchParams(defaultParams).toString()
-    let response = await fetch(`${WORDPRESS_API_URL}/faculties?${queryString}`)
-    if (!response.ok) throw new Error('Faculty not found')
-    let data = await response.json()
+    let data = await fetchWithCache(`${WORDPRESS_API_URL}/faculties?${queryString}`)
     
     // Fallback try raw slug if decoded didn't return matches
     if ((!data || data.length === 0) && slug !== decodedSlug) {
       const rawParams = new URLSearchParams({ ...defaultParams, slug }).toString()
-      const rawResponse = await fetch(`${WORDPRESS_API_URL}/faculties?${rawParams}`)
-      if (rawResponse.ok) {
-        data = await rawResponse.json()
-      }
+      data = await fetchWithCache(`${WORDPRESS_API_URL}/faculties?${rawParams}`)
     }
 
     if (data && data.length > 0) {
@@ -575,16 +573,16 @@ export async function fetchFacultyBySlug(slug, params = {}) {
       return {
         id: post.id,
         title: stripHtml(post.title?.rendered || ''),
-        content: post.content?.rendered || '',
+        content: fixWordPressUrls(post.content?.rendered || ''),
         date: post.date,
-        link: post.link,
+        link: cleanWordPressUrl(post.link || '#'),
         slug: post.slug,
         featuredImage: getFeaturedImage(post),
         excerpt: stripHtml(post.excerpt?.rendered || ''),
         acf: post.acf || {},
         department: departmentName,
         profilePdf: profileUrl,
-        attachments: attachments.map(att => ({ id: att.id, title: stripHtml(att.title?.rendered || ''), url: att.source_url }))
+        attachments: attachments.map(att => ({ id: att.id, title: stripHtml(att.title?.rendered || ''), url: fixAssetUrl(att.source_url) }))
       }
     }
     return null
@@ -600,20 +598,14 @@ export async function fetchGallery(params = {}) {
       per_page: 8,
       status: 'publish',
       _embed: true,
-      _t: Date.now(),
       lang: 'ml',
       ...params
     }
 
     const queryString = new URLSearchParams(defaultParams).toString()
-    const response = await fetch(`${WORDPRESS_API_URL}/galleries?${queryString}`)
+    const data = await fetchWithCache(`${WORDPRESS_API_URL}/galleries?${queryString}`)
+    if (!Array.isArray(data)) return []
 
-    if (!response.ok) {
-      console.warn('Gallery endpoint not found')
-      return []
-    }
-
-    const data = await response.json()
     return data.map(item => {
       const acfImages = item.acf?.photo_gallery?.gallery_images?.[0]
       const firstImage = Array.isArray(acfImages) ? acfImages[0]?.full_image_url : acfImages?.full_image_url
@@ -644,15 +636,12 @@ export async function fetchGalleryBySlug(slug, params = {}) {
     const defaultParams = {
       slug,
       _embed: true,
-      _t: Date.now(),
       lang: 'ml',
       ...params
     }
     const queryString = new URLSearchParams(defaultParams).toString()
-    const response = await fetch(`${WORDPRESS_API_URL}/galleries?${queryString}`)
-    if (!response.ok) throw new Error('Gallery not found')
-    const data = await response.json()
-    if (data.length > 0) {
+    const data = await fetchWithCache(`${WORDPRESS_API_URL}/galleries?${queryString}`)
+    if (Array.isArray(data) && data.length > 0) {
       const item = data[0]
       return {
         id: item.id,
@@ -670,6 +659,118 @@ export async function fetchGalleryBySlug(slug, params = {}) {
   }
 }
 
+export async function fetchSliders(params = {}) {
+  try {
+    const { location, lang = 'ml', per_page = 20, ...rest } = params
+
+    let locationTermId = null
+    const locSlug = location ? String(location).toLowerCase().trim() : null
+
+    if (locSlug) {
+      if (typeof location === 'number' || /^\d+$/.test(location)) {
+        locationTermId = Number(location)
+      } else {
+        try {
+          const terms = await fetchWithCache(`${WORDPRESS_API_URL}/slider_location?slug=${encodeURIComponent(locSlug)}`, {}, 600 * 1000)
+          if (Array.isArray(terms) && terms.length > 0) {
+            locationTermId = terms[0].id
+          }
+        } catch {
+          // slider_location endpoint might not be available
+        }
+      }
+    }
+
+    const queryParams = {
+      _embed: true,
+      acf_format: 'standard',
+      lang,
+      per_page,
+      ...rest
+    }
+
+    const qs = new URLSearchParams(queryParams).toString()
+    const data = await fetchWithCache(`${WORDPRESS_API_URL}/slider?${qs}`)
+
+    if (!Array.isArray(data)) return []
+
+    let filtered = data
+    if (locSlug) {
+      const isLandingMatch = (slide) => {
+        const embeddedTerms = (slide._embedded?.['wp:term'] || []).flat()
+        if (embeddedTerms.some(t => (t.taxonomy === 'slider_location' || !t.taxonomy) && t.slug === 'landing-page')) return true
+        if (Array.isArray(slide.class_list) && slide.class_list.some(c => c.includes('slider_location-landing-page'))) return true
+        return false
+      }
+
+      const isHomeMatch = (slide) => {
+        const embeddedTerms = (slide._embedded?.['wp:term'] || []).flat()
+        if (embeddedTerms.some(t => (t.taxonomy === 'slider_location' || !t.taxonomy) && t.slug === 'home-page')) return true
+        if (Array.isArray(slide.class_list) && slide.class_list.some(c => c.includes('slider_location-home-page'))) return true
+        if (locationTermId && Array.isArray(slide.slider_location) && slide.slider_location.includes(locationTermId)) return true
+        return false
+      }
+
+      if (locSlug === 'landing-page') {
+        filtered = filtered.filter(slide => {
+          if (locationTermId && Array.isArray(slide.slider_location) && slide.slider_location.includes(locationTermId)) {
+            return true
+          }
+          return isLandingMatch(slide)
+        })
+      } else if (locSlug === 'home-page') {
+        // Must match home-page and strictly never match landing-page
+        const matchedHome = filtered.filter(slide => !isLandingMatch(slide) && isHomeMatch(slide))
+        if (matchedHome.length > 0) {
+          filtered = matchedHome
+        } else {
+          // Fallback: If home-page slides are not yet tagged with the new taxonomy term,
+          // include all untagged slides while strictly excluding landing-page slides
+          filtered = filtered.filter(slide => !isLandingMatch(slide))
+        }
+      } else {
+        filtered = filtered.filter(slide => {
+          if (locationTermId && Array.isArray(slide.slider_location) && slide.slider_location.includes(locationTermId)) {
+            return true
+          }
+          const embeddedTerms = (slide._embedded?.['wp:term'] || []).flat()
+          return embeddedTerms.some(t => (t.taxonomy === 'slider_location' || !t.taxonomy) && t.slug === locSlug) ||
+            (Array.isArray(slide.class_list) && slide.class_list.some(c => c.includes(`slider_location-${locSlug}`)))
+        })
+      }
+    }
+
+    // Filter by language if multilingual
+    const slideLang = lang
+    filtered = filtered.filter(s => {
+      if (s.lang) return s.lang === slideLang
+      if (s.translations) return !!s.translations[slideLang === 'ml' ? 'ml_IN' : 'en_US'] || s.translations[slideLang]
+      return true
+    })
+
+    return filtered.map(s => {
+      const rawContent = typeof s.acf?.content === 'string'
+        ? fixWordPressUrls(s.acf.content)
+        : (s.acf?.content?.rendered
+          ? fixWordPressUrls(s.acf.content.rendered)
+          : (s.content?.rendered ? fixWordPressUrls(s.content.rendered) : ''))
+
+      return {
+        id: s.id,
+        title: s.title?.rendered || '',
+        content: rawContent,
+        sub: rawContent,
+        image: getFeaturedImage(s) || (typeof s.acf?.image === 'string' ? fixAssetUrl(s.acf.image) : (s.acf?.image?.url ? fixAssetUrl(s.acf.image.url) : null)) || '/images/slider.jpg',
+        buttons: s.acf?.slider_buttons || [],
+        raw: s
+      }
+    })
+  } catch (error) {
+    console.error('Error fetching sliders:', error)
+    return []
+  }
+}
+
 export async function fetchNotification(id, params = {}) {
   try {
     const defaultParams = {
@@ -680,18 +781,17 @@ export async function fetchNotification(id, params = {}) {
     const qs = new URLSearchParams(defaultParams)
 
     if (/^\d+$/.test(id)) {
-      const res = await fetch(`${WORDPRESS_API_URL}/notifications/${id}?${qs}`)
-      if (res.ok) {
-        const notification = await res.json()
-        return formatNotification(notification)
-      }
+      try {
+        const notification = await fetchWithCache(`${WORDPRESS_API_URL}/notifications/${id}?${qs.toString()}`)
+        if (notification && notification.id) {
+          return formatNotification(notification)
+        }
+      } catch {}
     }
 
     qs.set('slug', id)
-    const res = await fetch(`${WORDPRESS_API_URL}/notifications?${qs}`)
-    if (!res.ok) throw new Error('Notification not found')
-    const data = await res.json()
-    return data.length > 0 ? formatNotification(data[0]) : null
+    const data = await fetchWithCache(`${WORDPRESS_API_URL}/notifications?${qs.toString()}`)
+    return Array.isArray(data) && data.length > 0 ? formatNotification(data[0]) : null
   } catch (error) {
     console.error('Error fetching notification:', error)
     return null
@@ -732,12 +832,8 @@ export async function fetchNaacPosts(params = {}) {
       ...params
     }
     const queryString = new URLSearchParams(defaultParams).toString()
-    const response = await fetch(`${WORDPRESS_API_URL}/naac?${queryString}`)
-    if (!response.ok) {
-      console.warn('Naac endpoint not found (404) — check that post_type=naac is registered with show_in_rest=true')
-      return []
-    }
-    const data = await response.json()
+    const data = await fetchWithCache(`${WORDPRESS_API_URL}/naac?${queryString}`)
+    if (!Array.isArray(data)) return []
     return data.map(post => {
       let primaryCategory = getPrimaryTerm(post, 'naac_category')
       if (!primaryCategory) {
@@ -778,6 +874,25 @@ function getPrimaryTerm(post, taxonomy) {
   return terms.length > 0 ? { id: terms[0].id, name: terms[0].name, slug: terms[0].slug } : null
 }
 
+export function getPublicationPdf(post) {
+  if (!post) return null
+  const rawFile = post.acf?.file || post.acf?.pdf || post.acf?.document
+  if (typeof rawFile === 'string' && rawFile.trim() && !/^\d+$/.test(rawFile.trim())) {
+    return fixAssetUrl(rawFile.trim())
+  }
+  if (typeof rawFile === 'object' && rawFile?.url) {
+    return fixAssetUrl(rawFile.url)
+  }
+  const attachments = post._embedded?.['wp:attachment'] || []
+  const pdfAtt = attachments.find(att =>
+    att.mime_type === 'application/pdf' || att.source_url?.toLowerCase().endsWith('.pdf')
+  )
+  if (pdfAtt?.source_url) {
+    return fixAssetUrl(pdfAtt.source_url)
+  }
+  return null
+}
+
 export async function fetchPublications(params = {}) {
   try {
     const defaultParams = {
@@ -788,12 +903,8 @@ export async function fetchPublications(params = {}) {
       ...params
     }
     const queryString = new URLSearchParams(defaultParams).toString()
-    const response = await fetch(`${WORDPRESS_API_URL}/publications?${queryString}`)
-    if (!response.ok) {
-      console.warn('Publications endpoint not found (404)')
-      return []
-    }
-    const data = await response.json()
+    const data = await fetchWithCache(`${WORDPRESS_API_URL}/publications?${queryString}`)
+    if (!Array.isArray(data)) return []
     return data.map(post => ({
       id: post.id,
       title: stripHtml(post.title?.rendered || ''),
@@ -804,8 +915,13 @@ export async function fetchPublications(params = {}) {
       featuredImage: getFeaturedImage(post),
       editor: stripHtml(post.acf?.editor || ''),
       price: stripHtml(post.acf?.price || ''),
+      pdf: getPublicationPdf(post),
       categories: parseTerms(post, 'publication_category'),
       primaryCategory: getPrimaryTerm(post, 'publication_category'),
+      acf: post.acf || {},
+      _links: post._links,
+      translations: post.translations,
+      lang: post.lang
     }))
   } catch (error) {
     console.error('Error fetching publications:', error)
@@ -822,11 +938,18 @@ export async function fetchPublicationBySlug(slug, params = {}) {
       ...params
     }
     const queryString = new URLSearchParams(defaultParams).toString()
-    const response = await fetch(`${WORDPRESS_API_URL}/publications?${queryString}`)
-    if (!response.ok) throw new Error('Publication not found')
-    const data = await response.json()
-    if (data.length > 0) {
+    const data = await fetchWithCache(`${WORDPRESS_API_URL}/publications?${queryString}`)
+    if (Array.isArray(data) && data.length > 0) {
       const post = data[0]
+      let pdfUrl = getPublicationPdf(post)
+      const rawFile = post.acf?.file || post.acf?.pdf
+      if (!pdfUrl && rawFile && /^\d+$/.test(String(rawFile).trim())) {
+        try {
+          const mediaUrl = await fetchMedia(Number(rawFile))
+          if (mediaUrl) pdfUrl = fixAssetUrl(mediaUrl)
+        } catch {}
+      }
+
       return {
         id: post.id,
         title: stripHtml(post.title?.rendered || ''),
@@ -837,8 +960,13 @@ export async function fetchPublicationBySlug(slug, params = {}) {
         featuredImage: getFeaturedImage(post),
         editor: stripHtml(post.acf?.editor || ''),
         price: stripHtml(post.acf?.price || ''),
+        pdf: pdfUrl,
         categories: parseTerms(post, 'publication_category'),
         primaryCategory: getPrimaryTerm(post, 'publication_category'),
+        acf: post.acf || {},
+        _links: post._links,
+        translations: post.translations,
+        lang: post.lang
       }
     }
     return null
@@ -851,9 +979,8 @@ export async function fetchPublicationBySlug(slug, params = {}) {
 export async function fetchNotificationCategories(params = {}) {
   try {
     const queryString = new URLSearchParams(params).toString()
-    const response = await fetch(`${WORDPRESS_API_URL}/notification_category?${queryString}`)
-    if (!response.ok) throw new Error('Notification categories not found')
-    return await response.json()
+    const data = await fetchWithCache(`${WORDPRESS_API_URL}/notification_category?${queryString}`)
+    return Array.isArray(data) ? data : []
   } catch (error) {
     console.error('Error fetching notification categories:', error)
     return []
@@ -863,9 +990,8 @@ export async function fetchNotificationCategories(params = {}) {
 export async function fetchPublicationCategories(params = {}) {
   try {
     const queryString = new URLSearchParams(params).toString()
-    const response = await fetch(`${WORDPRESS_API_URL}/publication_category?${queryString}`)
-    if (!response.ok) throw new Error('Publication categories not found')
-    return await response.json()
+    const data = await fetchWithCache(`${WORDPRESS_API_URL}/publication_category?${queryString}`)
+    return Array.isArray(data) ? data : []
   } catch (error) {
     console.error('Error fetching publication categories:', error)
     return []
@@ -875,10 +1001,8 @@ export async function fetchPublicationCategories(params = {}) {
 export async function fetchPublicationCategoryBySlug(slug, params = {}) {
   try {
     const queryString = new URLSearchParams({ slug, ...params }).toString()
-    const response = await fetch(`${WORDPRESS_API_URL}/publication_category?${queryString}`)
-    if (!response.ok) throw new Error('Publication category not found')
-    const data = await response.json()
-    return data.length > 0 ? data[0] : null
+    const data = await fetchWithCache(`${WORDPRESS_API_URL}/publication_category?${queryString}`)
+    return Array.isArray(data) && data.length > 0 ? data[0] : null
   } catch (error) {
     console.error('Error fetching publication category by slug:', error)
     return null
@@ -894,12 +1018,8 @@ export async function fetchIqacPosts(params = {}) {
       ...params
     }
     const queryString = new URLSearchParams(defaultParams).toString()
-    const response = await fetch(`${WORDPRESS_API_URL}/iqac?${queryString}`, { cache: 'no-cache' })
-    if (!response.ok) {
-      console.warn('IQAC endpoint not found (404) — check that post_type=iqac is registered with show_in_rest=true')
-      return []
-    }
-    const data = await response.json()
+    const data = await fetchWithCache(`${WORDPRESS_API_URL}/iqac?${queryString}`)
+    if (!Array.isArray(data)) return []
     return data.map(post => {
       const embeddedTerms = post._embedded?.['wp:term'] || []
       let iqacCategoryTerms = embeddedTerms.flat().filter(term => term.taxonomy === 'iqac_category')
@@ -943,10 +1063,8 @@ export async function fetchIqacPostBySlug(slug, params = {}) {
       ...params
     }
     const queryString = new URLSearchParams(defaultParams).toString()
-    const response = await fetch(`${WORDPRESS_API_URL}/iqac?${queryString}`, { cache: 'no-cache' })
-    if (!response.ok) throw new Error('IQAC post not found')
-    const data = await response.json()
-    if (data.length > 0) {
+    const data = await fetchWithCache(`${WORDPRESS_API_URL}/iqac?${queryString}`)
+    if (Array.isArray(data) && data.length > 0) {
       const post = data[0]
       const embeddedTerms = post._embedded?.['wp:term'] || []
       let iqacCategoryTerms = embeddedTerms.flat().filter(term => term.taxonomy === 'iqac_category')
@@ -983,9 +1101,8 @@ export async function fetchIqacPostBySlug(slug, params = {}) {
 export async function fetchIqacCategories(params = {}) {
   try {
     const queryString = new URLSearchParams(params).toString()
-    const response = await fetch(`${WORDPRESS_API_URL}/iqac_category?${queryString}`, { cache: 'no-cache' })
-    if (!response.ok) throw new Error('IQAC categories not found')
-    const data = await response.json()
+    const data = await fetchWithCache(`${WORDPRESS_API_URL}/iqac_category?${queryString}`)
+    if (!Array.isArray(data)) return []
     return data.map(cat => ({ ...cat, name: stripHtml(cat.name || '') }))
   } catch (error) {
     console.error('Error fetching IQAC categories:', error)
@@ -996,10 +1113,8 @@ export async function fetchIqacCategories(params = {}) {
 export async function fetchIqacCategoryBySlug(slug, params = {}) {
   try {
     const queryString = new URLSearchParams({ slug, ...params }).toString()
-    const response = await fetch(`${WORDPRESS_API_URL}/iqac_category?${queryString}`, { cache: 'no-cache' })
-    if (!response.ok) throw new Error('IQAC category not found')
-    const data = await response.json()
-    return data.length > 0 ? data[0] : null
+    const data = await fetchWithCache(`${WORDPRESS_API_URL}/iqac_category?${queryString}`)
+    return Array.isArray(data) && data.length > 0 ? data[0] : null
   } catch (error) {
     console.error('Error fetching IQAC category by slug:', error)
     return null
@@ -1016,12 +1131,8 @@ export async function fetchNssPosts(params = {}) {
       ...params
     }
     const queryString = new URLSearchParams(defaultParams).toString()
-    const response = await fetch(`${WORDPRESS_API_URL}/nss?${queryString}`, { cache: 'no-cache' })
-    if (!response.ok) {
-      console.warn('NSS endpoint not found (404) — check that post_type=nss is registered with show_in_rest=true')
-      return []
-    }
-    const data = await response.json()
+    const data = await fetchWithCache(`${WORDPRESS_API_URL}/nss?${queryString}`)
+    if (!Array.isArray(data)) return []
     return data.map(post => {
       const embeddedTerms = post._embedded?.['wp:term'] || []
       let nssCategoryTerms = embeddedTerms.flat().filter(term => term.taxonomy === 'nss_category')
@@ -1067,10 +1178,8 @@ export async function fetchNssPostBySlug(slug, params = {}) {
       ...params
     }
     const queryString = new URLSearchParams(defaultParams).toString()
-    const response = await fetch(`${WORDPRESS_API_URL}/nss?${queryString}`, { cache: 'no-cache' })
-    if (!response.ok) throw new Error('NSS post not found')
-    const data = await response.json()
-    if (data.length > 0) {
+    const data = await fetchWithCache(`${WORDPRESS_API_URL}/nss?${queryString}`)
+    if (Array.isArray(data) && data.length > 0) {
       const post = data[0]
       const embeddedTerms = post._embedded?.['wp:term'] || []
       let nssCategoryTerms = embeddedTerms.flat().filter(term => term.taxonomy === 'nss_category')
@@ -1108,9 +1217,8 @@ export async function fetchNssPostBySlug(slug, params = {}) {
 export async function fetchNssCategories(params = {}) {
   try {
     const queryString = new URLSearchParams(params).toString()
-    const response = await fetch(`${WORDPRESS_API_URL}/nss_category?${queryString}`, { cache: 'no-cache' })
-    if (!response.ok) throw new Error('NSS categories not found')
-    const data = await response.json()
+    const data = await fetchWithCache(`${WORDPRESS_API_URL}/nss_category?${queryString}`)
+    if (!Array.isArray(data)) return []
     return data.map(cat => ({ ...cat, name: stripHtml(cat.name || '') }))
   } catch (error) {
     console.error('Error fetching NSS categories:', error)
@@ -1121,10 +1229,8 @@ export async function fetchNssCategories(params = {}) {
 export async function fetchNssCategoryBySlug(slug, params = {}) {
   try {
     const queryString = new URLSearchParams({ slug, ...params }).toString()
-    const response = await fetch(`${WORDPRESS_API_URL}/nss_category?${queryString}`, { cache: 'no-cache' })
-    if (!response.ok) throw new Error('NSS category not found')
-    const data = await response.json()
-    return data.length > 0 ? data[0] : null
+    const data = await fetchWithCache(`${WORDPRESS_API_URL}/nss_category?${queryString}`)
+    return Array.isArray(data) && data.length > 0 ? data[0] : null
   } catch (error) {
     console.error('Error fetching NSS category by slug:', error)
     return null
@@ -1148,25 +1254,106 @@ export function getLanguageContext(pathname, searchParams) {
   return 'ml'
 }
 
+export function fixAssetUrl(url) {
+  if (!url || typeof url !== 'string') return url
+  const trimmed = url.trim()
+  if (!trimmed || trimmed === '#' || trimmed.startsWith('javascript:') || trimmed.startsWith('mailto:') || trimmed.startsWith('tel:')) {
+    return trimmed
+  }
+
+  const wpBaseUrl = WP_CONFIG.SITE_URL.replace(/\/$/, '')
+  const isAsset = /\.(jpg|jpeg|png|gif|pdf|doc|docx|xls|xlsx|ppt|pptx|zip|rar|tar|gz|7z|mp4|mp3|avi|mov|webp|svg|avif)(?:[?#].*)?$/i.test(trimmed) ||
+                  trimmed.includes('/wp-content/') ||
+                  trimmed.includes('/wp-includes/') ||
+                  trimmed.includes('/uploads/')
+
+  if (!isAsset) return trimmed
+
+  if (trimmed.startsWith('/')) {
+    return `${wpBaseUrl}${trimmed}`
+  }
+  if (trimmed.startsWith('wp-content/') || trimmed.startsWith('uploads/')) {
+    return `${wpBaseUrl}/${trimmed}`
+  }
+
+  return trimmed
+    .replace(/^https?:\/\/(?:www\.)?(?!archive\.)malayalamuniversity\.edu\.in(?:\/sabir\/mu)?/i, wpBaseUrl)
+    .replace(/^https?:\/\/(?:localhost|127\.0\.0\.1)(?::\d+)?(?:\/sabir\/mu)?/i, wpBaseUrl)
+    .replace(/^https?:\/\/tessst\.com\/temu_cms/i, wpBaseUrl)
+    .replace(/^http:\/\/cms\.malayalamuniversity\.edu\.in/i, wpBaseUrl)
+}
+
+export function cleanWordPressUrl(url) {
+  if (!url || typeof url !== 'string') return url
+  const trimmed = url.trim()
+  if (!trimmed || trimmed === '#' || trimmed.startsWith('javascript:') || trimmed.startsWith('mailto:') || trimmed.startsWith('tel:')) {
+    return trimmed
+  }
+
+  const wpBaseUrl = WP_CONFIG.SITE_URL.replace(/\/$/, '')
+
+  // If it's an asset (image, pdf, doc, etc.)
+  const isAsset = /\.(jpg|jpeg|png|gif|pdf|doc|docx|xls|xlsx|ppt|pptx|zip|rar|tar|gz|7z|mp4|mp3|avi|mov|webp|svg|avif)(?:[?#].*)?$/i.test(trimmed) ||
+                  trimmed.includes('/wp-content/') ||
+                  trimmed.includes('/wp-includes/') ||
+                  trimmed.includes('/uploads/')
+  if (isAsset) {
+    return fixAssetUrl(trimmed)
+  }
+
+  const knownBases = [
+    wpBaseUrl,
+    'https://cms.malayalamuniversity.edu.in',
+    'http://cms.malayalamuniversity.edu.in',
+    'https://malayalamuniversity.edu.in/sabir/mu',
+    'http://malayalamuniversity.edu.in/sabir/mu',
+    'https://malayalamuniversity.edu.in',
+    'http://malayalamuniversity.edu.in',
+    'https://www.malayalamuniversity.edu.in',
+    'http://www.malayalamuniversity.edu.in',
+    'https://tessst.com/temu_cms',
+    'http://tessst.com/temu_cms',
+    'http://localhost/sabir/mu',
+    'https://localhost/sabir/mu',
+  ]
+
+  let cleaned = trimmed
+  for (const base of knownBases) {
+    if (base && cleaned.startsWith(base)) {
+      cleaned = cleaned.slice(base.length) || '/'
+      break
+    }
+  }
+
+  cleaned = cleaned.replace(/^https?:\/\/(?:localhost|127\.0\.0\.1)(?::\d+)?(?:\/sabir\/mu)?/i, '')
+
+  return cleaned || '/'
+}
+
 export function fixWordPressUrls(content) {
   if (!content || typeof content !== 'string') return content
 
-  const wpBaseUrl = WP_CONFIG.SITE_URL
+  // Parse HTML attribute values specifically (href, src, action, etc.)
+  return content.replace(
+    /\b(href|src|action|data-[a-z-]+)=(["'])(.*?)\2/gi,
+    (match, attr, quote, url) => {
+      if (!url || url === '#' || url.startsWith('javascript:') || url.startsWith('mailto:') || url.startsWith('tel:')) {
+        return match
+      }
 
-  let result = content.replace(new RegExp(escapeRegex(wpBaseUrl), 'g'), (match, offset, str) => {
-    const sub = str.substring(offset, offset + 150)
-    const isAsset = /\.(jpg|jpeg|png|gif|pdf|doc|docx|mp4|zip|css|js)/i.test(sub)
-    if (isAsset) return match
-    return ''
-  })
+      const isAssetPath = /\.(jpg|jpeg|png|gif|pdf|doc|docx|xls|xlsx|ppt|pptx|zip|rar|tar|gz|7z|mp4|mp3|avi|mov|webp|svg|avif)(?:[?#].*)?$/i.test(url) ||
+                          url.includes('/wp-content/') ||
+                          url.includes('/wp-includes/') ||
+                          url.includes('/uploads/')
 
-  // Make relative WordPress asset paths absolute by prepending the site URL
-  result = result.replace(
-    /((?:href|src|action|data)=["'])(\/wp-(?:content|includes|uploads)\/)/gi,
-    (match, prefix, path) => prefix + wpBaseUrl + path
+      if (attr.toLowerCase() === 'src' || isAssetPath) {
+        return `${attr}=${quote}${fixAssetUrl(url)}${quote}`
+      }
+
+      const cleanedUrl = cleanWordPressUrl(url)
+      return `${attr}=${quote}${cleanedUrl}${quote}`
+    }
   )
-
-  return result
 }
 
 function escapeRegex(str) {
@@ -1174,9 +1361,16 @@ function escapeRegex(str) {
 }
 
 export function stripHtml(html) {
-  const tmp = document.createElement('div')
-  tmp.innerHTML = html
-  return tmp.textContent || tmp.innerText || ''
+  if (!html) return ''
+  if (typeof window === 'undefined' || typeof DOMParser === 'undefined') {
+    return html.replace(/<[^>]*>?/gm, '')
+  }
+  try {
+    const doc = new DOMParser().parseFromString(html, 'text/html')
+    return doc.body.textContent || ''
+  } catch {
+    return html.replace(/<[^>]*>?/gm, '')
+  }
 }
 
 function pluralizePostType(postType) {
@@ -1230,13 +1424,10 @@ export async function extractTranslationSlugs(post, postType = 'page') {
         } else {
           // Different post — fetch its slug
           try {
-            const tRes = await fetch(
+            const tData = await fetchWithCache(
               `${WP_CONFIG.API_URL}/${endpoint}/${translatedId}?_fields=slug`
             )
-            if (tRes.ok) {
-              const tData = await tRes.json()
-              if (tData.slug) slugs[lang] = tData.slug
-            }
+            if (tData && tData.slug) slugs[lang] = tData.slug
           } catch {}
         }
       }
@@ -1251,11 +1442,10 @@ export async function fetchPolylangTranslation(postId, postType, targetLang) {
   try {
     const endpoint = pluralizePostType(postType)
     // Don't use _fields here — WordPress may strip _links when _fields is present
-    const res = await fetch(
+    const post = await fetchWithCache(
       `${WP_CONFIG.API_URL}/${endpoint}/${postId}`
     )
-    if (!res.ok) return null
-    const post = await res.json()
+    if (!post) return null
 
     // Method 1: _links.translations (extract slug from translation URL)
     const links = post._links?.translations
@@ -1278,18 +1468,28 @@ export async function fetchPolylangTranslation(postId, postType, targetLang) {
       if (translatedId === postId) {
         return post.slug
       }
-      const tRes = await fetch(
-        `${WP_CONFIG.API_URL}/${endpoint}/${translatedId}?_fields=slug`
-      )
-      if (tRes.ok) {
-        const tData = await tRes.json()
-        if (tData.slug) return tData.slug
-      }
+      try {
+        const tData = await fetchWithCache(
+          `${WP_CONFIG.API_URL}/${endpoint}/${translatedId}?_fields=slug`
+        )
+        if (tData && tData.slug) return tData.slug
+      } catch {}
     }
 
     return null
   } catch (e) {
     console.warn('fetchPolylangTranslation failed:', e)
+    return null
+  }
+}
+
+export async function fetchMedia(id) {
+  if (!id) return null
+  try {
+    const data = await fetchWithCache(`${WORDPRESS_API_URL}/media/${id}`)
+    return data?.source_url ? fixAssetUrl(data.source_url) : null
+  } catch (e) {
+    console.warn(`Failed to resolve media ID ${id}:`, e)
     return null
   }
 }

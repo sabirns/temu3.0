@@ -111,25 +111,36 @@ function FacultyDepartmentSingle() {
       <div className="container" style={{ paddingTop: '40px', paddingBottom: '80px' }}>
         {facultyDepts.length > 0 ? (
           <div className="faculties-departments-grid reveal-up active" style={{ transitionDelay: '0.2s' }}>
-            {facultyDepts.map(dept => (
-              <Link
-                key={dept.id}
-                className="department-card"
-                to={`/${lang}/department/${dept.slug}`}
-              >
-                <h3 className="department-card-title">
-                  {stripHtml(dept.title?.rendered || dept.title || '')}
-                </h3>
-                {dept.excerpt?.rendered && (
-                  <p className="department-card-desc">
-                    {stripHtml(dept.excerpt.rendered).substring(0, 80)}...
-                  </p>
-                )}
-                <span className="department-card-link">
-                  {lang === 'en' ? 'Explore Department →' : 'വിഭാഗം കാണുക →'}
-                </span>
-              </Link>
-            ))}
+            {facultyDepts.map(dept => {
+              const featImg = dept._embedded?.['wp:featuredmedia']?.[0]?.source_url || dept.featured_media_url || dept.acf?.image || dept.acf?.banner || dept.acf?.featured_image
+              const titleText = stripHtml(dept.title?.rendered || dept.title || '')
+              return (
+                <Link
+                  key={dept.id}
+                  className={`department-card ${featImg ? 'has-image' : ''}`}
+                  to={`/${lang}/department/${dept.slug}`}
+                >
+                  {featImg && (
+                    <div className="department-card-image-wrap">
+                      <img src={featImg} alt={titleText} className="department-card-image" />
+                    </div>
+                  )}
+                  <div className="department-card-body">
+                    <h3 className="department-card-title">
+                      {titleText}
+                    </h3>
+                    {dept.excerpt?.rendered && (
+                      <p className="department-card-desc">
+                        {stripHtml(dept.excerpt.rendered).substring(0, 80)}...
+                      </p>
+                    )}
+                    <span className="department-card-link">
+                      {lang === 'en' ? 'Explore Department' : 'വിഭാഗം കാണുക'}
+                    </span>
+                  </div>
+                </Link>
+              )
+            })}
           </div>
         ) : (
           <div className="notification-empty" style={{ margin: '40px 0', border: '1px dashed var(--stroke)' }}>

@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { fetchPage, getPageContent } from '../services/wordpressApi'
+import { WP_CONFIG } from '../config/wpConfig'
 
 export function useWordPressPage(pageId) {
   const [page, setPage] = useState(null)
@@ -47,7 +48,7 @@ export function useWordPressPages(params = {}) {
       setError(null)
 
       try {
-        const response = await fetch(`${import.meta.env.VITE_WP_API_URL || 'http://localhost/sabir/mu/wp-json/wp/v2'}/pages`, {
+        const response = await fetch(`${import.meta.env.VITE_WP_API_URL || WP_CONFIG.API_URL}/pages`, {
           params: { per_page: 100, ...params }
         })
         

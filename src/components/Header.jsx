@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef, useCallback, useMemo } from 'react'
 import { Link, useSearchParams, useNavigate, useLocation } from 'react-router-dom'
 import { WP_CONFIG } from '../config/wpConfig'
-import { fixWordPressUrls, getLanguageContext, stripHtml, fetchMenuByLocation, fetchPolylangTranslation } from '../services/wordpressApi'
+import { fixWordPressUrls, getLanguageContext, stripHtml, fetchMenuByLocation, fetchPolylangTranslation, fetchWithCache, cleanWordPressUrl, fetchPageBySlug } from '../services/wordpressApi'
 import { usePageInfo } from '../services/PageInfoContext'
 import '../styles/megaMenu.css'
 import '../styles/megaCenter.css'
@@ -13,14 +13,12 @@ async function fetchNotificationsFromAPI(lang = 'ml') {
         const params = new URLSearchParams({
             per_page: '10',
             status: 'publish',
-            lang,
-            _t: Date.now()
+            lang
         })
         const termId = lang === 'en' ? '1890' : '1888'
         params.set('notification_category', termId)
-        const response = await fetch(`${WP_CONFIG.API_URL}/notifications?${params}`)
-        if (!response.ok) throw new Error('Failed to fetch')
-        const data = await response.json()
+        const data = await fetchWithCache(`${WP_CONFIG.API_URL}/notifications?${params.toString()}`)
+        if (!Array.isArray(data)) return []
         return data.map(item => ({
             id: item.id,
             title: stripHtml(item.title?.rendered || item.title || ''),
@@ -86,7 +84,6 @@ function Header() {
         async function fetchContactInfo() {
             try {
                 const slug = siteLanguage === 'ml' ? 'contact-us-ml' : 'contact-us'
-                const { fetchPageBySlug } = await import('../services/wordpressApi')
                 const page = await fetchPageBySlug(slug, { lang: siteLanguage })
                 if (page && page.acf) {
                     let phone = '+91 494 2740000'
@@ -194,7 +191,8 @@ function Header() {
 
             // Skip external links
             const wpHost = new URL(wpBaseUrl).host
-            if (url.host !== window.location.host && url.host !== wpHost) return
+            const isInternalHost = url.host === window.location.host || url.host === wpHost || url.host === 'localhost' || url.host === '127.0.0.1'
+            if (!isInternalHost) return
 
             e.preventDefault()
 
@@ -202,8 +200,12 @@ function Header() {
             let path = url.pathname
 
             // Remove the WP base path prefix (e.g., /sabir/mu/about → /about)
-            if (wpBasePath !== '/' && path.startsWith(wpBasePath)) {
-                path = path.slice(wpBasePath.length)
+            const knownBasePaths = ['/sabir/mu', wpBasePath].filter(Boolean)
+            for (const bp of knownBasePaths) {
+                if (bp !== '/' && path.startsWith(bp)) {
+                    path = path.slice(bp.length)
+                    break
+                }
             }
 
             // Remove language prefix if present (e.g., /ml/about → /about)
@@ -373,15 +375,22 @@ function Header() {
             if (!link) return
             const href = link.getAttribute('href')
             if (!href || href === '#') return
-            const wpHost = new URL(WP_CONFIG.SITE_URL).host
             try {
-                const url = new URL(href)
-                if (url.host === window.location.host || url.host === wpHost) {
+                const url = new URL(href, window.location.origin)
+                const wpHost = new URL(WP_CONFIG.SITE_URL).host
+                const isInternalHost = url.host === window.location.host || url.host === wpHost || url.host === 'localhost' || url.host === '127.0.0.1'
+                if (isInternalHost) {
                     e.preventDefault()
-                    const path = url.pathname
+                    let path = url.pathname
                     const wpBasePath = new URL(WP_CONFIG.SITE_URL).pathname.replace(/\/$/, '')
-                    const relativePath = wpBasePath !== '/' && path.startsWith(wpBasePath) ? path.slice(wpBasePath.length) : path
-                    navigate(relativePath || '/')
+                    const knownBasePaths = ['/sabir/mu', wpBasePath].filter(Boolean)
+                    for (const bp of knownBasePaths) {
+                        if (bp !== '/' && path.startsWith(bp)) {
+                            path = path.slice(bp.length)
+                            break
+                        }
+                    }
+                    navigate(path || '/')
                 }
             } catch { }
         }
@@ -442,16 +451,23 @@ function Header() {
 
             const href = link.getAttribute('href')
             if (!href || href === '#') return
-            const wpHost = new URL(WP_CONFIG.SITE_URL).host
             try {
-                const url = new URL(href)
-                if (url.host === window.location.host || url.host === wpHost) {
+                const url = new URL(href, window.location.origin)
+                const wpHost = new URL(WP_CONFIG.SITE_URL).host
+                const isInternalHost = url.host === window.location.host || url.host === wpHost || url.host === 'localhost' || url.host === '127.0.0.1'
+                if (isInternalHost) {
                     e.preventDefault()
-                    const path = url.pathname
+                    let path = url.pathname
                     const wpBasePath = new URL(WP_CONFIG.SITE_URL).pathname.replace(/\/$/, '')
-                    const relativePath = wpBasePath !== '/' && path.startsWith(wpBasePath) ? path.slice(wpBasePath.length) : path
+                    const knownBasePaths = ['/sabir/mu', wpBasePath].filter(Boolean)
+                    for (const bp of knownBasePaths) {
+                        if (bp !== '/' && path.startsWith(bp)) {
+                            path = path.slice(bp.length)
+                            break
+                        }
+                    }
                     closeMobile()
-                    navigate(relativePath || '/')
+                    navigate(path || '/')
                 }
             } catch { }
         }
@@ -587,7 +603,7 @@ function Header() {
                                         {topMenuItems.length > 0 ? topMenuItems.map(item => (
                                             <a
                                                 key={item.id}
-                                                href={item.url || '#'}
+                                                href={cleanWordPressUrl(item.url) || '#'}
                                                 className="dropdown-item"
                                                 target={item.target || '_self'}
                                                 rel={item.target === '_blank' ? 'noopener noreferrer' : ''}
@@ -631,6 +647,21 @@ function Header() {
                                 </a>
                             </div>
                             <div className="action-buttons" style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+                                <a
+                                    href="http://archive.malayalamuniversity.edu.in"
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="btn-old-site-pill"
+                                    title={siteLanguage === 'ml' ? 'പഴയ വെബ്സൈറ്റ് സന്ദർശിക്കുക' : 'Visit Old Website'}
+                                >
+                                    <span className="old-site-pill-icon">🏛️</span>
+                                    <span className="old-site-pill-text">{siteLanguage === 'ml' ? 'പഴയ വെബ്സൈറ്റ്' : 'Old Website'}</span>
+                                    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                                        <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+                                        <polyline points="15 3 21 3 21 9"></polyline>
+                                        <line x1="10" y1="14" x2="21" y2="3"></line>
+                                    </svg>
+                                </a>
                                 <button className="search-btn-header" aria-label="Search" style={{ background: 'none', border: 'none', padding: '4px', cursor: 'pointer', display: 'flex', alignItems: 'center', color: 'var(--navy-900)' }} onClick={() => setIsSearchOpen(true)}>
                                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                                         <circle cx="11" cy="11" r="8"></circle>
@@ -706,7 +737,7 @@ function Header() {
                                         <ul className="mega-sub-menu">
                                             {topMenuItems.length > 0 ? topMenuItems.map(item => (
                                                 <li key={item.id} className="mega-menu-item">
-                                                    <a href={item.url || '#'} className="mega-menu-link">{item.title?.rendered || item.title}</a>
+                                                    <a href={cleanWordPressUrl(item.url) || '#'} className="mega-menu-link">{item.title?.rendered || item.title}</a>
                                                 </li>
                                             )) : (
                                                 <li className="mega-menu-item"><span className="mega-menu-link">{siteLanguage === 'ml' ? 'ലോഡ് ചെയ്യുന്നു...' : 'Loading...'}</span></li>
@@ -741,6 +772,18 @@ function Header() {
                                             ))}
                                         </ul>
                                     </li>
+                                    <li className="mega-menu-item mobile-old-site-item">
+                                        <a
+                                            href="http://archive.malayalamuniversity.edu.in"
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            className="mega-menu-link mobile-old-site-link"
+                                            onClick={closeMobile}
+                                        >
+                                            <span>🏛️ {siteLanguage === 'ml' ? 'പഴയ വെബ്സൈറ്റ് (Old Website)' : 'Visit Old Website'}</span>
+                                            <span className="mobile-old-site-arrow">↗</span>
+                                        </a>
+                                    </li>
                                 </ul>
                             </div>
                         </div>
@@ -759,7 +802,7 @@ function Header() {
                                     {notifications.map((item, index) => (
                                         <a
                                             key={`notif1-${index}`}
-                                            href={item.link || '#'}
+                                            href={cleanWordPressUrl(item.link) || '#'}
                                         >
                                             {item.title}
                                         </a>
@@ -768,7 +811,7 @@ function Header() {
                                     {notifications.map((item, index) => (
                                         <a
                                             key={`notif2-${index}`}
-                                            href={item.link || '#'}
+                                            href={cleanWordPressUrl(item.link) || '#'}
                                             aria-hidden="true"
                                         >
                                             {item.title}
@@ -804,6 +847,16 @@ function Header() {
                         </button>
                     </form>
                 </div>
+            </div>
+
+            {/* Vertical Beta Version Badge with small text */}
+            <div
+                className="vertical-beta-tab"
+                title={siteLanguage === 'ml' ? 'മലയാള സർവകലാശാല പുതിയ വെബ്സൈറ്റ് (ബീറ്റാ പതിപ്പ്)' : 'Malayalam University Website (Beta Version)'}
+                aria-label="Beta Version"
+            >
+                <span className="vertical-beta-dot" aria-hidden="true"></span>
+                <span className="vertical-beta-text">BETA VERSION</span>
             </div>
         </header>
     )

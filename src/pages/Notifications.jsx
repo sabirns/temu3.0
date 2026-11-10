@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useSearchParams, Link, useLocation } from 'react-router-dom'
-import { fetchNotificationCategories, fetchPosts, getLanguageContext, stripHtml } from '../services/wordpressApi'
+import { fetchNotificationCategories, fetchPosts, getLanguageContext, stripHtml, fixWordPressUrls, cleanWordPressUrl } from '../services/wordpressApi'
 import { WP_CONFIG } from '../config/wpConfig'
 
 function Notifications() {
@@ -33,9 +33,9 @@ function Notifications() {
       return {
         id: n.id,
         title: stripHtml(n.title?.rendered || ''),
-        content: n.content?.rendered || '',
-        excerpt: n.excerpt?.rendered || '',
-        link: n.link || '#',
+        content: fixWordPressUrls(n.content?.rendered || ''),
+        excerpt: fixWordPressUrls(n.excerpt?.rendered || ''),
+        link: cleanWordPressUrl(n.link || '#'),
         date: n.date,
         slug: n.slug || '',
         categories: n.notification_category || [],
@@ -55,7 +55,7 @@ function Notifications() {
         setRawCategories(catsData)
         setLatestNews(newsData)
 
-        const notifResponse = await fetch(`${WP_CONFIG.API_URL}/notifications?per_page=10&page=1&lang=${lang}&_embed&_t=${Date.now()}`)
+        const notifResponse = await fetch(`${WP_CONFIG.API_URL}/notifications?per_page=10&page=1&lang=${lang}&_embed`)
         const totalPagesFromHeaders = notifResponse.headers.get('X-WP-TotalPages')
         setTotalPages(totalPagesFromHeaders ? Number(totalPagesFromHeaders) : 1)
         setPage(1)
@@ -76,7 +76,7 @@ function Notifications() {
     setLoadingMore(true)
     try {
       const nextPage = page + 1
-      const res = await fetch(`${WP_CONFIG.API_URL}/notifications?per_page=10&page=${nextPage}&lang=${lang}&_embed&_t=${Date.now()}`)
+      const res = await fetch(`${WP_CONFIG.API_URL}/notifications?per_page=10&page=${nextPage}&lang=${lang}&_embed`)
       const data = res.ok ? await res.json() : []
       setNotifications(prev => [...prev, ...formatNotifications(data)])
       setPage(nextPage)
