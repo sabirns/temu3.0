@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useSearchParams, Link, useLocation } from 'react-router-dom'
-import { fetchNotificationCategories, fetchPosts, getLanguageContext, stripHtml, fixWordPressUrls, cleanWordPressUrl } from '../services/wordpressApi'
+import { fetchNotificationCategories, fetchPosts, getLanguageContext, stripHtml, fixWordPressUrls, cleanWordPressUrl, getNotificationPdf } from '../services/wordpressApi'
 import { WP_CONFIG } from '../config/wpConfig'
 
 function Notifications() {
@@ -40,7 +40,9 @@ function Notifications() {
         slug: n.slug || '',
         categories: n.notification_category || [],
         categoryName: primary?.name || null,
-        categorySlug: primary?.slug || null
+        categorySlug: primary?.slug || null,
+        pdf: n.pdf || getNotificationPdf(n),
+        acf: n.acf || {}
       }
     })
 
@@ -55,7 +57,7 @@ function Notifications() {
         setRawCategories(catsData)
         setLatestNews(newsData)
 
-        const notifResponse = await fetch(`${WP_CONFIG.API_URL}/notifications?per_page=10&page=1&lang=${lang}&_embed`)
+        const notifResponse = await fetch(`${WP_CONFIG.API_URL}/notifications?per_page=10&page=1&lang=${lang}&_embed&acf_format=standard`)
         const totalPagesFromHeaders = notifResponse.headers.get('X-WP-TotalPages')
         setTotalPages(totalPagesFromHeaders ? Number(totalPagesFromHeaders) : 1)
         setPage(1)
@@ -76,7 +78,7 @@ function Notifications() {
     setLoadingMore(true)
     try {
       const nextPage = page + 1
-      const res = await fetch(`${WP_CONFIG.API_URL}/notifications?per_page=10&page=${nextPage}&lang=${lang}&_embed`)
+      const res = await fetch(`${WP_CONFIG.API_URL}/notifications?per_page=10&page=${nextPage}&lang=${lang}&_embed&acf_format=standard`)
       const data = res.ok ? await res.json() : []
       setNotifications(prev => [...prev, ...formatNotifications(data)])
       setPage(nextPage)
@@ -211,13 +213,27 @@ function Notifications() {
                       // dangerouslySetInnerHTML={{ __html: item.excerpt || item.content }}
                       />
 
-                      <div className="archive-item-footer">
+                      <div className="archive-item-footer" style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', alignItems: 'center' }}>
                         <Link
                           to={lang === 'ml' ? `/notifications/${item.slug}` : `/${lang}/notifications/${item.slug}`}
                           className="btn primary btn-small"
                         >
                           {lang === 'ml' ? 'കൂടുതൽ വായിക്കുക →' : 'Read More →'}
                         </Link>
+                        {item.pdf && (
+                          <a
+                            href={item.pdf}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="btn outline btn-small"
+                            style={{ display: 'inline-flex', alignItems: 'center', gap: '5px' }}
+                          >
+                            <svg viewBox="0 0 24 24" width="14" height="14" fill="#ef4444">
+                              <path d="M14 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z" />
+                            </svg>
+                            {lang === 'ml' ? 'പി.ഡി.എഫ്' : 'PDF'}
+                          </a>
+                        )}
                       </div>
                     </article>
                   )

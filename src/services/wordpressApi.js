@@ -164,6 +164,7 @@ export async function fetchNotifications(params = {}) {
       per_page: 10,
       status: 'publish',
       _embed: true, // Embed terms and other related data
+      acf_format: 'standard',
       ...params
     }
 
@@ -201,7 +202,9 @@ export async function fetchNotifications(params = {}) {
         // Store both IDs and the primary category info for display
         categories: notification.notification_category || [],
         categoryName: primaryCategory?.name || null,
-        categorySlug: primaryCategory?.slug || null
+        categorySlug: primaryCategory?.slug || null,
+        pdf: getNotificationPdf(notification),
+        acf: notification.acf || {}
       }
     })
   } catch (error) {
@@ -771,27 +774,101 @@ export async function fetchSliders(params = {}) {
   }
 }
 
+export function getNotificationPdf(notification) {
+  if (!notification) return null
+
+  // 1. Check ACF fields (file, pdf, document, attachment, etc.)
+  const acf = notification.acf || {}
+  const rawFile = acf.file || acf.pdf || acf.document || acf.notification_file || acf.attachment || acf.upload_file
+  
+  if (typeof rawFile === 'string' && rawFile.trim() && !/^\d+$/.test(rawFile.trim())) {
+    return fixAssetUrl(rawFile.trim())
+  }
+  if (typeof rawFile === 'object' && rawFile !== null) {
+    if (rawFile.url) return fixAssetUrl(rawFile.url)
+    if (rawFile.source_url) return fixAssetUrl(rawFile.source_url)
+    if (rawFile.link) return fixAssetUrl(rawFile.link)
+    if (Array.isArray(rawFile) && rawFile.length > 0) {
+      const first = rawFile[0]
+      if (typeof first === 'string') return fixAssetUrl(first)
+      if (first?.url) return fixAssetUrl(first.url)
+    }
+  }
+
+  // 2. Check embedded attachments
+  const attachments = (notification._embedded?.['wp:attachment'] || []).flat()
+  const pdfAtt = attachments.find(att =>
+    att.mime_type === 'application/pdf' || att.source_url?.toLowerCase().endsWith('.pdf')
+  )
+  if (pdfAtt?.source_url) {
+    return fixAssetUrl(pdfAtt.source_url)
+  }
+
+  // 3. Fallback: Check if content has an embedded link to a PDF
+  const rawContent = notification.content?.rendered || notification.content || ''
+  if (typeof rawContent === 'string' && rawContent.length > 0) {
+    const match = rawContent.match(/href=["']([^"']*\.pdf[^"']*)["']/i)
+    if (match && match[1]) {
+      return fixAssetUrl(match[1])
+    }
+  }
+
+  return null
+}
+
 export async function fetchNotification(id, params = {}) {
   try {
+    const { lang: _ignoredLang, ...restParams } = params
     const defaultParams = {
       _embed: true,
-      lang: 'ml',
-      ...params
+      acf_format: 'standard',
+      ...restParams
     }
     const qs = new URLSearchParams(defaultParams)
 
+    let post = null
     if (/^\d+$/.test(id)) {
       try {
-        const notification = await fetchWithCache(`${WORDPRESS_API_URL}/notifications/${id}?${qs.toString()}`)
-        if (notification && notification.id) {
-          return formatNotification(notification)
-        }
+        const res = await fetchWithCache(`${WORDPRESS_API_URL}/notifications/${id}?${qs.toString()}`)
+        if (res && res.id) post = res
       } catch {}
     }
 
-    qs.set('slug', id)
-    const data = await fetchWithCache(`${WORDPRESS_API_URL}/notifications?${qs.toString()}`)
-    return Array.isArray(data) && data.length > 0 ? formatNotification(data[0]) : null
+    if (!post) {
+      qs.set('slug', id)
+      let data = await fetchWithCache(`${WORDPRESS_API_URL}/notifications?${qs.toString()}`)
+      if (Array.isArray(data) && data.length > 0) {
+        post = data[0]
+      } else {
+        // Try fallback with alternative decoded/encoded slug
+        try {
+          const altSlug = id.includes('%') ? decodeURIComponent(id) : encodeURIComponent(id)
+          if (altSlug !== id) {
+            qs.set('slug', altSlug)
+            data = await fetchWithCache(`${WORDPRESS_API_URL}/notifications?${qs.toString()}`)
+            if (Array.isArray(data) && data.length > 0) post = data[0]
+          }
+        } catch {}
+      }
+    }
+
+    if (!post) return null
+
+    let pdfUrl = getNotificationPdf(post)
+    const rawFile = post.acf?.file || post.acf?.pdf || post.acf?.document || post.acf?.attachment
+    if (!pdfUrl && rawFile && /^\d+$/.test(String(rawFile).trim())) {
+      try {
+        const mediaUrl = await fetchMedia(Number(rawFile))
+        if (mediaUrl) pdfUrl = fixAssetUrl(mediaUrl)
+      } catch {}
+    }
+
+    const formatted = formatNotification(post)
+    formatted.pdf = pdfUrl
+    formatted.acf = post.acf || {}
+    formatted._links = post._links
+    formatted.translations = post.translations
+    return formatted
   } catch (error) {
     console.error('Error fetching notification:', error)
     return null
@@ -812,14 +889,16 @@ function formatNotification(notification) {
     id: notification.id,
     title: stripHtml(notification.title?.rendered || ''),
     content: fixWordPressUrls(notification.content?.rendered || ''),
-    excerpt: notification.excerpt?.rendered || '',
-    link: notification.link || '#',
+    excerpt: fixWordPressUrls(notification.excerpt?.rendered || ''),
+    link: cleanWordPressUrl(notification.link || '#'),
     date: notification.date,
     slug: notification.slug || '',
     categories: notification.notification_category || [],
     categoryName: primaryCategory?.name || null,
     categorySlug: primaryCategory?.slug || null,
-    featuredImage: getFeaturedImage(notification)
+    featuredImage: getFeaturedImage(notification),
+    pdf: getNotificationPdf(notification),
+    acf: notification.acf || {}
   }
 }
 
