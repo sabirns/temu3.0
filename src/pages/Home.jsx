@@ -16,48 +16,33 @@ function Home() {
 	const [slides, setSlides] = useState([])
 	const [currentSlide, setCurrentSlide] = useState(0)
 	const [loadingSlides, setLoadingSlides] = useState(true)
-	const [newsIndex, setNewsIndex] = useState(0)
-	const [isPaused, setIsPaused] = useState(false)
 	const [isHeroPaused, setIsHeroPaused] = useState(false)
 	const [galleryItems, setGalleryItems] = useState([])
 	const [newsItems, setNewsItems] = useState([])
 	const [loadingNews, setLoadingNews] = useState(true)
 	const [homePageData, setHomePageData] = useState(null)
 	const [loadingHomePage, setLoadingHomePage] = useState(true)
-	const [cardsToShow, setCardsToShow] = useState(3)
 	const [topMenuItems, setTopMenuItems] = useState([])
 	const [portalTab, setPortalTab] = useState('all')
 	const [socialActivities, setSocialActivities] = useState([])
-
-	useEffect(() => {
-		const handleResize = () => {
-			if (window.innerWidth < 768) setCardsToShow(1)
-			else if (window.innerWidth < 1100) setCardsToShow(2)
-			else setCardsToShow(3)
-		}
-		handleResize()
-		window.addEventListener('resize', handleResize)
-		return () => window.removeEventListener('resize', handleResize)
-	}, [])
 
 	useEffect(() => {
 		const loadData = async () => {
 			setLoadingNews(true)
 			setLoadingHomePage(true)
 			setLoadingSlides(true)
-			setNewsIndex(0)
 			try {
 				const [slidesData, gallery, news, homePage, topMenu, activitiesData] = await Promise.all([
 					fetchSliders({ location: 'home-page', lang }),
 					fetchGallery({ lang, per_page: 8 }),
-					fetchPosts({ lang, per_page: 6 }),
+					fetchPosts({ lang, per_page: 4 }),
 					lang === 'ml' ? fetchPageBySlug('home-page-ml', { lang }) : fetchPage(465, { lang }),
 					fetchMenuByLocation('top_menu_1', lang),
 					fetchActivities({ activity_type: 1991, lang, per_page: 50 })
 				])
 				setSlides(slidesData || [])
 				setGalleryItems(gallery || [])
-				setNewsItems(news || [])
+				setNewsItems((news || []).slice(0, 4))
 				setTopMenuItems(topMenu || [])
 				setSocialActivities(activitiesData || [])
 
@@ -108,17 +93,6 @@ function Home() {
 		}, 5000)
 		return () => clearInterval(timer)
 	}, [slides.length, isHeroPaused])
-
-	useEffect(() => {
-		if (!isPaused && newsItems.length > cardsToShow) {
-			const timer = setInterval(() => {
-				setNewsIndex(prev => (prev + 1) % (newsItems.length - (cardsToShow - 1)))
-			}, 8000)
-			return () => clearInterval(timer)
-		} else {
-			setNewsIndex(0)
-		}
-	}, [isPaused, newsItems.length, cardsToShow])
 
 	useEffect(() => {
 		const revealElements = document.querySelectorAll('.reveal')
@@ -225,64 +199,67 @@ function Home() {
 			{/* News Section */}
 			<section className="news-slider-section" id="news" style={{ minHeight: '400px' }}>
 				<div className="container">
-					<div className="section-head reveal reveal-up">
+					<div className="section-head reveal reveal-up active">
 						<div>
 							<h2>{lang === 'ml' ? '📰 വാർത്തകൾ' : '📰 Latest News & Announcements'}</h2>
 							<p>{lang === 'ml' ? 'സർവകലാശാലയിലെ പുതിയ സംഭവവികാസങ്ങളും പരിഷ്‌കാരങ്ങളും.' : 'The latest developments and reforms in the university.'}</p>
 						</div>
 						<Link
 							to={lang === 'ml' ? '/news' : `/${lang}/news`}
-							className="btn primary"
+							className="btn primary news-header-btn"
 						>
 							{lang === 'ml' ? 'എല്ലാ വാർത്തകളും കാണുക →' : 'View All News →'}
 						</Link>
 					</div>
 
-					<div className="news-slider-container">
-						<div
-							className="news-slider-track"
-							id="newsSliderTrack"
-							style={{ transform: `translateX(-${newsIndex * (100 / cardsToShow)}%)` }}
-						>
-							{loadingNews ? (
-								<div className="loading-state" style={{ padding: '40px', textAlign: 'center', width: '100%' }}>
-									<div className="loading-spinner"></div>
-									<p>{lang === 'ml' ? 'വാർത്തകൾ ലോഡ് ചെയ്യുന്നു...' : 'Loading news...'}</p>
-								</div>
-							) : newsItems.length > 0 ? (
-								newsItems.map(news => (
-									<Link
-										key={news.id}
-										to={lang === 'ml' ? `/news/${news.slug}` : `/${lang}/news/${news.slug}`}
-										className="news-text-card-home"
-									>
-										<div className="news-content-home">
-											<div className="news-meta-home">
-												{news.category && (
-													<span className={`news-badge-mini ${news.categorySlug || 'default'}`}>
-														{news.category}
-													</span>
-												)}
-												<span className="news-date-home">
-													{new Date(news.date).toLocaleDateString(lang === 'ml' ? 'ml-IN' : 'en-US', { day: 'numeric', month: 'long', year: 'numeric' })}
+					<div className="home-news-grid">
+						{loadingNews ? (
+							<div className="loading-state" style={{ padding: '40px', textAlign: 'center', width: '100%', gridColumn: '1 / -1' }}>
+								<div className="loading-spinner"></div>
+								<p>{lang === 'ml' ? 'വാർത്തകൾ ലോഡ് ചെയ്യുന്നു...' : 'Loading news...'}</p>
+							</div>
+						) : newsItems.length > 0 ? (
+							newsItems.slice(0, 4).map(news => (
+								<Link
+									key={news.id}
+									to={lang === 'ml' ? `/news/${news.slug}` : `/${lang}/news/${news.slug}`}
+									className="news-text-card-home"
+								>
+									<div className="news-content-home">
+										<div className="news-meta-home">
+											{news.category && (
+												<span className={`news-badge-mini ${news.categorySlug || 'default'}`}>
+													{news.category}
 												</span>
-											</div>
-											<h3 className="news-title-home">{news.title}</h3>
-											<p className="news-excerpt-home" dangerouslySetInnerHTML={{ __html: news.excerpt }} />
-											<div className="news-footer-home">
-												<span className="read-more-text">
-													{lang === 'ml' ? 'കൂടുതൽ വായിക്കുക →' : 'Read More →'}
-												</span>
-											</div>
+											)}
+											<span className="news-date-home">
+												{new Date(news.date).toLocaleDateString(lang === 'ml' ? 'ml-IN' : 'en-US', { day: 'numeric', month: 'long', year: 'numeric' })}
+											</span>
 										</div>
-									</Link>
-								))
-							) : (
-								<div className="empty-state" style={{ padding: '40px', textAlign: 'center', width: '100%' }}>
-									<p>{lang === 'ml' ? 'വാർത്തകളൊന്നും കണ്ടെത്തിയില്ല.' : 'No news found.'}</p>
-								</div>
-							)}
-						</div>
+										<h3 className="news-title-home">{news.title}</h3>
+										<div className="news-excerpt-home" dangerouslySetInnerHTML={{ __html: news.excerpt }} />
+									</div>
+									<div className="news-footer-home">
+										<span className="read-more-text">
+											{lang === 'ml' ? 'കൂടുതൽ വായിക്കുക →' : 'Read More →'}
+										</span>
+									</div>
+								</Link>
+							))
+						) : (
+							<div className="empty-state" style={{ padding: '40px', textAlign: 'center', width: '100%', gridColumn: '1 / -1' }}>
+								<p>{lang === 'ml' ? 'വാർത്തകളൊന്നും കണ്ടെത്തിയില്ല.' : 'No news found.'}</p>
+							</div>
+						)}
+					</div>
+
+					<div className="home-news-bottom-action">
+						<Link
+							to={lang === 'ml' ? '/news' : `/${lang}/news`}
+							className="btn primary"
+						>
+							{lang === 'ml' ? 'എല്ലാ വാർത്തകളും കാണുക →' : 'View All News →'}
+						</Link>
 					</div>
 				</div>
 			</section>
