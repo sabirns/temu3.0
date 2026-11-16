@@ -408,7 +408,7 @@ function Home() {
 									}
 								</p>
 							</div>
-							<div className="story-image" style={{ backgroundImage: "url('images/campus.jpg')", backgroundSize: 'cover' }}>
+							<div className="story-image" style={{ backgroundImage: "url('/images/campus.jpg')", backgroundSize: 'cover' }}>
 							</div>
 						</div>
 					</div>

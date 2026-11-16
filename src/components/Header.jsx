@@ -78,7 +78,11 @@ function Header() {
     const megaMenuContainerRef = useRef(null)
     const mobilePanelRef = useRef(null)
 
-    const [contactInfo, setContactInfo] = useState({ phone: '+91 494 2740000', email: 'info@malayalamuniversity.edu.in' })
+    const [contactInfo, setContactInfo] = useState({ 
+        phones: ['+91 494 2740000'], 
+        phone: '+91 494 2740000', 
+        email: 'info@malayalamuniversity.edu.in' 
+    })
 
     useEffect(() => {
         async function fetchContactInfo() {
@@ -86,6 +90,7 @@ function Header() {
                 const slug = siteLanguage === 'ml' ? 'contact-us-ml' : 'contact-us'
                 const page = await fetchPageBySlug(slug, { lang: siteLanguage })
                 if (page && page.acf) {
+                    let phones = ['+91 494 2740000']
                     let phone = '+91 494 2740000'
                     let email = 'info@malayalamuniversity.edu.in'
                     for (const [key, value] of Object.entries(page.acf)) {
@@ -93,14 +98,18 @@ function Header() {
                         const k = key.toLowerCase()
                         if (typeof value === 'string') {
                             if (k.includes('phone') || k.includes('mobile') || k.includes('tel')) {
-                                phone = value.split(',')[0].trim()
+                                const parsedPhones = value.split(/[,;]/).map(p => p.trim()).filter(Boolean)
+                                if (parsedPhones.length > 0) {
+                                    phones = parsedPhones
+                                    phone = value
+                                }
                             }
                             if (k.includes('email') || k.includes('mail')) {
                                 email = value.split(',')[0].trim()
                             }
                         }
                     }
-                    setContactInfo({ phone, email })
+                    setContactInfo({ phones, phone, email })
                 }
             } catch (e) {
                 console.error("Failed to fetch contact info:", e)
@@ -413,8 +422,28 @@ function Header() {
                 closeMobile()
             }
         }
+        const handleKeyDown = (e) => {
+            if (e.key === 'Escape') {
+                closeMobile()
+            }
+        }
         document.addEventListener('mousedown', handleClickOutside)
-        return () => document.removeEventListener('mousedown', handleClickOutside)
+        document.addEventListener('keydown', handleKeyDown)
+        return () => {
+            document.removeEventListener('mousedown', handleClickOutside)
+            document.removeEventListener('keydown', handleKeyDown)
+        }
+    }, [mobileOpen])
+
+    useEffect(() => {
+        if (!mobileOpen) return
+        const handleResize = () => {
+            if (window.innerWidth > 980) {
+                closeMobile()
+            }
+        }
+        window.addEventListener('resize', handleResize)
+        return () => window.removeEventListener('resize', handleResize)
     }, [mobileOpen])
 
     useEffect(() => {
@@ -430,7 +459,7 @@ function Header() {
     }, [mobileOpen, megaMenuHtml])
 
     useEffect(() => {
-        const el = document.querySelector('.mobile-panel')
+        const el = mobilePanelRef.current || document.querySelector('.mobile-panel')
         if (!el) return
         const handler = (e) => {
             const link = e.target.closest('a')
@@ -639,11 +668,27 @@ function Header() {
                             </div>
 
                             <div className="header-contact-inline">
-                                <a href={`tel:${contactInfo.phone.replace(/[^0-9+]/g, '')}`} className="contact-link-inline">
-                                    <img src="/images/phone.png" alt="Phone" className="icon" style={{ width: '16px', height: '16px', objectFit: 'contain' }} /> {contactInfo.phone}
-                                </a>
+                                {contactInfo.phones && contactInfo.phones.length > 1 ? (
+                                    <div className="contact-link-inline">
+                                        <img src="/images/phone.png" alt="Phone" className="icon" style={{ width: '16px', height: '16px', objectFit: 'contain', flexShrink: 0 }} />
+                                        <span className="contact-phone-numbers">
+                                            {contactInfo.phones.map((p, idx) => (
+                                                <span key={idx}>
+                                                    {idx > 0 && <span className="contact-sep">, </span>}
+                                                    <a href={`tel:${p.replace(/[^0-9+]/g, '')}`} className="contact-phone-link">
+                                                        {p}
+                                                    </a>
+                                                </span>
+                                            ))}
+                                        </span>
+                                    </div>
+                                ) : (
+                                    <a href={`tel:${(contactInfo.phones?.[0] || contactInfo.phone).replace(/[^0-9+]/g, '')}`} className="contact-link-inline">
+                                        <img src="/images/phone.png" alt="Phone" className="icon" style={{ width: '16px', height: '16px', objectFit: 'contain', flexShrink: 0 }} /> {contactInfo.phones?.[0] || contactInfo.phone}
+                                    </a>
+                                )}
                                 <a href={`mailto:${contactInfo.email}`} className="contact-link-inline">
-                                    <img src="/images/mail.png" alt="Email" className="icon" style={{ width: '16px', height: '16px', objectFit: 'contain' }} /> {contactInfo.email}
+                                    <img src="/images/mail.png" alt="Email" className="icon" style={{ width: '16px', height: '16px', objectFit: 'contain', flexShrink: 0 }} /> {contactInfo.email}
                                 </a>
                             </div>
                             <div className="action-buttons" style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
@@ -708,87 +753,98 @@ function Header() {
                     </div>
                 </div>
 
-                {mobileOpen && (
-                    <div className="mobile-sheet open" onClick={closeMobile}>
-                        <div className="mobile-panel" ref={mobilePanelRef} onClick={e => e.stopPropagation()}>
-                            <div className="mobile-head">
-                                <button className="mobile-toggle active" onClick={closeMobile} aria-label="Close menu" style={{ marginLeft: 0 }}>
-                                    <span className="bar"></span>
-                                    <span className="bar"></span>
-                                    <span className="bar"></span>
-                                </button>
-                            </div>
-
-                            <div className="mobile-menu-wrapper">
-                                {megaMenuHtml && (
-                                    <div
-                                        key={`mobile-${menuKey}`}
-                                        className={`mega-menu-container-mobile lang-${siteLanguage}`}
-                                        dangerouslySetInnerHTML={{ __html: megaMenuHtml.replace(/id="mega-menu-[^"]+"/g, 'id="mega-menu-mobile"') }}
+                <div
+                    className={`mobile-sheet ${mobileOpen ? 'open' : ''}`}
+                    onClick={closeMobile}
+                    aria-hidden={!mobileOpen}
+                >
+                    <div className="mobile-panel" ref={mobilePanelRef} onClick={e => e.stopPropagation()}>
+                        <div className="mobile-head">
+                            <div className="mobile-head-brand">
+                                <Link to={`/${siteLanguage}/home`} onClick={closeMobile}>
+                                    <img
+                                        src={siteLanguage === 'en' ? '/images/malayalam-university-logo-en.png' : '/images/malayalam-university-logo.png'}
+                                        alt="Malayalam University Logo"
+                                        style={{ height: '34px', width: 'auto', objectFit: 'contain', display: 'block' }}
                                     />
-                                )}
-                                
-                                <ul className="mobile-nav-list" id="mobile-custom-menus">
-                                    <li className="mega-menu-item mega-menu-item-has-children">
-                                        <a href="#" className="mega-menu-link">
-                                            {siteLanguage === 'ml' ? 'സൗകര്യങ്ങൾ' : 'Facilities'}
-                                            <span className="mega-indicator"></span>
-                                        </a>
-                                        <ul className="mega-sub-menu">
-                                            {topMenuItems.length > 0 ? topMenuItems.map(item => (
-                                                <li key={item.id} className="mega-menu-item">
-                                                    <a href={cleanWordPressUrl(item.url) || '#'} className="mega-menu-link">{item.title?.rendered || item.title}</a>
-                                                </li>
-                                            )) : (
-                                                <li className="mega-menu-item"><span className="mega-menu-link">{siteLanguage === 'ml' ? 'ലോഡ് ചെയ്യുന്നു...' : 'Loading...'}</span></li>
-                                            )}
-                                        </ul>
-                                    </li>
-
-                                    <li className="mega-menu-item mega-menu-item-has-children">
-                                        <a href="#" className="mega-menu-link">
-                                            {siteLanguage === 'ml' ? 'വിദ്യാർത്ഥി പിന്തുണ' : 'Student Support'}
-                                            <span className="mega-indicator"></span>
-                                        </a>
-                                        <ul className="mega-sub-menu">
-                                            {[
-                                                { en: 'Scholarship', ml: 'സ്കോളർഷിപ്പ്', slug: 'scholarship' },
-                                                { en: 'NSS', ml: 'എൻഎസ്എസ്', slug: 'nss' },
-                                                { en: 'PTA', ml: 'പിടിഎ', slug: 'pta' },
-                                                { en: 'Student Union', ml: 'വിദ്യാർത്ഥി യൂണിയൻ', slug: 'student-union' },
-                                                { en: 'Student Zone', ml: 'സ്റ്റുഡന്റ് സോൺ', slug: 'student-zone' },
-                                                { en: 'Internship', ml: 'ഇന്റേൺഷിപ്പ്', slug: 'internship' },
-                                                { en: 'Field Trips', ml: 'ഫീൽഡ് ട്രിപ്പുകൾ', slug: 'field-trips' },
-                                                { en: 'Placement', ml: 'പ്ലേസ്മെന്റ്', slug: 'placement-cell' },
-                                                { en: 'Career Guidance', ml: 'കരിയർ ഗൈഡൻസ്', slug: 'career-guidance' },
-                                                { en: 'Civil Services Academy', ml: 'സിവിൽ സർവീസസ് അക്കാദമി', slug: 'civil-services-academy' },
-                                                { en: 'Grievance & Redressal', ml: 'പരാതി പരിഹാര സെൽ', slug: 'grievance-redressal-cell' }
-                                            ].map((item, i) => (
-                                                <li key={i} className="mega-menu-item">
-                                                    <Link to={`/${siteLanguage}/${item.slug}`} className="mega-menu-link" onClick={closeMobile}>
-                                                        {siteLanguage === 'ml' ? item.ml : item.en}
-                                                    </Link>
-                                                </li>
-                                            ))}
-                                        </ul>
-                                    </li>
-                                    <li className="mega-menu-item mobile-old-site-item">
-                                        <a
-                                            href="http://archive.malayalamuniversity.edu.in"
-                                            target="_blank"
-                                            rel="noopener noreferrer"
-                                            className="mega-menu-link mobile-old-site-link"
-                                            onClick={closeMobile}
-                                        >
-                                            <span>🏛️ {siteLanguage === 'ml' ? 'പഴയ വെബ്സൈറ്റ് (Old Website)' : 'Visit Old Website'}</span>
-                                            <span className="mobile-old-site-arrow">↗</span>
-                                        </a>
-                                    </li>
-                                </ul>
+                                </Link>
                             </div>
+                            <button className="mobile-toggle active" onClick={closeMobile} aria-label="Close menu">
+                                <span className="bar"></span>
+                                <span className="bar"></span>
+                                <span className="bar"></span>
+                            </button>
+                        </div>
+
+                        <div className="mobile-menu-wrapper">
+                            {megaMenuHtml && (
+                                <div
+                                    key={`mobile-${menuKey}`}
+                                    className={`mega-menu-container-mobile lang-${siteLanguage}`}
+                                    dangerouslySetInnerHTML={{ __html: megaMenuHtml.replace(/id="mega-menu-[^"]+"/g, 'id="mega-menu-mobile"') }}
+                                />
+                            )}
+                            
+                            <ul className="mobile-nav-list" id="mobile-custom-menus">
+                                <li className="mega-menu-item mega-menu-item-has-children">
+                                    <a href="#" className="mega-menu-link">
+                                        {siteLanguage === 'ml' ? 'സൗകര്യങ്ങൾ' : 'Facilities'}
+                                        <span className="mega-indicator"></span>
+                                    </a>
+                                    <ul className="mega-sub-menu">
+                                        {topMenuItems.length > 0 ? topMenuItems.map(item => (
+                                            <li key={item.id} className="mega-menu-item">
+                                                <a href={cleanWordPressUrl(item.url) || '#'} className="mega-menu-link">{item.title?.rendered || item.title}</a>
+                                            </li>
+                                        )) : (
+                                            <li className="mega-menu-item"><span className="mega-menu-link">{siteLanguage === 'ml' ? 'ലോഡ് ചെയ്യുന്നു...' : 'Loading...'}</span></li>
+                                        )}
+                                    </ul>
+                                </li>
+
+                                <li className="mega-menu-item mega-menu-item-has-children">
+                                    <a href="#" className="mega-menu-link">
+                                        {siteLanguage === 'ml' ? 'വിദ്യാർത്ഥി പിന്തുണ' : 'Student Support'}
+                                        <span className="mega-indicator"></span>
+                                    </a>
+                                    <ul className="mega-sub-menu">
+                                        {[
+                                            { en: 'Scholarship', ml: 'സ്കോളർഷിപ്പ്', slug: 'scholarship' },
+                                            { en: 'NSS', ml: 'എൻഎസ്എസ്', slug: 'nss' },
+                                            { en: 'PTA', ml: 'പിടിഎ', slug: 'pta' },
+                                            { en: 'Student Union', ml: 'വിദ്യാർത്ഥി യൂണിയൻ', slug: 'student-union' },
+                                            { en: 'Student Zone', ml: 'സ്റ്റുഡന്റ് സോൺ', slug: 'student-zone' },
+                                            { en: 'Internship', ml: 'ഇന്റേൺഷിപ്പ്', slug: 'internship' },
+                                            { en: 'Field Trips', ml: 'ഫീൽഡ് ട്രിപ്പുകൾ', slug: 'field-trips' },
+                                            { en: 'Placement', ml: 'പ്ലേസ്മെന്റ്', slug: 'placement-cell' },
+                                            { en: 'Career Guidance', ml: 'കരിയർ ഗൈഡൻസ്', slug: 'career-guidance' },
+                                            { en: 'Civil Services Academy', ml: 'സിവിൽ സർവീസസ് അക്കാദമി', slug: 'civil-services-academy' },
+                                            { en: 'Grievance & Redressal', ml: 'പരാതി പരിഹാര സെൽ', slug: 'grievance-redressal-cell' }
+                                        ].map((item, i) => (
+                                            <li key={i} className="mega-menu-item">
+                                                <Link to={`/${siteLanguage}/${item.slug}`} className="mega-menu-link" onClick={closeMobile}>
+                                                    {siteLanguage === 'ml' ? item.ml : item.en}
+                                                </Link>
+                                            </li>
+                                        ))}
+                                    </ul>
+                                </li>
+                                <li className="mega-menu-item mobile-old-site-item">
+                                    <a
+                                        href="http://archive.malayalamuniversity.edu.in"
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="mega-menu-link mobile-old-site-link"
+                                        onClick={closeMobile}
+                                    >
+                                        <span>🏛️ {siteLanguage === 'ml' ? 'പഴയ വെബ്സൈറ്റ് (Old Website)' : 'Visit Old Website'}</span>
+                                        <span className="mobile-old-site-arrow">↗</span>
+                                    </a>
+                                </li>
+                            </ul>
                         </div>
                     </div>
-                )}
+                </div>
 
 
                 <div className="news-ticker-area" ref={tickerRef}>
@@ -824,7 +880,12 @@ function Header() {
                 </div>
             </div>
             {/* Search Modal */}
-            <div className={`search-modal-overlay ${isSearchOpen ? 'open' : ''}`}>
+            <div 
+                className={`search-modal-overlay ${isSearchOpen ? 'open' : ''}`}
+                onClick={(e) => {
+                    if (e.target === e.currentTarget) setIsSearchOpen(false)
+                }}
+            >
                 <button className="search-modal-close" onClick={() => setIsSearchOpen(false)} aria-label="Close search">
                     &times;
                 </button>

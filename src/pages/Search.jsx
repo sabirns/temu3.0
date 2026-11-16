@@ -48,8 +48,8 @@ function Search() {
 
             <section className="search-results-section" style={{ padding: '60px 0', minHeight: '50vh' }}>
                 <div className="container">
-                    <div style={{ marginBottom: '40px' }}>
-                        <h2>
+                    <div style={{ marginBottom: '40px', wordBreak: 'break-word', overflowWrap: 'break-word' }}>
+                        <h2 style={{ wordBreak: 'break-word', overflowWrap: 'break-word' }}>
                             {lang === 'ml' 
                                 ? `"${query}" നായുള്ള തിരയൽ ഫലങ്ങൾ` 
                                 : `Search results for "${query}"`}
